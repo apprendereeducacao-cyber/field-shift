@@ -56,6 +56,20 @@ const FEATURES = [
     cta: "Ver as coberturas",
   },
   {
+    title: "Vegetacao por satelite (NDVI)",
+    description:
+      "25 anos de indice de vegetacao MODIS — sazonalidade, tendencia e o que o verde revela sobre sua lavoura.",
+    href: "/vegetacao",
+    cta: "Ver o NDVI",
+  },
+  {
+    title: "Uso do solo — 39 anos",
+    description:
+      "Como a terra mudou de 1985 a 2023. MapBiomas mostra a explosao da soja e o que sumiu no caminho.",
+    href: "/uso-do-solo",
+    cta: "Ver a transformacao",
+  },
+  {
     title: "Como e o clima aqui",
     description:
       "Riscos mes a mes: seca, calor, chuvarada e geada. Baseado em 44 anos de satelite da NASA.",
@@ -94,6 +108,18 @@ const DATA_SOURCES = [
     name: "Estacao do tempo local",
     description:
       "Estacao meteorologica automatica de Cruz Alta, medindo desde 2007.",
+  },
+  {
+    label: "MODIS",
+    name: "Vegetacao por satelite (NDVI)",
+    description:
+      "Indice de vegetacao MODIS a cada 16 dias, 250m de resolucao, desde 2000. Via Google Earth Engine.",
+  },
+  {
+    label: "MAP",
+    name: "MapBiomas",
+    description:
+      "Uso e cobertura do solo mapeados com Landsat (30m) de 1985 a 2023. Projeto INPE + universidades.",
   },
 ];
 

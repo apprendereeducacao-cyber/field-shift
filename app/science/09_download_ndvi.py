@@ -19,7 +19,7 @@ from datetime import datetime
 
 warnings.filterwarnings("ignore")
 
-PROJECT = "field-shift-ndvi"
+PROJECT = "apprendere-educacao"
 LAT, LON = -28.6033, -53.6733
 START_DATE = "2000-02-18"  # MODIS MOD13Q1 starts here
 END_DATE = "2025-12-31"

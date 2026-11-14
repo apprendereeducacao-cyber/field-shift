@@ -6,6 +6,8 @@ import timelineData from "../../data/timeline.json";
 import topoData from "../../data/topography.json";
 import coverCropsData from "../../data/cover_crops.json";
 import soilMoistureData from "../../data/soil_moisture.json";
+import ndviData from "../../data/ndvi.json";
+import mapbiomasData from "../../data/mapbiomas.json";
 
 export type MonthRisk = {
   dry_spell: number;
@@ -269,6 +271,73 @@ export type SoilMoistureData = {
 };
 
 export const soilMoisture = soilMoistureData as SoilMoistureData;
+
+export type NdviMonthly = {
+  month: number;
+  name: string;
+  avg_ndvi: number;
+  avg_evi: number;
+  n_obs: number;
+};
+
+export type NdviAnnual = {
+  year: number;
+  avg_ndvi: number;
+  n_obs: number;
+  growing_season_ndvi?: number;
+};
+
+export type NdviData = {
+  source: string;
+  resolution: string;
+  location: { name: string; state: string; lat: number; lon: number };
+  period: string;
+  summary: {
+    overall_mean: number;
+    overall_min: number;
+    overall_max: number;
+    growing_season_mean: number | null;
+    n_total_records: number;
+    n_good_quality: number;
+    years_covered: string;
+  };
+  monthly_averages: NdviMonthly[];
+  annual_averages: NdviAnnual[];
+};
+
+export const ndvi = ndviData as NdviData;
+
+export type MapBiomasGroupEntry = {
+  year: number;
+  area_ha: number;
+};
+
+export type MapBiomasState = {
+  area_ha: number;
+  pct: number;
+};
+
+export type MapBiomasTransition = {
+  from_ha: number;
+  to_ha: number;
+  change_pct: number;
+  from_year: number;
+  to_year: number;
+};
+
+export type MapBiomasData = {
+  source: string;
+  resolution: string;
+  location: { name: string; state: string; lat: number; lon: number };
+  buffer_radius_m: number;
+  period: string;
+  total_area_ha: number;
+  current_state: Record<string, MapBiomasState>;
+  transitions: Record<string, MapBiomasTransition>;
+  group_timeseries: Record<string, MapBiomasGroupEntry[]>;
+};
+
+export const mapbiomas = mapbiomasData as MapBiomasData;
 
 export const MONTH_NAMES = [
   "Jan",

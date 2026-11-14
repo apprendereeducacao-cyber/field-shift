@@ -38,7 +38,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             Field Shift — NASA Space Apps Challenge 2026 — Cruz Alta-RS, Brasil
           </p>
           <p className="mt-1">
-            Dados: NASA POWER, IBGE SIDRA, SoilGrids (ISRIC), INMET
+            Dados: NASA POWER, IBGE SIDRA, SoilGrids (ISRIC), INMET, MODIS/GEE, MapBiomas, Embrapa
           </p>
         </footer>
       </body>

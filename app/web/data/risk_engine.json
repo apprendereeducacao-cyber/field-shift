@@ -1,0 +1,895 @@
+{
+  "meta": {
+    "source": "Motor de risco Field Shift — baseado em 44 anos de dados NASA POWER + IBGE",
+    "methodology": "Regressão linear com detrending tecnológico. Pesos derivados da correlação de Pearson entre variáveis climáticas e produtividade corrigida.",
+    "generated": "2026-11-14"
+  },
+  "model": {
+    "trend": {
+      "slope_sc_ha_year": 0.62,
+      "slope_kg_ha_year": 37.2,
+      "interpretation": "A cada ano, a tecnologia adiciona 0,6 sacas/ha. Mas o clima pode tirar isso e mais."
+    },
+    "correlations": {
+      "season_rain_vs_yield": {
+        "r": 0.629,
+        "weight": 0.36,
+        "direction": "positiva",
+        "meaning": "Mais chuva dez-fev = melhor safra"
+      },
+      "hot_days_vs_yield": {
+        "r": -0.65,
+        "weight": 0.372,
+        "direction": "negativa",
+        "meaning": "Mais calor acima de 32°C = pior safra"
+      },
+      "soil_moisture_vs_yield": {
+        "r": 0.47,
+        "weight": 0.269,
+        "direction": "positiva",
+        "meaning": "Solo mais úmido = melhor safra"
+      }
+    },
+    "equation": "Risco = 36% × falta_de_chuva + 37% × calor_extremo + 27% × solo_seco"
+  },
+  "risk_thresholds": {
+    "season_rain_mm": {
+      "alto": {
+        "max": 500
+      },
+      "medio": {
+        "min": 500,
+        "max": 700
+      },
+      "baixo": {
+        "min": 700
+      }
+    },
+    "hot_days": {
+      "alto": {
+        "min": 40
+      },
+      "medio": {
+        "min": 25,
+        "max": 40
+      },
+      "baixo": {
+        "max": 25
+      }
+    },
+    "soil_moisture": {
+      "alto": {
+        "max": 0.72
+      },
+      "medio": {
+        "min": 0.72,
+        "max": 0.8
+      },
+      "baixo": {
+        "min": 0.8
+      }
+    }
+  },
+  "historical_averages": {
+    "season_rain_mm": 715,
+    "hot_days": 32.3,
+    "avg_soil_moisture": 0.794,
+    "yield_sc_ha": 36.4
+  },
+  "enso_impact": {
+    "el_nino": {
+      "n": 19,
+      "avg_yield_sc_ha": 39.1,
+      "avg_season_rain_mm": 830
+    },
+    "la_nina": {
+      "n": 16,
+      "avg_yield_sc_ha": 36.9,
+      "avg_season_rain_mm": 623
+    },
+    "neutro": {
+      "n": 9,
+      "avg_yield_sc_ha": 29.4,
+      "avg_season_rain_mm": 639
+    }
+  },
+  "scenario_frequencies": {
+    "safra_boa": {
+      "count": 13,
+      "pct": 29.5,
+      "avg_season_rain_mm": 819,
+      "avg_hot_days": 24.5,
+      "avg_moisture": 0.805,
+      "enso_distribution": {
+        "el_nino": 6,
+        "la_nina": 5,
+        "neutro": 2
+      }
+    },
+    "safra_normal": {
+      "count": 18,
+      "pct": 40.9,
+      "avg_season_rain_mm": 727,
+      "avg_hot_days": 30.3,
+      "avg_moisture": 0.797,
+      "enso_distribution": {
+        "el_nino": 10,
+        "la_nina": 5,
+        "neutro": 3
+      }
+    },
+    "safra_ruim": {
+      "count": 13,
+      "pct": 29.5,
+      "avg_season_rain_mm": 595,
+      "avg_hot_days": 42.8,
+      "avg_moisture": 0.779,
+      "enso_distribution": {
+        "el_nino": 3,
+        "la_nina": 6,
+        "neutro": 4
+      }
+    }
+  },
+  "year_classifications": [
+    {
+      "year": 1982,
+      "yield_sc_ha": 21.1,
+      "class": "safra_ruim",
+      "season_rain_mm": 591,
+      "hot_days": 25,
+      "avg_soil_moisture": 0.76,
+      "enso": "neutro"
+    },
+    {
+      "year": 1983,
+      "yield_sc_ha": 28.4,
+      "class": "safra_ruim",
+      "season_rain_mm": 1107,
+      "hot_days": 8,
+      "avg_soil_moisture": 0.885,
+      "enso": "el_nino"
+    },
+    {
+      "year": 1984,
+      "yield_sc_ha": 27,
+      "class": "safra_ruim",
+      "season_rain_mm": 726,
+      "hot_days": 11,
+      "avg_soil_moisture": 0.874,
+      "enso": "la_nina"
+    },
+    {
+      "year": 1985,
+      "yield_sc_ha": 29.7,
+      "class": "safra_ruim",
+      "season_rain_mm": 768,
+      "hot_days": 51,
+      "avg_soil_moisture": 0.805,
+      "enso": "la_nina"
+    },
+    {
+      "year": 1986,
+      "yield_sc_ha": 16.7,
+      "class": "safra_ruim",
+      "season_rain_mm": 543,
+      "hot_days": 50,
+      "avg_soil_moisture": 0.794,
+      "enso": "neutro"
+    },
+    {
+      "year": 1987,
+      "yield_sc_ha": 30,
+      "class": "safra_normal",
+      "season_rain_mm": 922,
+      "hot_days": 15,
+      "avg_soil_moisture": 0.849,
+      "enso": "el_nino"
+    },
+    {
+      "year": 1988,
+      "yield_sc_ha": 18,
+      "class": "safra_ruim",
+      "season_rain_mm": 572,
+      "hot_days": 59,
+      "avg_soil_moisture": 0.73,
+      "enso": "el_nino"
+    },
+    {
+      "year": 1989,
+      "yield_sc_ha": 30,
+      "class": "safra_normal",
+      "season_rain_mm": 676,
+      "hot_days": 31,
+      "avg_soil_moisture": 0.736,
+      "enso": "la_nina"
+    },
+    {
+      "year": 1990,
+      "yield_sc_ha": 34,
+      "class": "safra_normal",
+      "season_rain_mm": 676,
+      "hot_days": 22,
+      "avg_soil_moisture": 0.834,
+      "enso": "el_nino"
+    },
+    {
+      "year": 1991,
+      "yield_sc_ha": 12,
+      "class": "safra_ruim",
+      "season_rain_mm": 559,
+      "hot_days": 59,
+      "avg_soil_moisture": 0.714,
+      "enso": "neutro"
+    },
+    {
+      "year": 1992,
+      "yield_sc_ha": 34,
+      "class": "safra_normal",
+      "season_rain_mm": 774,
+      "hot_days": 28,
+      "avg_soil_moisture": 0.826,
+      "enso": "el_nino"
+    },
+    {
+      "year": 1993,
+      "yield_sc_ha": 36.8,
+      "class": "safra_normal",
+      "season_rain_mm": 803,
+      "hot_days": 8,
+      "avg_soil_moisture": 0.831,
+      "enso": "el_nino"
+    },
+    {
+      "year": 1994,
+      "yield_sc_ha": 30,
+      "class": "safra_normal",
+      "season_rain_mm": 1010,
+      "hot_days": 18,
+      "avg_soil_moisture": 0.853,
+      "enso": "neutro"
+    },
+    {
+      "year": 1995,
+      "yield_sc_ha": 34,
+      "class": "safra_normal",
+      "season_rain_mm": 728,
+      "hot_days": 29,
+      "avg_soil_moisture": 0.759,
+      "enso": "el_nino"
+    },
+    {
+      "year": 1996,
+      "yield_sc_ha": 30.5,
+      "class": "safra_normal",
+      "season_rain_mm": 763,
+      "hot_days": 20,
+      "avg_soil_moisture": 0.786,
+      "enso": "la_nina"
+    },
+    {
+      "year": 1997,
+      "yield_sc_ha": 25,
+      "class": "safra_ruim",
+      "season_rain_mm": 581,
+      "hot_days": 18,
+      "avg_soil_moisture": 0.77,
+      "enso": "neutro"
+    },
+    {
+      "year": 1998,
+      "yield_sc_ha": 37,
+      "class": "safra_normal",
+      "season_rain_mm": 1303,
+      "hot_days": 10,
+      "avg_soil_moisture": 0.922,
+      "enso": "el_nino"
+    },
+    {
+      "year": 1999,
+      "yield_sc_ha": 27,
+      "class": "safra_ruim",
+      "season_rain_mm": 498,
+      "hot_days": 40,
+      "avg_soil_moisture": 0.773,
+      "enso": "la_nina"
+    },
+    {
+      "year": 2000,
+      "yield_sc_ha": 26,
+      "class": "safra_ruim",
+      "season_rain_mm": 626,
+      "hot_days": 33,
+      "avg_soil_moisture": 0.784,
+      "enso": "la_nina"
+    },
+    {
+      "year": 2001,
+      "yield_sc_ha": 45,
+      "class": "safra_boa",
+      "season_rain_mm": 913,
+      "hot_days": 11,
+      "avg_soil_moisture": 0.883,
+      "enso": "la_nina"
+    },
+    {
+      "year": 2002,
+      "yield_sc_ha": 38.3,
+      "class": "safra_normal",
+      "season_rain_mm": 645,
+      "hot_days": 14,
+      "avg_soil_moisture": 0.855,
+      "enso": "neutro"
+    },
+    {
+      "year": 2003,
+      "yield_sc_ha": 53,
+      "class": "safra_boa",
+      "season_rain_mm": 1037,
+      "hot_days": 4,
+      "avg_soil_moisture": 0.86,
+      "enso": "el_nino"
+    },
+    {
+      "year": 2004,
+      "yield_sc_ha": 33,
+      "class": "safra_normal",
+      "season_rain_mm": 743,
+      "hot_days": 15,
+      "avg_soil_moisture": 0.759,
+      "enso": "el_nino"
+    },
+    {
+      "year": 2005,
+      "yield_sc_ha": 13,
+      "class": "safra_ruim",
+      "season_rain_mm": 403,
+      "hot_days": 62,
+      "avg_soil_moisture": 0.784,
+      "enso": "el_nino"
+    },
+    {
+      "year": 2006,
+      "yield_sc_ha": 38,
+      "class": "safra_normal",
+      "season_rain_mm": 550,
+      "hot_days": 34,
+      "avg_soil_moisture": 0.733,
+      "enso": "el_nino"
+    },
+    {
+      "year": 2007,
+      "yield_sc_ha": 41.7,
+      "class": "safra_boa",
+      "season_rain_mm": 795,
+      "hot_days": 29,
+      "avg_soil_moisture": 0.78,
+      "enso": "el_nino"
+    },
+    {
+      "year": 2008,
+      "yield_sc_ha": 35,
+      "class": "safra_normal",
+      "season_rain_mm": 493,
+      "hot_days": 34,
+      "avg_soil_moisture": 0.757,
+      "enso": "la_nina"
+    },
+    {
+      "year": 2009,
+      "yield_sc_ha": 37,
+      "class": "safra_normal",
+      "season_rain_mm": 475,
+      "hot_days": 33,
+      "avg_soil_moisture": 0.776,
+      "enso": "la_nina"
+    },
+    {
+      "year": 2010,
+      "yield_sc_ha": 40,
+      "class": "safra_normal",
+      "season_rain_mm": 1284,
+      "hot_days": 11,
+      "avg_soil_moisture": 0.873,
+      "enso": "el_nino"
+    },
+    {
+      "year": 2011,
+      "yield_sc_ha": 50,
+      "class": "safra_boa",
+      "season_rain_mm": 841,
+      "hot_days": 16,
+      "avg_soil_moisture": 0.833,
+      "enso": "la_nina"
+    },
+    {
+      "year": 2012,
+      "yield_sc_ha": 16,
+      "class": "safra_ruim",
+      "season_rain_mm": 319,
+      "hot_days": 75,
+      "avg_soil_moisture": 0.687,
+      "enso": "la_nina"
+    },
+    {
+      "year": 2013,
+      "yield_sc_ha": 45.3,
+      "class": "safra_boa",
+      "season_rain_mm": 671,
+      "hot_days": 36,
+      "avg_soil_moisture": 0.729,
+      "enso": "neutro"
+    },
+    {
+      "year": 2014,
+      "yield_sc_ha": 40.9,
+      "class": "safra_boa",
+      "season_rain_mm": 681,
+      "hot_days": 34,
+      "avg_soil_moisture": 0.81,
+      "enso": "neutro"
+    },
+    {
+      "year": 2015,
+      "yield_sc_ha": 52.5,
+      "class": "safra_boa",
+      "season_rain_mm": 659,
+      "hot_days": 3,
+      "avg_soil_moisture": 0.819,
+      "enso": "el_nino"
+    },
+    {
+      "year": 2016,
+      "yield_sc_ha": 58.6,
+      "class": "safra_boa",
+      "season_rain_mm": 1132,
+      "hot_days": 10,
+      "avg_soil_moisture": 0.844,
+      "enso": "el_nino"
+    },
+    {
+      "year": 2017,
+      "yield_sc_ha": 59.5,
+      "class": "safra_boa",
+      "season_rain_mm": 816,
+      "hot_days": 11,
+      "avg_soil_moisture": 0.832,
+      "enso": "la_nina"
+    },
+    {
+      "year": 2018,
+      "yield_sc_ha": 58.5,
+      "class": "safra_boa",
+      "season_rain_mm": 817,
+      "hot_days": 19,
+      "avg_soil_moisture": 0.755,
+      "enso": "la_nina"
+    },
+    {
+      "year": 2019,
+      "yield_sc_ha": 60.6,
+      "class": "safra_boa",
+      "season_rain_mm": 782,
+      "hot_days": 48,
+      "avg_soil_moisture": 0.767,
+      "enso": "el_nino"
+    },
+    {
+      "year": 2020,
+      "yield_sc_ha": 35.7,
+      "class": "safra_normal",
+      "season_rain_mm": 466,
+      "hot_days": 82,
+      "avg_soil_moisture": 0.699,
+      "enso": "neutro"
+    },
+    {
+      "year": 2021,
+      "yield_sc_ha": 65.3,
+      "class": "safra_boa",
+      "season_rain_mm": 476,
+      "hot_days": 65,
+      "avg_soil_moisture": 0.702,
+      "enso": "la_nina"
+    },
+    {
+      "year": 2022,
+      "yield_sc_ha": 22.3,
+      "class": "safra_ruim",
+      "season_rain_mm": 443,
+      "hot_days": 66,
+      "avg_soil_moisture": 0.767,
+      "enso": "la_nina"
+    },
+    {
+      "year": 2023,
+      "yield_sc_ha": 32.4,
+      "class": "safra_normal",
+      "season_rain_mm": 310,
+      "hot_days": 76,
+      "avg_soil_moisture": 0.743,
+      "enso": "la_nina"
+    },
+    {
+      "year": 2024,
+      "yield_sc_ha": 61.2,
+      "class": "safra_boa",
+      "season_rain_mm": 1021,
+      "hot_days": 32,
+      "avg_soil_moisture": 0.855,
+      "enso": "el_nino"
+    },
+    {
+      "year": 2025,
+      "yield_sc_ha": 39.8,
+      "class": "safra_normal",
+      "season_rain_mm": 473,
+      "hot_days": 66,
+      "avg_soil_moisture": 0.75,
+      "enso": "el_nino"
+    }
+  ],
+  "year_risks": [
+    {
+      "year": 1982,
+      "risk_score": 54.7,
+      "yield_sc_ha": 21.1,
+      "class": "safra_ruim"
+    },
+    {
+      "year": 1983,
+      "risk_score": 14.5,
+      "yield_sc_ha": 28.4,
+      "class": "safra_ruim"
+    },
+    {
+      "year": 1984,
+      "risk_score": 30.8,
+      "yield_sc_ha": 27,
+      "class": "safra_ruim"
+    },
+    {
+      "year": 1985,
+      "risk_score": 55.1,
+      "yield_sc_ha": 29.7,
+      "class": "safra_ruim"
+    },
+    {
+      "year": 1986,
+      "risk_score": 64,
+      "yield_sc_ha": 16.7,
+      "class": "safra_ruim"
+    },
+    {
+      "year": 1987,
+      "risk_score": 28.3,
+      "yield_sc_ha": 30,
+      "class": "safra_normal"
+    },
+    {
+      "year": 1988,
+      "risk_score": 74.2,
+      "yield_sc_ha": 18,
+      "class": "safra_ruim"
+    },
+    {
+      "year": 1989,
+      "risk_score": 57.1,
+      "yield_sc_ha": 30,
+      "class": "safra_normal"
+    },
+    {
+      "year": 1990,
+      "risk_score": 42,
+      "yield_sc_ha": 34,
+      "class": "safra_normal"
+    },
+    {
+      "year": 1991,
+      "risk_score": 76.5,
+      "yield_sc_ha": 12,
+      "class": "safra_ruim"
+    },
+    {
+      "year": 1992,
+      "risk_score": 42.1,
+      "yield_sc_ha": 34,
+      "class": "safra_normal"
+    },
+    {
+      "year": 1993,
+      "risk_score": 31.5,
+      "yield_sc_ha": 36.8,
+      "class": "safra_normal"
+    },
+    {
+      "year": 1994,
+      "risk_score": 26.1,
+      "yield_sc_ha": 30,
+      "class": "safra_normal"
+    },
+    {
+      "year": 1995,
+      "risk_score": 51.7,
+      "yield_sc_ha": 34,
+      "class": "safra_normal"
+    },
+    {
+      "year": 1996,
+      "risk_score": 43.4,
+      "yield_sc_ha": 30.5,
+      "class": "safra_normal"
+    },
+    {
+      "year": 1997,
+      "risk_score": 50.8,
+      "yield_sc_ha": 25,
+      "class": "safra_ruim"
+    },
+    {
+      "year": 1998,
+      "risk_score": 4.5,
+      "yield_sc_ha": 37,
+      "class": "safra_normal"
+    },
+    {
+      "year": 1999,
+      "risk_score": 63.4,
+      "yield_sc_ha": 27,
+      "class": "safra_ruim"
+    },
+    {
+      "year": 2000,
+      "risk_score": 54.4,
+      "yield_sc_ha": 26,
+      "class": "safra_ruim"
+    },
+    {
+      "year": 2001,
+      "risk_score": 23,
+      "yield_sc_ha": 45,
+      "class": "safra_boa"
+    },
+    {
+      "year": 2002,
+      "risk_score": 37.2,
+      "yield_sc_ha": 38.3,
+      "class": "safra_normal"
+    },
+    {
+      "year": 2003,
+      "risk_score": 18,
+      "yield_sc_ha": 53,
+      "class": "safra_boa"
+    },
+    {
+      "year": 2004,
+      "risk_score": 44.9,
+      "yield_sc_ha": 33,
+      "class": "safra_normal"
+    },
+    {
+      "year": 2005,
+      "risk_score": 75.6,
+      "yield_sc_ha": 13,
+      "class": "safra_ruim"
+    },
+    {
+      "year": 2006,
+      "risk_score": 63.3,
+      "yield_sc_ha": 38,
+      "class": "safra_normal"
+    },
+    {
+      "year": 2007,
+      "risk_score": 47,
+      "yield_sc_ha": 41.7,
+      "class": "safra_boa"
+    },
+    {
+      "year": 2008,
+      "risk_score": 62.7,
+      "yield_sc_ha": 35,
+      "class": "safra_normal"
+    },
+    {
+      "year": 2009,
+      "risk_score": 60.8,
+      "yield_sc_ha": 37,
+      "class": "safra_normal"
+    },
+    {
+      "year": 2010,
+      "risk_score": 10.8,
+      "yield_sc_ha": 40,
+      "class": "safra_normal"
+    },
+    {
+      "year": 2011,
+      "risk_score": 33.5,
+      "yield_sc_ha": 50,
+      "class": "safra_boa"
+    },
+    {
+      "year": 2012,
+      "risk_score": 95.4,
+      "yield_sc_ha": 16,
+      "class": "safra_ruim"
+    },
+    {
+      "year": 2013,
+      "risk_score": 60.3,
+      "yield_sc_ha": 45.3,
+      "class": "safra_boa"
+    },
+    {
+      "year": 2014,
+      "risk_score": 50,
+      "yield_sc_ha": 40.9,
+      "class": "safra_boa"
+    },
+    {
+      "year": 2015,
+      "risk_score": 35.7,
+      "yield_sc_ha": 52.5,
+      "class": "safra_boa"
+    },
+    {
+      "year": 2016,
+      "risk_score": 19.1,
+      "yield_sc_ha": 58.6,
+      "class": "safra_boa"
+    },
+    {
+      "year": 2017,
+      "risk_score": 32.2,
+      "yield_sc_ha": 59.5,
+      "class": "safra_boa"
+    },
+    {
+      "year": 2018,
+      "risk_score": 44.5,
+      "yield_sc_ha": 58.5,
+      "class": "safra_boa"
+    },
+    {
+      "year": 2019,
+      "risk_score": 57.5,
+      "yield_sc_ha": 60.6,
+      "class": "safra_boa"
+    },
+    {
+      "year": 2020,
+      "risk_score": 91.9,
+      "yield_sc_ha": 35.7,
+      "class": "safra_normal"
+    },
+    {
+      "year": 2021,
+      "risk_score": 83.5,
+      "yield_sc_ha": 65.3,
+      "class": "safra_boa"
+    },
+    {
+      "year": 2022,
+      "risk_score": 77.9,
+      "yield_sc_ha": 22.3,
+      "class": "safra_ruim"
+    },
+    {
+      "year": 2023,
+      "risk_score": 89.9,
+      "yield_sc_ha": 32.4,
+      "class": "safra_normal"
+    },
+    {
+      "year": 2024,
+      "risk_score": 31.8,
+      "yield_sc_ha": 61.2,
+      "class": "safra_boa"
+    },
+    {
+      "year": 2025,
+      "risk_score": 78.7,
+      "yield_sc_ha": 39.8,
+      "class": "safra_normal"
+    }
+  ],
+  "current_scenario": {
+    "year": 2025,
+    "season_rain_mm": 473,
+    "hot_days": 66,
+    "avg_soil_moisture": 0.75,
+    "enso": "el_nino",
+    "enso_detail": "el_nino_fraco",
+    "risk_score": 78.7,
+    "similar_years": {
+      "count": 8,
+      "bad_outcomes": 5,
+      "bad_rate": 0.63,
+      "years": [
+        {
+          "year": 1986,
+          "yield_sc_ha": 16.7,
+          "class": "safra_ruim",
+          "risk_score": 64
+        },
+        {
+          "year": 1988,
+          "yield_sc_ha": 18,
+          "class": "safra_ruim",
+          "risk_score": 74.2
+        },
+        {
+          "year": 1991,
+          "yield_sc_ha": 12,
+          "class": "safra_ruim",
+          "risk_score": 76.5
+        },
+        {
+          "year": 2005,
+          "yield_sc_ha": 13,
+          "class": "safra_ruim",
+          "risk_score": 75.6
+        },
+        {
+          "year": 2020,
+          "yield_sc_ha": 35.7,
+          "class": "safra_normal",
+          "risk_score": 91.9
+        },
+        {
+          "year": 2021,
+          "yield_sc_ha": 65.3,
+          "class": "safra_boa",
+          "risk_score": 83.5
+        },
+        {
+          "year": 2022,
+          "yield_sc_ha": 22.3,
+          "class": "safra_ruim",
+          "risk_score": 77.9
+        },
+        {
+          "year": 2023,
+          "yield_sc_ha": 32.4,
+          "class": "safra_normal",
+          "risk_score": 89.9
+        }
+      ]
+    }
+  },
+  "strategy_adjustments": {
+    "description": "Ajustes de pontuação por nível de risco. Risco alto favorece retenção de umidade; risco baixo favorece geração de renda.",
+    "high_risk": {
+      "baseline": -15,
+      "conservative": 20,
+      "adaptive": 10,
+      "reasoning": {
+        "baseline": "Solo nu perde umidade — pior cenário em ano seco",
+        "conservative": "Palha da aveia retém umidade; ervilhaca fixa N sem custo",
+        "adaptive": "Trigo gera renda de inverno que amortece o prejuízo"
+      }
+    },
+    "medium_risk": {
+      "baseline": -5,
+      "conservative": 10,
+      "adaptive": 15,
+      "reasoning": {
+        "baseline": "Ainda perde oportunidade de melhorar o solo",
+        "conservative": "Boa proteção com custo moderado",
+        "adaptive": "Melhor equilíbrio entre renda e proteção"
+      }
+    },
+    "low_risk": {
+      "baseline": 0,
+      "conservative": 5,
+      "adaptive": 20,
+      "reasoning": {
+        "baseline": "Risco baixo, mas solo continua degradando",
+        "conservative": "Sempre vale cobrir, mas há espaço para renda",
+        "adaptive": "Trigo rende bem + nabo melhora o solo para o próximo ano"
+      }
+    }
+  }
+}

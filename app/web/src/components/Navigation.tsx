@@ -5,18 +5,11 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const NAV_ITEMS = [
-  { href: "/", label: "Inicio" },
-  { href: "/diagnostico", label: "Clima" },
-  { href: "/timeline", label: "Historico" },
+  { href: "/", label: "Início" },
+  { href: "/painel", label: "Painel" },
   { href: "/produtor", label: "Sua Lavoura" },
-  { href: "/recomendacao", label: "Recomendacao" },
-  { href: "/solo", label: "Solo" },
-  { href: "/rotacoes", label: "Rotacoes" },
-  { href: "/coberturas", label: "Coberturas" },
-  { href: "/mapa-ndvi", label: "Mapa NDVI" },
-  { href: "/vegetacao", label: "NDVI" },
-  { href: "/uso-do-solo", label: "Uso do Solo" },
-  { href: "/evidencia", label: "Evidencia" },
+  { href: "/dados", label: "Dados" },
+  { href: "/mapa", label: "Mapa" },
   { href: "/sobre", label: "Sobre" },
 ];
 

@@ -11,11 +11,11 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Field Shift | Cruz Alta-RS",
   description:
-    "Ferramenta de decisao para rotacao de culturas usando 44 anos de dados da NASA. NASA Space Apps Challenge 2026.",
+    "Ferramenta de decisão para rotação de culturas usando 44 anos de dados da NASA. NASA Space Apps Challenge 2026.",
   openGraph: {
     title: "Field Shift | Cruz Alta-RS",
     description:
-      "Ferramenta de decisao para rotacao de culturas usando 44 anos de dados da NASA. NASA Space Apps Challenge 2026.",
+      "Ferramenta de decisão para rotação de culturas usando 44 anos de dados da NASA. NASA Space Apps Challenge 2026.",
     siteName: "Field Shift",
     locale: "pt_BR",
     type: "website",

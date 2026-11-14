@@ -5,7 +5,7 @@ const STATS = [
   {
     value: "44 safras",
     label: "de clima analisadas",
-    detail: "Dados de satelite da NASA, de 1981 ate 2025",
+    detail: "Dados de satélite da NASA, de 1981 até 2025",
   },
   {
     value: "7 em 10",
@@ -13,107 +13,79 @@ const STATS = [
     detail: "Quando choveu bem entre dezembro e fevereiro, a soja rendeu mais",
   },
   {
-    value: "3 opcoes",
+    value: "3 opções",
     label: "de manejo comparadas",
-    detail: "Do pousio atual ate sistemas com renda no inverno",
+    detail: "Do pousio atual até sistemas com renda no inverno",
   },
 ];
 
 const FEATURES = [
   {
-    title: "Recomendacao personalizada",
+    title: "Painel de Decisão",
     description:
-      "Conte o que plantou nos ultimos 2 anos e receba uma recomendacao de inverno baseada no seu historico, no clima e no solo da regiao.",
+      "Motor de risco com 44 anos de dados. Veja o cenário atual, o risco calculado, quais anos foram parecidos e qual manejo tem mais chance de dar certo.",
+    href: "/painel",
+    cta: "Ver o painel",
+  },
+  {
+    title: "Sua Lavoura",
+    description:
+      "Conte o que plantou nos últimos 2 anos e receba uma recomendação de inverno baseada no seu histórico, no clima e no solo da região.",
     href: "/produtor",
-    cta: "Comecar agora",
+    cta: "Receber recomendação",
   },
   {
-    title: "44 anos de historico climatico",
+    title: "Dados Científicos",
     description:
-      "Temperatura, chuva, produtividade, umidade do solo e El Nino/La Nina — tudo em graficos interativos, ano a ano.",
-    href: "/timeline",
-    cta: "Ver historico",
+      "44 anos de clima, solo, NDVI, uso do solo e produtividade — tudo reunido em abas interativas com dados de satélite.",
+    href: "/dados",
+    cta: "Explorar os dados",
   },
   {
-    title: "Solo, terreno e fertilidade",
+    title: "Mapa de Cruz Alta",
     description:
-      "Tipo de solo, acidez, materia organica, topografia da regiao e o que fazer pra melhorar a fertilidade.",
-    href: "/solo",
-    cta: "Ver o solo",
+      "Relevo, temperatura, vegetação e uso do solo em camadas interativas sobre o mapa da região.",
+    href: "/mapa",
+    cta: "Ver o mapa",
   },
   {
-    title: "Comparar opcoes de manejo",
+    title: "A Ciência por Trás",
     description:
-      "Tres estrategias lado a lado: pousio, aveia+ervilhaca, ou trigo+nabo. Com numeros reais e evidencia de satelite.",
-    href: "/rotacoes",
-    cta: "Comparar opcoes",
-  },
-  {
-    title: "Culturas de cobertura",
-    description:
-      "9 opcoes de inverno com materia seca, funcao no solo, epoca de semeadura e fontes cientificas. Dados da Embrapa e pesquisa.",
-    href: "/coberturas",
-    cta: "Ver as coberturas",
-  },
-  {
-    title: "Vegetacao por satelite (NDVI)",
-    description:
-      "25 anos de indice de vegetacao MODIS — sazonalidade, tendencia e o que o verde revela sobre sua lavoura.",
-    href: "/vegetacao",
-    cta: "Ver o NDVI",
-  },
-  {
-    title: "Uso do solo — 39 anos",
-    description:
-      "Como a terra mudou de 1985 a 2023. MapBiomas mostra a explosao da soja e o que sumiu no caminho.",
-    href: "/uso-do-solo",
-    cta: "Ver a transformacao",
-  },
-  {
-    title: "Como e o clima aqui",
-    description:
-      "Riscos mes a mes: seca, calor, chuvarada e geada. Baseado em 44 anos de satelite da NASA.",
-    href: "/diagnostico",
-    cta: "Ver o clima",
-  },
-  {
-    title: "De onde vem cada conclusao",
-    description:
-      "A metodologia cientifica por tras de cada numero. Validacao satelite vs estacao local, correlacoes, fontes de dados.",
-    href: "/evidencia",
-    cta: "Ver as provas",
+      "Metodologia, fontes de dados, validação satélite vs estação local, equipe e estratégias de manejo comparadas.",
+    href: "/sobre",
+    cta: "Ver a metodologia",
   },
 ];
 
 const DATA_SOURCES = [
   {
     label: "NASA",
-    name: "Satelite da NASA",
-    description: "Chuva e temperatura medidas do espaco, todo dia, por 44 anos.",
+    name: "Satélite da NASA",
+    description: "Chuva e temperatura medidas do espaço, todo dia, por 44 anos.",
   },
   {
     label: "IBGE",
-    name: "Producao agricola (IBGE)",
+    name: "Produção agrícola (IBGE)",
     description:
       "Quanto de soja Cruz Alta produziu por hectare, ano a ano, desde 1974.",
   },
   {
     label: "SOLO",
-    name: "Analise do solo",
+    name: "Análise do solo",
     description:
-      "Tipo de terra, acidez, materia organica e capacidade de guardar agua.",
+      "Tipo de terra, acidez, matéria orgânica e capacidade de guardar água.",
   },
   {
     label: "INMET",
-    name: "Estacao do tempo local",
+    name: "Estação do tempo local",
     description:
-      "Estacao meteorologica automatica de Cruz Alta, medindo desde 2007.",
+      "Estação meteorológica automática de Cruz Alta, medindo desde 2007.",
   },
   {
     label: "MODIS",
-    name: "Vegetacao por satelite (NDVI)",
+    name: "Vegetação por satélite (NDVI)",
     description:
-      "Indice de vegetacao MODIS a cada 16 dias, 250m de resolucao, desde 2000. Via Google Earth Engine.",
+      "Índice de vegetação MODIS a cada 16 dias, 250m de resolução, desde 2000. Via Google Earth Engine.",
   },
   {
     label: "MAP",
@@ -149,13 +121,13 @@ export default function Home() {
               href="/produtor"
               className="rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-light"
             >
-              Receber recomendacao pra minha lavoura
+              Receber recomendação pra minha lavoura
             </Link>
             <Link
-              href="/timeline"
+              href="/dados"
               className="rounded-lg border border-border bg-bg-surface px-6 py-3 text-sm font-semibold text-text-secondary transition-colors hover:bg-bg-surface-alt hover:text-text-primary"
             >
-              Ver 44 anos de historico
+              Explorar os dados
             </Link>
           </div>
         </div>
@@ -183,7 +155,7 @@ export default function Home() {
       <section className="px-4 py-16">
         <div className="mx-auto max-w-5xl">
           <h2 className="text-center text-2xl font-bold text-text-primary">
-            O que voce vai encontrar aqui
+            O que você vai encontrar aqui
           </h2>
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map((f) => (
@@ -217,7 +189,7 @@ export default function Home() {
               </p>
               <p className="mt-1 text-xs text-text-muted">
                 A soja rende mais hoje por causa de sementes melhores e manejo.
-                Mas o clima ta piorando.
+                Mas o clima tá piorando.
               </p>
             </div>
             <div>
@@ -225,7 +197,7 @@ export default function Home() {
                 +{KEY_FINDINGS.hot_days_increase_pct}% de calor
               </p>
               <p className="mt-1 text-xs text-text-muted">
-                Mais dias acima de 32 graus do que 20 anos atras. A soja sofre
+                Mais dias acima de 32 graus do que 20 anos atrás. A soja sofre
                 com esse calor.
               </p>
             </div>
@@ -234,8 +206,8 @@ export default function Home() {
                 {KEY_FINDINGS.bare_soil_months} meses parado
               </p>
               <p className="mt-1 text-xs text-text-muted">
-                E o tempo que o solo fica sem nada plantado no sistema
-                soja-pousio. Terra nua e terra perdendo valor.
+                É o tempo que o solo fica sem nada plantado no sistema
+                soja-pousio. Terra nua é terra perdendo valor.
               </p>
             </div>
           </div>
@@ -245,10 +217,10 @@ export default function Home() {
       <section className="border-t border-border bg-bg-surface px-4 py-16">
         <div className="mx-auto max-w-5xl">
           <h2 className="text-center text-2xl font-bold text-text-primary">
-            De onde vem os dados
+            De onde vêm os dados
           </h2>
           <p className="mt-2 text-center text-sm text-text-muted">
-            Tudo o que mostramos aqui vem de fontes publicas e verificaveis
+            Tudo o que mostramos aqui vem de fontes públicas e verificáveis
           </p>
           <div className="mt-10 grid gap-4 sm:grid-cols-2">
             {DATA_SOURCES.map((source) => (
@@ -281,7 +253,7 @@ export default function Home() {
             </p>
             <p className="mt-2 text-sm text-text-muted">
               Field Shift: Adapting Farms with NASA Data. Uma ferramenta para
-              ajudar o agricultor a tomar decisoes usando dados de satelite.
+              ajudar o agricultor a tomar decisões usando dados de satélite.
             </p>
           </div>
         </div>

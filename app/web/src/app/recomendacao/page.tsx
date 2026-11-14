@@ -59,9 +59,9 @@ const YIELD_LABELS: Record<string, string> = {
 const PROBLEM_LABELS: Record<string, string> = {
   seca: "Seca",
   geada: "Geada",
-  praga: "Pragas/doencas",
+  praga: "Pragas/doenças",
   solo_compactado: "Solo compactado",
-  erosao: "Erosao",
+  erosão: "Erosão",
   nenhum: "Nenhum problema grave",
 };
 
@@ -136,31 +136,31 @@ function scoreStrategies(
       if (allPousio) {
         contextBonus += 10;
         reasons.push(
-          "O senhor deixou a terra parada nos dois invernos — a aveia+ervilhaca e a forma mais simples de comecar a cobrir o solo"
+          "O senhor deixou a terra parada nos dois invernos — a aveia+ervilhaca é a forma mais simples de começar a cobrir o solo"
         );
       }
       if (hadDrought) {
         contextBonus += 10;
         reasons.push(
-          `Seca foi problema na sua lavoura. A palha da aveia segura umidade no solo — em anos secos a diferenca aparece no enchimento do grao`
+          `Seca foi problema na sua lavoura. A palha da aveia segura umidade no solo — em anos secos a diferença aparece no enchimento do grão`
         );
       }
       if (producer.has_cattle) {
         contextBonus += 10;
         reasons.push(
-          "Com gado na propriedade, a aveia vira forragem de inverno alem de cobertura"
+          "Com gado na propriedade, a aveia vira forragem de inverno além de cobertura"
         );
       }
       if (!producer.used_green_manure) {
         contextBonus += 5;
         reasons.push(
-          "Nunca usou adubo verde — a aveia+ervilhaca e o manejo mais simples pra comecar"
+          "Nunca usou adubo verde — a aveia+ervilhaca é o manejo mais simples pra começar"
         );
       }
       if (hadCompaction) {
         contextBonus += 5;
         reasons.push(
-          "Tem problema de compactacao — a aveia ajuda na camada superficial, mas o nabo (estrategia 3) faz mais efeito em profundidade"
+          "Tem problema de compactação — a aveia ajuda na camada superficial, mas o nabo (estratégia 3) faz mais efeito em profundidade"
         );
       }
     }
@@ -169,13 +169,13 @@ function scoreStrategies(
       if (hadCompaction) {
         contextBonus += 15;
         reasons.push(
-          `Solo compactado: a raiz do nabo forrageiro penetra ate 2 metros e quebra camadas duras sem gastar com subsolador (economia de R$200-400/ha)`
+          `Solo compactado: a raiz do nabo forrageiro penetra até 2 metros e quebra camadas duras sem gastar com subsolador (economia de R$200-400/ha)`
         );
       }
       if (hadBadYield && hadDrought) {
         contextBonus += 10;
         reasons.push(
-          "Produtividade ruim por seca — o trigo gera renda de inverno e amortece o prejuizo. Nabo melhora a retencao de agua pro proximo verao"
+          "Produtividade ruim por seca — o trigo gera renda de inverno e amortece o prejuízo. Nabo melhora a retenção de água pro próximo verão"
         );
       }
       if (producer.has_cattle) {
@@ -187,13 +187,13 @@ function scoreStrategies(
       if (!producer.used_green_manure) {
         contextBonus -= 5;
         reasons.push(
-          "Nunca usou adubo verde — trigo+nabo exige mais manejo. Pode ser melhor comecar com aveia+ervilhaca (estrategia 2) e migrar depois"
+          "Nunca usou adubo verde — trigo+nabo exige mais manejo. Pode ser melhor começar com aveia+ervilhaca (estratégia 2) e migrar depois"
         );
       }
       if (allPousio) {
         contextBonus += 5;
         reasons.push(
-          "Terra parada no inverno ha 2 anos — qualquer cobertura ja melhora, e o trigo ainda gera renda"
+          "Terra parada no inverno ha 2 anos — qualquer cobertura já melhora, é o trigo ainda gera renda"
         );
       }
     }
@@ -202,7 +202,7 @@ function scoreStrategies(
       if (allPousio && hadBadYield) {
         contextBonus -= 10;
         reasons.push(
-          "Deixar parado mais um inverno depois de safra ruim agrava a situacao do solo"
+          "Deixar parado mais um inverno depois de safra ruim agrava a situação do solo"
         );
       }
       if (hadDrought) {
@@ -212,7 +212,7 @@ function scoreStrategies(
         );
       }
       if (!allPousio) {
-        reasons.push("Voltar pro pousio depois de ter usado cobertura e um retrocesso");
+        reasons.push("Voltar pro pousio depois de ter usado cobertura é um retrocesso");
       }
     }
 
@@ -221,25 +221,25 @@ function scoreStrategies(
       if (climate.moistureTrend < -2) {
         climateBonus += 5;
         reasons.push(
-          `O satelite mostra que a umidade do solo caiu ${Math.abs(climate.moistureTrend).toFixed(1)}% nos ultimos anos — cobertura de inverno ajuda a segurar agua`
+          `O satélite mostra que a umidade do solo caiu ${Math.abs(climate.moistureTrend).toFixed(1)}% nos últimos anos — cobertura de inverno ajuda a segurar água`
         );
       }
       if (climate.avgHotDays5 > climate.avgHotDaysAll * 1.1) {
         climateBonus += 5;
         reasons.push(
-          `Media de ${climate.avgHotDays5.toFixed(0)} dias acima de 32 graus nos ultimos 5 anos (media historica: ${climate.avgHotDaysAll.toFixed(0)}) — solo coberto resiste melhor ao calor`
+          `Média de ${climate.avgHotDays5.toFixed(0)} dias acima de 32 graus nos últimos 5 anos (média histórica: ${climate.avgHotDaysAll.toFixed(0)}) — solo coberto resiste melhor ao calor`
         );
       }
       if (climate.hadRecentLaNina) {
         climateBonus += 5;
         reasons.push(
-          `Houve La Nina recente (menos chuva na safra: ${timeline.enso_impact.la_nina.avg_season_rain_mm} mm contra ${timeline.enso_impact.el_nino.avg_season_rain_mm} mm no El Nino). Cada gota retida conta`
+          `Houve La Niña recente (menos chuva na safra: ${timeline.enso_impact.la_nina.avg_season_rain_mm} mm contra ${timeline.enso_impact.el_nino.avg_season_rain_mm} mm no El Niño). Cada gota retida conta`
         );
       }
       if (climate.recentBadYields.length >= 2) {
         climateBonus += 5;
         reasons.push(
-          `${climate.recentBadYields.length} safras abaixo de 35 sc/ha nos ultimos 5 anos — sinal de que o clima esta testando a lavoura`
+          `${climate.recentBadYields.length} safras abaixo de 35 sc/ha nos últimos 5 anos — sinal de que o clima está testando a lavoura`
         );
       }
     }
@@ -256,14 +256,14 @@ function scoreStrategies(
 }
 
 const CALENDAR = [
-  { month: "Abril", action: "Plantar a cultura de inverno (aveia, ervilhaca, trigo ou nabo conforme a estrategia escolhida)", color: "#2D6A4F" },
-  { month: "Maio", action: "Cultura de inverno em desenvolvimento. Trigo: aplicar N se necessario", color: "#2D6A4F" },
+  { month: "Abril", action: "Plantar a cultura de inverno (aveia, ervilhaca, trigo ou nabo conforme a estratégia escolhida)", color: "#2D6A4F" },
+  { month: "Maio", action: "Cultura de inverno em desenvolvimento. Trigo: aplicar N se necessário", color: "#2D6A4F" },
   { month: "Junho", action: "Inverno pleno. Geada em 76% dos anos — aveia e nabo aguentam bem", color: "#1E88E5" },
   { month: "Julho", action: "Pico de geada (80% dos anos). Cultura de inverno protegendo o solo", color: "#1E88E5" },
-  { month: "Agosto", action: "Fim do inverno. Trigo: acompanhar florada. Aveia: avaliar ponto de dessecacao", color: "#42A5F5" },
+  { month: "Agosto", action: "Fim do inverno. Trigo: acompanhar florada. Aveia: avaliar ponto de dessecação", color: "#42A5F5" },
   { month: "Setembro", action: "Dessecar cobertura de inverno (aveia/ervilhaca). Trigo: colheita comecando", color: "#FF8F00" },
   { month: "Outubro", action: "Plantio da soja sobre a palha. Solo coberto, umido, com N da ervilhaca", color: "#E65100" },
-  { month: "Novembro", action: "Soja em desenvolvimento. Solo com palha retendo umidade do periodo critico", color: "#E65100" },
+  { month: "Novembro", action: "Soja em desenvolvimento. Solo com palha retendo umidade do período critico", color: "#E65100" },
 ];
 
 function HistorySummary({ producer }: { producer: ProducerData }) {
@@ -279,11 +279,11 @@ function HistorySummary({ producer }: { producer: ProducerData }) {
             className="rounded-xl border border-border bg-bg-surface p-4"
           >
             <p className="text-sm font-semibold text-text-primary">
-              {i === 0 ? "Ano passado" : "2 anos atras"}
+              {i === 0 ? "Ano passado" : "2 anos atrás"}
             </p>
             <div className="mt-2 space-y-1 text-sm text-text-secondary">
               <p>
-                Verao: {CROP_LABELS[year.summer_crop] ?? year.summer_crop} /
+                Verão: {CROP_LABELS[year.summer_crop] ?? year.summer_crop} /
                 Inverno: {CROP_LABELS[year.winter_crop] ?? year.winter_crop}
               </p>
               <p>Resultado: {YIELD_LABELS[year.yield_result] ?? year.yield_result}</p>
@@ -299,19 +299,19 @@ function HistorySummary({ producer }: { producer: ProducerData }) {
         <div className="rounded-lg border border-border bg-bg-surface-alt p-3">
           <p className="text-xs text-text-muted">Gado na propriedade</p>
           <p className="text-sm font-semibold text-text-primary">
-            {producer.has_cattle ? "Sim" : "Nao"}
+            {producer.has_cattle ? "Sim" : "Não"}
           </p>
         </div>
         <div className="rounded-lg border border-border bg-bg-surface-alt p-3">
           <p className="text-xs text-text-muted">Solo compactado</p>
           <p className="text-sm font-semibold text-text-primary">
-            {producer.soil_compacted ? "Sim" : "Nao"}
+            {producer.soil_compacted ? "Sim" : "Não"}
           </p>
         </div>
         <div className="rounded-lg border border-border bg-bg-surface-alt p-3">
-          <p className="text-xs text-text-muted">Ja usou adubo verde</p>
+          <p className="text-xs text-text-muted">Já usou adubo verde</p>
           <p className="text-sm font-semibold text-text-primary">
-            {producer.used_green_manure ? "Sim" : "Nao"}
+            {producer.used_green_manure ? "Sim" : "Não"}
           </p>
         </div>
       </div>
@@ -330,16 +330,16 @@ function ClimateSummarySection({
   return (
     <section className="mb-10">
       <h2 className="mb-4 text-lg font-bold text-text-primary">
-        O que o clima esta mostrando
+        O que o clima está mostrando
       </h2>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border border-border bg-bg-surface p-4">
           <p className="text-xs text-text-muted">ENSO atual (2025)</p>
           <p className="text-xl font-bold text-text-primary">
-            El Nino Fraco
+            El Niño Fraco
           </p>
           <p className="mt-1 text-xs text-text-secondary">
-            Historico: El Nino traz mais chuva ({timeline.enso_impact.el_nino.avg_season_rain_mm} mm na safra)
+            Histórico: El Niño traz mais chuva ({timeline.enso_impact.el_nino.avg_season_rain_mm} mm na safra)
           </p>
         </div>
         <div className="rounded-xl border border-border bg-bg-surface p-4">
@@ -348,7 +348,7 @@ function ClimateSummarySection({
             {(climate.avgMoisture5 * 100).toFixed(0)}%
           </p>
           <p className="mt-1 text-xs text-warning-light">
-            {climate.moistureTrend.toFixed(1)}% vs media historica — solo secando
+            {climate.moistureTrend.toFixed(1)}% vs média histórica — solo secando
           </p>
         </div>
         <div className="rounded-xl border border-border bg-bg-surface p-4">
@@ -357,22 +357,22 @@ function ClimateSummarySection({
             {climate.avgHotDays5.toFixed(0)} dias/ano
           </p>
           <p className="mt-1 text-xs text-text-secondary">
-            Media historica: {climate.avgHotDaysAll.toFixed(0)} dias/ano
+            Média histórica: {climate.avgHotDaysAll.toFixed(0)} dias/ano
           </p>
         </div>
         <div className="rounded-xl border border-border bg-bg-surface p-4">
-          <p className="text-xs text-text-muted">Chuva media (3 anos)</p>
+          <p className="text-xs text-text-muted">Chuva média (3 anos)</p>
           <p className="text-xl font-bold text-text-primary">
             {Math.round(climate.avgRain3)} mm
           </p>
           <p className="mt-1 text-xs text-text-secondary">
-            Media historica: {q1 ? Math.round(q1.annual_rainfall_mm.mean) : "—"} mm
+            Média histórica: {q1 ? Math.round(q1.annual_rainfall_mm.mean) : "—"} mm
           </p>
         </div>
       </div>
       <div className="mt-3 rounded-lg border border-border bg-bg-surface-alt p-4">
         <p className="text-sm text-text-secondary">
-          Ultimos 3 anos:{" "}
+          Últimos 3 anos:{" "}
           {climate.last3.map((y) => (
             <span key={y.year} className="mr-2">
               <span className="font-semibold text-text-primary">{y.year}</span>{" "}
@@ -395,7 +395,7 @@ function SoilSummarySection() {
   return (
     <section className="mb-10">
       <h2 className="mb-4 text-lg font-bold text-text-primary">
-        Como esta o solo da regiao
+        Como está o solo da região
       </h2>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border border-border bg-bg-surface p-4">
@@ -404,7 +404,7 @@ function SoilSummarySection() {
             {topLayer.clay_pct}%
           </p>
           <p className="mt-1 text-xs text-text-secondary">
-            Solo argiloso — segura agua e nutriente, mas compacta facil
+            Solo argiloso — segura água e nutriente, mas compacta facil
           </p>
         </div>
         <div className="rounded-xl border border-border bg-bg-surface p-4">
@@ -421,18 +421,18 @@ function SoilSummarySection() {
           </p>
         </div>
         <div className="rounded-xl border border-border bg-bg-surface p-4">
-          <p className="text-xs text-text-muted">Carbono organico</p>
+          <p className="text-xs text-text-muted">Carbono orgânico</p>
           <p className="text-xl font-bold text-text-primary">
             {topLayer.organic_carbon_g_kg} g/kg
           </p>
           <p className="mt-1 text-xs text-text-secondary">
             {topLayer.organic_carbon_g_kg > 20
-              ? "Bom nivel — manter com cobertura"
+              ? "Bom nível — manter com cobertura"
               : "Pode melhorar com adubo verde"}
           </p>
         </div>
         <div className="rounded-xl border border-border bg-bg-surface p-4">
-          <p className="text-xs text-text-muted">Retencao de agua</p>
+          <p className="text-xs text-text-muted">Retenção de água</p>
           <p className="text-xl font-bold text-text-primary capitalize">
             {interp.water_holding === "high"
               ? "Alta"
@@ -441,7 +441,7 @@ function SoilSummarySection() {
                 : "Baixa"}
           </p>
           <p className="mt-1 text-xs text-text-secondary">
-            Com cobertura de palha, a retencao melhora ainda mais
+            Com cobertura de palha, a retenção melhora ainda mais
           </p>
         </div>
       </div>
@@ -463,14 +463,14 @@ function RecommendationSection({
   return (
     <section className="mb-10">
       <h2 className="mb-4 text-lg font-bold text-text-primary">
-        Nossa recomendacao
+        Nossa recomendação
       </h2>
 
       <div className="mb-6 rounded-xl border-2 border-primary bg-primary/5 p-6">
         <div className="flex items-start justify-between">
           <div>
             <p className="text-xs font-medium tracking-wider text-primary-light uppercase">
-              Melhor opcao para a sua situacao
+              Melhor opção para a sua situação
             </p>
             <h3 className="mt-1 text-2xl font-bold text-text-primary">
               {best.strategy.name}
@@ -489,7 +489,7 @@ function RecommendationSection({
 
         <div className="mt-4">
           <p className="mb-2 text-sm font-semibold text-text-primary">
-            Por que essa opcao e a melhor pra sua lavoura:
+            Por que essa opção é a melhor pra sua lavoura:
           </p>
           <ul className="space-y-2">
             {best.reasons.map((reason, i) => (
@@ -505,7 +505,7 @@ function RecommendationSection({
         </div>
 
         <div className="mt-4 rounded-lg bg-bg-surface p-4">
-          <p className="text-xs text-text-muted">Detalhamento da pontuacao</p>
+          <p className="text-xs text-text-muted">Detalhamento da pontuação</p>
           <div className="mt-2 flex gap-4 text-sm">
             <div>
               <span className="text-text-muted">Base: </span>
@@ -514,7 +514,7 @@ function RecommendationSection({
               </span>
             </div>
             <div>
-              <span className="text-text-muted">Sua situacao: </span>
+              <span className="text-text-muted">Sua situação: </span>
               <span className="font-semibold text-primary-light">
                 +{best.contextBonus}
               </span>
@@ -530,7 +530,7 @@ function RecommendationSection({
       </div>
 
       <h3 className="mb-3 text-sm font-semibold text-text-primary">
-        Comparativo das 3 opcoes
+        Comparativo das 3 opções
       </h3>
       <div className="space-y-3">
         {sorted.map((s) => {
@@ -595,10 +595,10 @@ function CalendarSection({ best }: { best: ScoredStrategy }) {
 
   const calendarItems = isAdaptive
     ? [
-        { month: "Maio-Junho", action: "Plantar trigo. Temperatura de 12-15 graus e ideal. Geada nao afeta", color: "#2D6A4F" },
+        { month: "Maio-Junho", action: "Plantar trigo. Temperatura de 12-15 graus e ideal. Geada não afeta", color: "#2D6A4F" },
         { month: "Julho-Agosto", action: "Trigo em desenvolvimento. Acompanhar geada tardia na florada", color: "#1E88E5" },
-        { month: "Setembro", action: "Plantar nabo forrageiro nas entrelinhas ou apos colheita do trigo", color: "#42A5F5" },
-        { month: "Outubro", action: "Colher trigo (renda extra). Nabo crescendo e quebrando compactacao", color: "#FF8F00" },
+        { month: "Setembro", action: "Plantar nabo forrageiro nas entrelinhas ou após colheita do trigo", color: "#42A5F5" },
+        { month: "Outubro", action: "Colher trigo (renda extra). Nabo crescendo e quebrando compactação", color: "#FF8F00" },
         { month: "Novembro", action: "Dessecar nabo. Plantar soja sobre palha do trigo + nabo", color: "#E65100" },
       ]
     : CALENDAR;
@@ -606,10 +606,10 @@ function CalendarSection({ best }: { best: ScoredStrategy }) {
   return (
     <section className="mb-10">
       <h2 className="mb-4 text-lg font-bold text-text-primary">
-        Calendario de acao
+        Calendário de ação
       </h2>
       <p className="mb-4 text-sm text-text-secondary">
-        Meses-chave para a estrategia{" "}
+        Meses-chave para a estratégia{" "}
         <span className="font-semibold text-text-primary">
           {best.strategy.name}
         </span>
@@ -642,20 +642,20 @@ function NoDataState() {
     <div className="px-4 py-12">
       <div className="mx-auto max-w-3xl text-center">
         <p className="text-sm font-medium tracking-wider text-accent-light uppercase">
-          Recomendacao
+          Recomendação
         </p>
         <h1 className="mt-2 text-3xl font-bold text-text-primary">
-          Recomendacao para sua lavoura
+          Recomendação para sua lavoura
         </h1>
         <p className="mx-auto mt-4 max-w-lg text-sm text-text-secondary">
-          Para gerar uma recomendacao personalizada, primeiro precisamos saber o
-          que o senhor plantou nos ultimos 2 anos e como foi o resultado.
+          Para gerar uma recomendação personalizada, primeiro precisamos saber o
+          que o senhor plantou nos últimos 2 anos e como foi o resultado.
         </p>
         <Link
           href="/produtor"
           className="mt-8 inline-block rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-text-primary transition-colors hover:bg-primary-light"
         >
-          Preencher meu historico
+          Preencher meu histórico
         </Link>
         <p className="mt-4 text-xs text-text-dim">
           Leva menos de 2 minutos. Seus dados ficam salvos no seu navegador.
@@ -706,16 +706,16 @@ export default function RecomendacaoPage() {
       <div className="mx-auto max-w-4xl">
         <header className="mb-10">
           <p className="text-sm font-medium tracking-wider text-accent-light uppercase">
-            Recomendacao Personalizada
+            Recomendação Personalizada
           </p>
           <h1 className="mt-2 text-3xl font-bold text-text-primary">
-            Recomendacao para sua lavoura
+            Recomendação para sua lavoura
           </h1>
           <p className="mt-3 max-w-2xl text-sm text-text-secondary">
-            Cruzamos o seu historico com {KEY_FINDINGS.data_years} anos de dados
-            de satelite da NASA, produtividade do IBGE, analise de solo do
-            SoilGrids e o padrao El Nino/La Nina da NOAA para gerar essa
-            recomendacao.
+            Cruzamos o seu histórico com {KEY_FINDINGS.data_years} anos de dados
+            de satélite da NASA, produtividade do IBGE, análise de solo do
+            SoilGrids é o padrão El Niño/La Niña da NOAA para gerar essa
+            recomendação.
           </p>
         </header>
 
@@ -731,8 +731,8 @@ export default function RecomendacaoPage() {
               Aviso importante
             </h3>
             <p className="mt-2 text-sm text-text-secondary">
-              Esta recomendacao foi gerada por um algoritmo que cruza dados
-              publicos de satelite, solo e clima. Ela serve como ponto de
+              Esta recomendação foi gerada por um algoritmo que cruza dados
+              publicos de satélite, solo e clima. Ela serve como ponto de
               partida para a conversa com seu agronomo — que conhece sua terra,
               seu maquinario e sua realidade. Nenhuma ferramenta substitui o
               olho de quem pisa na lavoura.
@@ -745,7 +745,7 @@ export default function RecomendacaoPage() {
             href="/produtor"
             className="rounded-lg bg-bg-surface px-4 py-2 text-sm font-medium text-text-muted transition-colors hover:bg-bg-surface-alt hover:text-text-primary"
           >
-            Atualizar meu historico
+            Atualizar meu histórico
           </Link>
           <Link
             href="/rotacoes"

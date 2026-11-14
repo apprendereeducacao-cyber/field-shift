@@ -8,6 +8,8 @@ import coverCropsData from "../../data/cover_crops.json";
 import soilMoistureData from "../../data/soil_moisture.json";
 import ndviData from "../../data/ndvi.json";
 import mapbiomasData from "../../data/mapbiomas.json";
+import riskEngineData from "../../data/risk_engine.json";
+
 
 export type MonthRisk = {
   dry_spell: number;
@@ -339,6 +341,95 @@ export type MapBiomasData = {
 
 export const mapbiomas = mapbiomasData as MapBiomasData;
 
+export type RiskCorrelation = {
+  r: number;
+  weight: number;
+  direction: string;
+  meaning: string;
+};
+
+export type YearClassification = {
+  year: number;
+  yield_sc_ha: number;
+  class: "safra_boa" | "safra_normal" | "safra_ruim";
+  season_rain_mm: number;
+  hot_days: number;
+  avg_soil_moisture: number;
+  enso: string;
+};
+
+export type YearRisk = {
+  year: number;
+  risk_score: number;
+  yield_sc_ha: number;
+  class: string;
+};
+
+export type ScenarioFrequency = {
+  count: number;
+  pct: number;
+  avg_season_rain_mm: number;
+  avg_hot_days: number;
+  avg_moisture: number;
+  enso_distribution: Record<string, number>;
+};
+
+export type StrategyAdjustment = {
+  baseline: number;
+  conservative: number;
+  adaptive: number;
+  reasoning: Record<string, string>;
+};
+
+export type RiskEngineData = {
+  meta: { source: string; methodology: string; generated: string };
+  model: {
+    trend: { slope_sc_ha_year: number; slope_kg_ha_year: number; interpretation: string };
+    correlations: {
+      season_rain_vs_yield: RiskCorrelation;
+      hot_days_vs_yield: RiskCorrelation;
+      soil_moisture_vs_yield: RiskCorrelation;
+    };
+    equation: string;
+  };
+  risk_thresholds: Record<string, Record<string, { min?: number; max?: number }>>;
+  historical_averages: {
+    season_rain_mm: number;
+    hot_days: number;
+    avg_soil_moisture: number;
+    yield_sc_ha: number;
+  };
+  enso_impact: Record<string, { n: number; avg_yield_sc_ha: number; avg_season_rain_mm: number }>;
+  scenario_frequencies: Record<string, ScenarioFrequency | null>;
+  year_classifications: YearClassification[];
+  year_risks: YearRisk[];
+  current_scenario: {
+    year: number;
+    season_rain_mm: number;
+    hot_days: number;
+    avg_soil_moisture: number;
+    enso: string;
+    enso_detail: string;
+    risk_score: number;
+    similar_years: {
+      count: number;
+      bad_outcomes: number;
+      bad_rate: number;
+      years: YearRisk[];
+    };
+  };
+  strategy_adjustments: {
+    description: string;
+    high_risk: StrategyAdjustment;
+    medium_risk: StrategyAdjustment;
+    low_risk: StrategyAdjustment;
+  };
+};
+
+export const riskEngine = riskEngineData as RiskEngineData;
+
+
+
 export const MONTH_NAMES = [
   "Jan",
   "Fev",
@@ -357,7 +448,7 @@ export const MONTH_NAMES = [
 export const MONTH_NAMES_FULL = [
   "Janeiro",
   "Fevereiro",
-  "Marco",
+  "Março",
   "Abril",
   "Maio",
   "Junho",
@@ -371,10 +462,10 @@ export const MONTH_NAMES_FULL = [
 
 export const SCORE_LABELS: Record<keyof RotationScores, string> = {
   soil_health: "Cuida do solo",
-  erosion_control: "Protege contra erosao",
+  erosion_control: "Protege contra erosão",
   water_efficiency: "Aguenta a seca",
   climate_resilience: "Resiste ao clima ruim",
-  economic_return: "Da retorno",
+  economic_return: "Dá retorno",
   biodiversity: "Varia as culturas",
 };
 

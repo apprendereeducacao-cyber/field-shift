@@ -17,14 +17,14 @@ const WINTER_CROPS = [
   { value: "nabo_forrageiro", label: "Nabo Forrageiro" },
   { value: "azevem", label: "Azevem" },
   { value: "canola", label: "Canola" },
-  { value: "pousio", label: "Pousio (nao plantou nada)" },
+  { value: "pousio", label: "Pousio (não plantou nada)" },
   { value: "outro", label: "Outro" },
 ];
 
 const YIELD_RESULTS = [
-  { value: "boa", label: "Boa (acima da media)" },
+  { value: "boa", label: "Boa (acima da média)" },
   { value: "normal", label: "Normal" },
-  { value: "ruim", label: "Ruim (abaixo da media)" },
+  { value: "ruim", label: "Ruim (abaixo da média)" },
   { value: "perda_total", label: "Perda total" },
 ];
 
@@ -207,8 +207,8 @@ export default function ProdutorPage() {
             Conte a historia da sua lavoura
           </h1>
           <p className="mt-3 max-w-2xl text-sm text-text-secondary">
-            Responda sobre os ultimos 2 anos. Isso ajuda a gente a recomendar o
-            melhor manejo de inverno pra voce.
+            Responda sobre os últimos 2 anos. Isso ajuda a gente a recomendar o
+            melhor manejo de inverno pra você.
           </p>
         </header>
 
@@ -224,7 +224,7 @@ export default function ProdutorPage() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <SelectField
                   id={`summer-${i}`}
-                  label="O que plantou no verao?"
+                  label="O que plantou no verão?"
                   value={year.summer_crop}
                   onChange={(v) => updateYear(i, "summer_crop", v)}
                   options={SUMMER_CROPS}
@@ -238,7 +238,7 @@ export default function ProdutorPage() {
                 />
                 <SelectField
                   id={`yield-${i}`}
-                  label="Como foi a safra de verao?"
+                  label="Como foi a safra de verão?"
                   value={year.yield_result}
                   onChange={(v) => updateYear(i, "yield_result", v)}
                   options={YIELD_RESULTS}
@@ -270,8 +270,8 @@ export default function ProdutorPage() {
             />
             <Toggle
               id="compaction"
-              label="O solo esta compactado?"
-              description="Se a agua empoça ou a raiz nao desce, o solo pode estar compactado"
+              label="O solo está compactado?"
+              description="Se a água empoça ou a raiz não desce, o solo pode estar compactado"
               checked={soilCompacted}
               onChange={(v) => {
                 setSoilCompacted(v);
@@ -280,7 +280,7 @@ export default function ProdutorPage() {
             />
             <Toggle
               id="green-manure"
-              label="Ja usou adubo verde alguma vez?"
+              label="Já usou adubo verde alguma vez?"
               description="Ervilhaca, crotalaria, nabo — qualquer planta pra melhorar o solo"
               checked={usedGreenManure}
               onChange={(v) => {
@@ -295,13 +295,13 @@ export default function ProdutorPage() {
               onClick={handleSave}
               className="w-full rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-text-primary transition-colors hover:bg-primary-light sm:w-auto sm:px-12"
             >
-              Salvar meu historico
+              Salvar meu histórico
             </button>
 
             {saved && (
               <div className="w-full rounded-xl border border-primary/30 bg-primary/10 p-5 text-center">
                 <p className="text-sm font-medium text-primary-light">
-                  Historico salvo com sucesso
+                  Histórico salvo com sucesso
                 </p>
                 <p className="mt-2 text-sm text-text-secondary">
                   Agora a gente pode cruzar seus dados com 44 anos de clima e
@@ -311,7 +311,7 @@ export default function ProdutorPage() {
                   href="/recomendacao"
                   className="mt-4 inline-block rounded-lg bg-accent px-6 py-2 text-sm font-medium text-text-primary transition-colors hover:bg-accent-light"
                 >
-                  Ver minha recomendacao
+                  Ver minha recomendação
                 </Link>
               </div>
             )}
@@ -323,10 +323,10 @@ export default function ProdutorPage() {
             Por que essas perguntas?
           </h3>
           <p className="mt-2 text-sm text-text-muted">
-            Saber o que voce plantou, o que deu certo e o que deu errado nos
-            ajuda a cruzar com os dados do satelite da NASA (44 anos de clima),
-            as condicoes do solo e o historico de El Nino/La Nina. Assim a
-            recomendacao e feita pra sua realidade, nao uma sugestao generica.
+            Saber o que você plantou, o que deu certo e o que deu errado nos
+            ajuda a cruzar com os dados do satélite da NASA (44 anos de clima),
+            as condições do solo e o histórico de El Niño/La Niña. Assim a
+            recomendação e feita pra sua realidade, não uma sugestao generica.
           </p>
         </div>
       </div>

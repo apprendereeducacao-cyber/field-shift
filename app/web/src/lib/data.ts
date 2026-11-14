@@ -1,0 +1,335 @@
+import siteData from "../../data/site.json";
+import cropsData from "../../data/crops.json";
+import rotationsData from "../../data/rotations.json";
+import soilData from "../../data/soil.json";
+import timelineData from "../../data/timeline.json";
+import topoData from "../../data/topography.json";
+import coverCropsData from "../../data/cover_crops.json";
+import soilMoistureData from "../../data/soil_moisture.json";
+
+export type MonthRisk = {
+  dry_spell: number;
+  heat: number;
+  heavy_rain: number;
+  frost: number;
+};
+
+export type RainfallWindow = {
+  name: string;
+  r: number;
+};
+
+export type MonthlyAverage = {
+  month: number;
+  name: string;
+  avg_rain_mm: number;
+  avg_tmax_c: number;
+  avg_tmin_c: number;
+};
+
+export type ClimateSummary = {
+  status: string;
+  source: string;
+  period: { start: number; end: number; years: number };
+  annual_rainfall_mm: {
+    mean: number;
+    median: number;
+    min: number;
+    max: number;
+    min_year: number;
+    max_year: number;
+  };
+  temperature_c: {
+    avg_tmax: number;
+    avg_tmin: number;
+    avg_annual: number;
+  };
+  extremes: {
+    hot_days_per_year: number;
+    frost_days_per_year: number;
+    hot_days_first_half: number;
+    hot_days_second_half: number;
+  };
+  driest_years: { year: number; rain_mm: number }[];
+  wettest_years: { year: number; rain_mm: number }[];
+  monthly_averages: MonthlyAverage[];
+};
+
+export type SiteData = {
+  point: { name: string; state: string; lat: number; lon: number };
+  q1: ClimateSummary | null;
+  q2: {
+    status: string;
+    source: string;
+    months: MonthRisk[];
+  };
+  q3: unknown;
+  q4: unknown;
+  q6: {
+    power_vs_station: { r: number; bias_pct: number; n: number; missing_note: string } | null;
+    windows: RainfallWindow[];
+  };
+};
+
+export type Crop = {
+  id: string;
+  name: string;
+  name_en: string;
+  season: string;
+  plant_months: number[];
+  harvest_months: number[];
+  cycle_days: number[];
+  temp_min: number;
+  temp_opt: number[];
+  temp_max: number;
+  heat_threshold: number;
+  frost_tolerant: boolean;
+  water_need_mm: number[];
+  drought_tolerance: string;
+  n_fixing: boolean;
+  root_depth: string;
+  root_depth_cm: number[];
+  organic_matter_input: string;
+  erosion_protection: string;
+  soil_ph_range: number[];
+  market_value: string;
+  forage_value: string;
+  pest_cycle_break: boolean;
+  compaction_relief: boolean;
+  tags: string[];
+};
+
+export type RotationScores = {
+  soil_health: number;
+  erosion_control: number;
+  water_efficiency: number;
+  climate_resilience: number;
+  economic_return: number;
+  biodiversity: number;
+};
+
+export type Strategy = {
+  id: string;
+  name: string;
+  subtitle: string;
+  sequence: { season: string; crop: string }[];
+  scores: RotationScores;
+  total_score: number;
+  evidence: {
+    nasa_insight: string;
+    soil_impact: string;
+    climate_risk: string;
+    economic: string;
+  };
+  risks: string[];
+  benefits: string[];
+};
+
+export type SoilLayer = {
+  depth: string;
+  clay_pct: number;
+  sand_pct: number;
+  silt_pct: number;
+  ph: number;
+  organic_carbon_g_kg: number;
+  nitrogen_g_kg: number;
+  cec_cmol_kg: number;
+  bulk_density_kg_dm3: number;
+};
+
+export type SoilData = {
+  source: string;
+  lat: number;
+  lon: number;
+  layers: SoilLayer[];
+  texture_class: string;
+  interpretation: {
+    fertility: string;
+    compaction_risk: string;
+    water_holding: string;
+    erosion_vulnerability: string;
+  };
+};
+
+export type TimelineYear = {
+  year: number;
+  annual_rain_mm: number;
+  avg_tmax_c: number | null;
+  avg_tmin_c: number | null;
+  avg_temp_c: number | null;
+  hot_days: number;
+  frost_days: number;
+  avg_soil_moisture: number | null;
+  season_rain_mm: number | null;
+  yield_kg_ha: number | null;
+  yield_sc_ha: number | null;
+  enso: string;
+};
+
+export type MonthlyNormal = {
+  month: number;
+  name: string;
+  avg_rain_mm: number;
+  avg_tmax_c: number;
+  avg_tmin_c: number;
+  avg_moisture: number;
+};
+
+export type EnsoImpact = {
+  avg_yield_sc_ha: number;
+  avg_season_rain_mm?: number;
+  n_safras: number;
+};
+
+export type TimelineData = {
+  timeline: TimelineYear[];
+  monthly_normals: MonthlyNormal[];
+  enso_impact: {
+    el_nino: EnsoImpact;
+    la_nina: EnsoImpact;
+    neutro: EnsoImpact;
+  };
+};
+
+export const site = siteData as SiteData;
+export const crops = cropsData.crops as Crop[];
+export const rotations = rotationsData.strategies as Strategy[];
+export const rotationsMeta = rotationsData.scoring_methodology;
+export type TopoPoint = {
+  latitude: number;
+  longitude: number;
+  elevation_m: number;
+};
+
+export type TopographyData = {
+  source: string;
+  center: { lat: number; lon: number };
+  points: TopoPoint[];
+  summary: {
+    min_elevation_m: number;
+    max_elevation_m: number;
+    range_m: number;
+    mean_elevation_m: number;
+    n_points: number;
+  };
+};
+
+export const soil = soilData as SoilData;
+export const timeline = timelineData as TimelineData;
+export const topography = topoData as TopographyData;
+
+export type CoverCropSource = {
+  field: string;
+  url?: string;
+  quality: string;
+};
+
+export type CoverCrop = {
+  id: string;
+  name: string;
+  name_en: string;
+  scientific: string;
+  family: string;
+  group: string;
+  functions: string[];
+  sowing_months: number[] | null;
+  days_to_flower: number[] | null;
+  dry_matter_t_ha: (number | null)[] | null;
+  cn_ratio: string | null;
+  seed_kg_ha: number[] | null;
+  notes: string[];
+  sources: CoverCropSource[];
+};
+
+export type CoverCropsData = {
+  functions: Record<string, string>;
+  system_rules: { rule: string; url: string; quality: string }[];
+  crops: CoverCrop[];
+};
+
+export const coverCrops = coverCropsData as CoverCropsData;
+
+export type SoilMoistureMonth = {
+  month: number;
+  name: string;
+  root_zone: number;
+  profile: number;
+};
+
+export type SoilMoistureData = {
+  source: string;
+  period: string;
+  unit: string;
+  monthly_averages: SoilMoistureMonth[];
+  trend: {
+    first_half_avg: number;
+    second_half_avg: number;
+    change_pct: number;
+  };
+};
+
+export const soilMoisture = soilMoistureData as SoilMoistureData;
+
+export const MONTH_NAMES = [
+  "Jan",
+  "Fev",
+  "Mar",
+  "Abr",
+  "Mai",
+  "Jun",
+  "Jul",
+  "Ago",
+  "Set",
+  "Out",
+  "Nov",
+  "Dez",
+];
+
+export const MONTH_NAMES_FULL = [
+  "Janeiro",
+  "Fevereiro",
+  "Marco",
+  "Abril",
+  "Maio",
+  "Junho",
+  "Julho",
+  "Agosto",
+  "Setembro",
+  "Outubro",
+  "Novembro",
+  "Dezembro",
+];
+
+export const SCORE_LABELS: Record<keyof RotationScores, string> = {
+  soil_health: "Cuida do solo",
+  erosion_control: "Protege contra erosao",
+  water_efficiency: "Aguenta a seca",
+  climate_resilience: "Resiste ao clima ruim",
+  economic_return: "Da retorno",
+  biodiversity: "Varia as culturas",
+};
+
+export const SCORE_COLORS: Record<keyof RotationScores, string> = {
+  soil_health: "#8B5E3C",
+  erosion_control: "#2D6A4F",
+  water_efficiency: "#1E88E5",
+  climate_resilience: "#E65100",
+  economic_return: "#F9A825",
+  biodiversity: "#7CB342",
+};
+
+export const KEY_FINDINGS = {
+  correlation_dez_fev: 0.63,
+  trend_kg_ha_year: 38.1,
+  productivity_increase_pct: 56,
+  productivity_old: 28.6,
+  productivity_new: 44.5,
+  hot_days_increase_pct: 36,
+  bare_soil_months: "5-6",
+  frost_jul_pct: 76,
+  frost_aug_pct: 80,
+  worst_seasons_pattern: "pouca chuva + calor extremo",
+  data_years: 44,
+  data_start: 1981,
+  data_end: 2025,
+};

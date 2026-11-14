@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+:root {
+  --bg-base: #0B1120;
+  --bg-surface: #111827;
+  --bg-surface-alt: #1F2937;
+  --bg-surface-hover: #374151;
+
+  --primary: #2D6A4F;
+  --primary-light: #40916C;
+  --primary-dark: #1B4332;
+
+  --accent: #1E88E5;
+  --accent-light: #42A5F5;
+  --accent-dark: #1565C0;
+
+  --warning: #E65100;
+  --warning-light: #FF8F00;
+
+  --text-primary: #F9FAFB;
+  --text-secondary: #D1D5DB;
+  --text-muted: #9CA3AF;
+  --text-dim: #6B7280;
+
+  --border: #374151;
+  --border-light: #4B5563;
+
+  --font-sans: var(--font-inter);
+}
+
+@theme inline {
+  --color-bg-base: var(--bg-base);
+  --color-bg-surface: var(--bg-surface);
+  --color-bg-surface-alt: var(--bg-surface-alt);
+  --color-bg-surface-hover: var(--bg-surface-hover);
+  --color-primary: var(--primary);
+  --color-primary-light: var(--primary-light);
+  --color-primary-dark: var(--primary-dark);
+  --color-accent: var(--accent);
+  --color-accent-light: var(--accent-light);
+  --color-accent-dark: var(--accent-dark);
+  --color-warning: var(--warning);
+  --color-warning-light: var(--warning-light);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-text-dim: var(--text-dim);
+  --color-border: var(--border);
+  --color-border-light: var(--border-light);
+  --font-sans: var(--font-inter);
+}
+
+body {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+}
+
+::selection {
+  background: var(--primary);
+  color: var(--text-primary);
+}

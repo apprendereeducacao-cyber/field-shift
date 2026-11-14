@@ -1,0 +1,84 @@
+{
+  "source": "NASA POWER — GWETROOT (root zone 0-100cm), GWETPROF (full profile)",
+  "period": "1981-2025",
+  "unit": "0 = seco, 1 = saturado",
+  "monthly_averages": [
+    {
+      "month": 1,
+      "name": "Jan",
+      "root_zone": 0.749,
+      "profile": 0.783
+    },
+    {
+      "month": 2,
+      "name": "Fev",
+      "root_zone": 0.738,
+      "profile": 0.768
+    },
+    {
+      "month": 3,
+      "name": "Mar",
+      "root_zone": 0.73,
+      "profile": 0.757
+    },
+    {
+      "month": 4,
+      "name": "Abr",
+      "root_zone": 0.747,
+      "profile": 0.765
+    },
+    {
+      "month": 5,
+      "name": "Mai",
+      "root_zone": 0.776,
+      "profile": 0.792
+    },
+    {
+      "month": 6,
+      "name": "Jun",
+      "root_zone": 0.814,
+      "profile": 0.829
+    },
+    {
+      "month": 7,
+      "name": "Jul",
+      "root_zone": 0.843,
+      "profile": 0.861
+    },
+    {
+      "month": 8,
+      "name": "Ago",
+      "root_zone": 0.845,
+      "profile": 0.867
+    },
+    {
+      "month": 9,
+      "name": "Set",
+      "root_zone": 0.84,
+      "profile": 0.863
+    },
+    {
+      "month": 10,
+      "name": "Out",
+      "root_zone": 0.842,
+      "profile": 0.867
+    },
+    {
+      "month": 11,
+      "name": "Nov",
+      "root_zone": 0.82,
+      "profile": 0.852
+    },
+    {
+      "month": 12,
+      "name": "Dez",
+      "root_zone": 0.777,
+      "profile": 0.812
+    }
+  ],
+  "trend": {
+    "first_half_avg": 0.809,
+    "second_half_avg": 0.779,
+    "change_pct": -3.7
+  }
+}

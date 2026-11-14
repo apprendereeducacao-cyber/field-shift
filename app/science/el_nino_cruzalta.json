@@ -1,0 +1,74 @@
+{
+  "source": "NOAA Oceanic Nino Index (ONI) - 3-month running mean SST anomaly in Nino 3.4 region",
+  "classification": "El Nino: ONI >= +0.5C for 5+ consecutive overlapping 3-month periods",
+  "el_nino_safras": {
+    "strong": [
+      1983,
+      1992,
+      1998,
+      2003,
+      2010,
+      2016,
+      2024
+    ],
+    "moderate": [
+      1987,
+      1988,
+      1995,
+      2005,
+      2007,
+      2019
+    ],
+    "weak": [
+      1990,
+      1993,
+      2004,
+      2006,
+      2015,
+      2025
+    ]
+  },
+  "la_nina_safras": {
+    "strong": [
+      1989,
+      1999,
+      2000,
+      2008,
+      2011,
+      2012,
+      2021,
+      2022,
+      2023
+    ],
+    "moderate": [
+      1985,
+      1996,
+      2009,
+      2018
+    ],
+    "weak": [
+      1984,
+      2001,
+      2006,
+      2017
+    ]
+  },
+  "neutral_example_safras": [
+    1982,
+    1986,
+    1991,
+    1994,
+    1997,
+    2002,
+    2013,
+    2014,
+    2020
+  ],
+  "impact_cruz_alta": {
+    "el_nino_avg_yield_kg_ha": 2348,
+    "la_nina_avg_yield_kg_ha": 2220,
+    "neutral_avg_yield_kg_ha": 1561,
+    "el_nino_avg_rain_mm": 830,
+    "la_nina_avg_rain_mm": 618
+  }
+}

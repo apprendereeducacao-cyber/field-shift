@@ -1,0 +1,142 @@
+{
+  "source": "Open-Meteo Elevation API (SRTM/Copernicus DEM)",
+  "center": {
+    "lat": -28.6033,
+    "lon": -53.6733
+  },
+  "grid_step_deg": 0.05,
+  "points": [
+    {
+      "latitude": -28.7033,
+      "longitude": -53.7733,
+      "elevation_m": 387.0
+    },
+    {
+      "latitude": -28.7033,
+      "longitude": -53.7233,
+      "elevation_m": 393.0
+    },
+    {
+      "latitude": -28.7033,
+      "longitude": -53.6733,
+      "elevation_m": 439.0
+    },
+    {
+      "latitude": -28.7033,
+      "longitude": -53.6233,
+      "elevation_m": 440.0
+    },
+    {
+      "latitude": -28.7033,
+      "longitude": -53.5733,
+      "elevation_m": 389.0
+    },
+    {
+      "latitude": -28.6533,
+      "longitude": -53.7733,
+      "elevation_m": 411.0
+    },
+    {
+      "latitude": -28.6533,
+      "longitude": -53.7233,
+      "elevation_m": 419.0
+    },
+    {
+      "latitude": -28.6533,
+      "longitude": -53.6733,
+      "elevation_m": 381.0
+    },
+    {
+      "latitude": -28.6533,
+      "longitude": -53.6233,
+      "elevation_m": 455.0
+    },
+    {
+      "latitude": -28.6533,
+      "longitude": -53.5733,
+      "elevation_m": 405.0
+    },
+    {
+      "latitude": -28.6033,
+      "longitude": -53.7733,
+      "elevation_m": 417.0
+    },
+    {
+      "latitude": -28.6033,
+      "longitude": -53.7233,
+      "elevation_m": 412.0
+    },
+    {
+      "latitude": -28.6033,
+      "longitude": -53.6733,
+      "elevation_m": 427.0
+    },
+    {
+      "latitude": -28.6033,
+      "longitude": -53.6233,
+      "elevation_m": 441.0
+    },
+    {
+      "latitude": -28.6033,
+      "longitude": -53.5733,
+      "elevation_m": 424.0
+    },
+    {
+      "latitude": -28.5533,
+      "longitude": -53.7733,
+      "elevation_m": 374.0
+    },
+    {
+      "latitude": -28.5533,
+      "longitude": -53.7233,
+      "elevation_m": 413.0
+    },
+    {
+      "latitude": -28.5533,
+      "longitude": -53.6733,
+      "elevation_m": 439.0
+    },
+    {
+      "latitude": -28.5533,
+      "longitude": -53.6233,
+      "elevation_m": 421.0
+    },
+    {
+      "latitude": -28.5533,
+      "longitude": -53.5733,
+      "elevation_m": 439.0
+    },
+    {
+      "latitude": -28.5033,
+      "longitude": -53.7733,
+      "elevation_m": 417.0
+    },
+    {
+      "latitude": -28.5033,
+      "longitude": -53.7233,
+      "elevation_m": 381.0
+    },
+    {
+      "latitude": -28.5033,
+      "longitude": -53.6733,
+      "elevation_m": 362.0
+    },
+    {
+      "latitude": -28.5033,
+      "longitude": -53.6233,
+      "elevation_m": 417.0
+    },
+    {
+      "latitude": -28.5033,
+      "longitude": -53.5733,
+      "elevation_m": 466.0
+    }
+  ],
+  "summary": {
+    "min_elevation_m": 362.0,
+    "max_elevation_m": 466.0,
+    "range_m": 104.0,
+    "mean_elevation_m": 414.8,
+    "n_points": 25
+  }
+}

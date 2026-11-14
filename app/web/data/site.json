@@ -1,0 +1,276 @@
+{
+  "point": {
+    "name": "Cruz Alta",
+    "state": "RS",
+    "lat": -28.6033,
+    "lon": -53.6733
+  },
+  "q1": {
+    "status": "real",
+    "source": "NASA POWER daily 1981-2025",
+    "period": {
+      "start": 1981,
+      "end": 2025,
+      "years": 45
+    },
+    "annual_rainfall_mm": {
+      "mean": 1818,
+      "median": 1838,
+      "min": 1222,
+      "max": 2628,
+      "min_year": 2021,
+      "max_year": 2002
+    },
+    "temperature_c": {
+      "avg_tmax": 25.4,
+      "avg_tmin": 13.6,
+      "avg_annual": 19.5
+    },
+    "extremes": {
+      "hot_days_per_year": 31.8,
+      "frost_days_per_year": 8.8,
+      "hot_days_first_half": 25.9,
+      "hot_days_second_half": 37.4
+    },
+    "driest_years": [
+      {
+        "year": 2021,
+        "rain_mm": 1222
+      },
+      {
+        "year": 2020,
+        "rain_mm": 1255
+      },
+      {
+        "year": 2004,
+        "rain_mm": 1275
+      },
+      {
+        "year": 1995,
+        "rain_mm": 1299
+      },
+      {
+        "year": 2013,
+        "rain_mm": 1301
+      }
+    ],
+    "wettest_years": [
+      {
+        "year": 2002,
+        "rain_mm": 2628
+      },
+      {
+        "year": 1983,
+        "rain_mm": 2562
+      },
+      {
+        "year": 1997,
+        "rain_mm": 2298
+      },
+      {
+        "year": 1984,
+        "rain_mm": 2294
+      },
+      {
+        "year": 1990,
+        "rain_mm": 2228
+      }
+    ],
+    "monthly_averages": [
+      {
+        "month": 1,
+        "name": "Janeiro",
+        "avg_rain_mm": 156.8,
+        "avg_tmax_c": 30.5,
+        "avg_tmin_c": 18.7
+      },
+      {
+        "month": 2,
+        "name": "Fevereiro",
+        "avg_rain_mm": 132.0,
+        "avg_tmax_c": 29.9,
+        "avg_tmin_c": 18.5
+      },
+      {
+        "month": 3,
+        "name": "Marco",
+        "avg_rain_mm": 129.0,
+        "avg_tmax_c": 29.0,
+        "avg_tmin_c": 17.1
+      },
+      {
+        "month": 4,
+        "name": "Abril",
+        "avg_rain_mm": 160.2,
+        "avg_tmax_c": 26.1,
+        "avg_tmin_c": 14.3
+      },
+      {
+        "month": 5,
+        "name": "Maio",
+        "avg_rain_mm": 160.7,
+        "avg_tmax_c": 22.1,
+        "avg_tmin_c": 11.0
+      },
+      {
+        "month": 6,
+        "name": "Junho",
+        "avg_rain_mm": 151.9,
+        "avg_tmax_c": 19.6,
+        "avg_tmin_c": 9.0
+      },
+      {
+        "month": 7,
+        "name": "Julho",
+        "avg_rain_mm": 137.3,
+        "avg_tmax_c": 19.1,
+        "avg_tmin_c": 8.2
+      },
+      {
+        "month": 8,
+        "name": "Agosto",
+        "avg_rain_mm": 117.3,
+        "avg_tmax_c": 21.1,
+        "avg_tmin_c": 9.5
+      },
+      {
+        "month": 9,
+        "name": "Setembro",
+        "avg_rain_mm": 167.8,
+        "avg_tmax_c": 23.1,
+        "avg_tmin_c": 11.0
+      },
+      {
+        "month": 10,
+        "name": "Outubro",
+        "avg_rain_mm": 206.7,
+        "avg_tmax_c": 25.9,
+        "avg_tmin_c": 13.5
+      },
+      {
+        "month": 11,
+        "name": "Novembro",
+        "avg_rain_mm": 153.7,
+        "avg_tmax_c": 28.2,
+        "avg_tmin_c": 15.1
+      },
+      {
+        "month": 12,
+        "name": "Dezembro",
+        "avg_rain_mm": 145.1,
+        "avg_tmax_c": 30.0,
+        "avg_tmin_c": 17.3
+      }
+    ]
+  },
+  "q2": {
+    "status": "real",
+    "source": "NASA POWER daily 1981-2025",
+    "months": [
+      {
+        "dry_spell": 0.111,
+        "heat": 0.711,
+        "heavy_rain": 0.2,
+        "frost": 0.0
+      },
+      {
+        "dry_spell": 0.111,
+        "heat": 0.422,
+        "heavy_rain": 0.067,
+        "frost": 0.0
+      },
+      {
+        "dry_spell": 0.311,
+        "heat": 0.356,
+        "heavy_rain": 0.222,
+        "frost": 0.0
+      },
+      {
+        "dry_spell": 0.222,
+        "heat": 0.022,
+        "heavy_rain": 0.2,
+        "frost": 0.0
+      },
+      {
+        "dry_spell": 0.333,
+        "heat": 0.0,
+        "heavy_rain": 0.444,
+        "frost": 0.244
+      },
+      {
+        "dry_spell": 0.2,
+        "heat": 0.0,
+        "heavy_rain": 0.244,
+        "frost": 0.8
+      },
+      {
+        "dry_spell": 0.422,
+        "heat": 0.0,
+        "heavy_rain": 0.289,
+        "frost": 0.756
+      },
+      {
+        "dry_spell": 0.4,
+        "heat": 0.0,
+        "heavy_rain": 0.2,
+        "frost": 0.578
+      },
+      {
+        "dry_spell": 0.178,
+        "heat": 0.0,
+        "heavy_rain": 0.4,
+        "frost": 0.267
+      },
+      {
+        "dry_spell": 0.178,
+        "heat": 0.044,
+        "heavy_rain": 0.4,
+        "frost": 0.0
+      },
+      {
+        "dry_spell": 0.222,
+        "heat": 0.2,
+        "heavy_rain": 0.222,
+        "frost": 0.0
+      },
+      {
+        "dry_spell": 0.111,
+        "heat": 0.556,
+        "heavy_rain": 0.156,
+        "frost": 0.0
+      }
+    ]
+  },
+  "q3": null,
+  "q4": null,
+  "q6": {
+    "power_vs_station": {
+      "r": 0.886,
+      "bias_pct": 1.8,
+      "n": 18,
+      "missing_note": "18 seasons with <10% missing INMET data (station since 2007)"
+    },
+    "windows": [
+      {
+        "name": "nov-mar",
+        "r": 0.629
+      },
+      {
+        "name": "dez-fev",
+        "r": 0.63
+      },
+      {
+        "name": "jan-fev",
+        "r": 0.519
+      },
+      {
+        "name": "jan",
+        "r": 0.424
+      },
+      {
+        "name": "fev",
+        "r": 0.325
+      }
+    ]
+  }
+}

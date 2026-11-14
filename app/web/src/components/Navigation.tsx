@@ -13,6 +13,7 @@ const NAV_ITEMS = [
   { href: "/solo", label: "Solo" },
   { href: "/rotacoes", label: "Rotacoes" },
   { href: "/coberturas", label: "Coberturas" },
+  { href: "/mapa-ndvi", label: "Mapa NDVI" },
   { href: "/vegetacao", label: "NDVI" },
   { href: "/uso-do-solo", label: "Uso do Solo" },
   { href: "/evidencia", label: "Evidencia" },

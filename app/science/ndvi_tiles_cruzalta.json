@@ -1,0 +1,143 @@
+{
+  "source": "Google Earth Engine - MODIS MOD13Q1 v061",
+  "resolution": "250m",
+  "center": {
+    "lat": -28.6033,
+    "lon": -53.6733
+  },
+  "zoom": 11,
+  "generated": "2026-11-14 19:32",
+  "palette": [
+    "#d73027",
+    "#f46d43",
+    "#fdae61",
+    "#fee08b",
+    "#ffffbf",
+    "#d9ef8b",
+    "#a6d96a",
+    "#66bd63",
+    "#1a9850",
+    "#006837"
+  ],
+  "palette_labels": [
+    "Solo nu",
+    "",
+    "Vegetacao rala",
+    "",
+    "Moderada",
+    "",
+    "Densa",
+    "",
+    "Muito densa",
+    "Maxima"
+  ],
+  "monthly_tiles": [
+    {
+      "month": 1,
+      "name": "Janeiro",
+      "tile_url": "https://earthengine.googleapis.com/v1/projects/apprendere-educacao/maps/2fe0ef6d77a79d780980a80c5d3ccf88-13519a3ee0641c285f1c19ab4238b232/tiles/{z}/{x}/{y}",
+      "ndvi_mean": 0.735,
+      "period": "2020-2024 (media 5 anos)"
+    },
+    {
+      "month": 2,
+      "name": "Fevereiro",
+      "tile_url": "https://earthengine.googleapis.com/v1/projects/apprendere-educacao/maps/606aa62e410cfcfeb0940dab32b1375a-b2c46f6aa0b337ac91a2879c5188fdc8/tiles/{z}/{x}/{y}",
+      "ndvi_mean": 0.7753,
+      "period": "2020-2024 (media 5 anos)"
+    },
+    {
+      "month": 3,
+      "name": "Marco",
+      "tile_url": "https://earthengine.googleapis.com/v1/projects/apprendere-educacao/maps/82741a82dd5c00c97e774af3b4ed138c-2b582902e3a463b9b1c27a7292ef503d/tiles/{z}/{x}/{y}",
+      "ndvi_mean": 0.6462,
+      "period": "2020-2024 (media 5 anos)"
+    },
+    {
+      "month": 4,
+      "name": "Abril",
+      "tile_url": "https://earthengine.googleapis.com/v1/projects/apprendere-educacao/maps/df9612004b2a4de8c46c38a9cc904b42-04aac3dc228ff3258e9dcb8e857f863f/tiles/{z}/{x}/{y}",
+      "ndvi_mean": 0.5083,
+      "period": "2020-2024 (media 5 anos)"
+    },
+    {
+      "month": 5,
+      "name": "Maio",
+      "tile_url": "https://earthengine.googleapis.com/v1/projects/apprendere-educacao/maps/78b328f0b939bef98242324f32754398-dda4b6ef66b43a9b856c601e507026db/tiles/{z}/{x}/{y}",
+      "ndvi_mean": 0.5622,
+      "period": "2020-2024 (media 5 anos)"
+    },
+    {
+      "month": 6,
+      "name": "Junho",
+      "tile_url": "https://earthengine.googleapis.com/v1/projects/apprendere-educacao/maps/245aed614962e9db09afe1ffafb06ad6-02ed2d87f5886ca78bc47e5c0e3e3298/tiles/{z}/{x}/{y}",
+      "ndvi_mean": 0.6093,
+      "period": "2020-2024 (media 5 anos)"
+    },
+    {
+      "month": 7,
+      "name": "Julho",
+      "tile_url": "https://earthengine.googleapis.com/v1/projects/apprendere-educacao/maps/d71c4aa3800f1ceaf45f427ca20195ef-aee095d7121d26c479f66e1b28fa95cc/tiles/{z}/{x}/{y}",
+      "ndvi_mean": 0.7074,
+      "period": "2020-2024 (media 5 anos)"
+    },
+    {
+      "month": 8,
+      "name": "Agosto",
+      "tile_url": "https://earthengine.googleapis.com/v1/projects/apprendere-educacao/maps/59a5a1c62b240e714b670fdc40b0adab-044bdb44a78ccf7c0085a06afac363b2/tiles/{z}/{x}/{y}",
+      "ndvi_mean": 0.7591,
+      "period": "2020-2024 (media 5 anos)"
+    },
+    {
+      "month": 9,
+      "name": "Setembro",
+      "tile_url": "https://earthengine.googleapis.com/v1/projects/apprendere-educacao/maps/192d42c9023e757450036304311f93ac-d5395cabeedb40f2a6d3741a94bc408d/tiles/{z}/{x}/{y}",
+      "ndvi_mean": 0.702,
+      "period": "2020-2024 (media 5 anos)"
+    },
+    {
+      "month": 10,
+      "name": "Outubro",
+      "tile_url": "https://earthengine.googleapis.com/v1/projects/apprendere-educacao/maps/8301bd8f50b3c2ca2b4c9e727a0aa1fb-30794f1c3fa08a9423c9bcb3809fb79c/tiles/{z}/{x}/{y}",
+      "ndvi_mean": 0.48,
+      "period": "2020-2024 (media 5 anos)"
+    },
+    {
+      "month": 11,
+      "name": "Novembro",
+      "tile_url": "https://earthengine.googleapis.com/v1/projects/apprendere-educacao/maps/eddf32058f165e6a2309e2c7e5a8a4ee-c3736e3ea548952fc00a4ee5de55a529/tiles/{z}/{x}/{y}",
+      "ndvi_mean": 0.4179,
+      "period": "2020-2024 (media 5 anos)"
+    },
+    {
+      "month": 12,
+      "name": "Dezembro",
+      "tile_url": "https://earthengine.googleapis.com/v1/projects/apprendere-educacao/maps/6084942c31903b624af2cfc173bd851c-1a6e086e5634132d9e09429d21e559cc/tiles/{z}/{x}/{y}",
+      "ndvi_mean": 0.5417,
+      "period": "2020-2024 (media 5 anos)"
+    }
+  ],
+  "year_comparisons": [
+    {
+      "year": 2004,
+      "label": "Seca severa",
+      "tile_url": "https://earthengine.googleapis.com/v1/projects/apprendere-educacao/maps/176c1e0ad5b59c4888739b918eb0fbab-84032d16dfb63895a2b078e6188d5cc9/tiles/{z}/{x}/{y}",
+      "ndvi_mean": 0.7751,
+      "season": "Jan-Mar (pico da soja)"
+    },
+    {
+      "year": 2021,
+      "label": "Safra recorde",
+      "tile_url": "https://earthengine.googleapis.com/v1/projects/apprendere-educacao/maps/c8e0dcfe2916561edf63d7266178462a-cd3dd4ba32eca1a3e341d6e0bfc064cd/tiles/{z}/{x}/{y}",
+      "ndvi_mean": 0.8016,
+      "season": "Jan-Mar (pico da soja)"
+    },
+    {
+      "year": 2023,
+      "label": "Normal",
+      "tile_url": "https://earthengine.googleapis.com/v1/projects/apprendere-educacao/maps/1a83b40374b56c26f28e4c7ebebf9814-7f48fdf0308e1152ece98b857c8477cd/tiles/{z}/{x}/{y}",
+      "ndvi_mean": 0.6775,
+      "season": "Jan-Mar (pico da soja)"
+    }
+  ]
+}

@@ -15,6 +15,7 @@ import type {
   SiteData,
   CoverCropsData,
 } from "@/lib/types";
+import Chat from "@/components/Chat";
 
 const ENSO_LABELS: Record<string, string> = {
   el_nino: "El Nino",
@@ -319,6 +320,8 @@ export default function HomeClient({ timeline, riskEngine, site, coverCrops, key
       <p className="pb-2 text-center text-[10px] text-text-dim">
         {rec.climateContext} | Dados: NASA POWER + IBGE | {keyFindings.data_years} anos
       </p>
+
+      <Chat />
     </div>
   );
 }

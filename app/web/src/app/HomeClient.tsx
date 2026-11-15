@@ -56,6 +56,7 @@ type ReportData = {
   rotation: { name: string; subtitle: string; scores: Record<string, number>; totalScore: number; sequence: { crop: string; season: string }[] } | null;
   strategies: { name: string; subtitle: string; totalScore: number; sequence: { crop: string; season: string }[] }[];
   riskCalendar: { dry_spell: number; heat: number; heavy_rain: number; frost: number }[];
+  summary: string;
 };
 
 /* ── Producer Form Data ── */
@@ -360,6 +361,12 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
         )}
       </div>
 
+      {report.summary && (
+        <div className="rounded-[24px] border border-border bg-card p-6">
+          <p className="text-sm leading-relaxed text-foreground">{report.summary}</p>
+        </div>
+      )}
+
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <div className="rounded-[24px] border border-border bg-card p-5 text-center">
           <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">Risco</p>
@@ -645,6 +652,7 @@ export default function HomeClient() {
         rotation: data.rotation,
         strategies: data.strategies ?? [],
         riskCalendar: data.riskCalendar ?? [],
+        summary: data.summary ?? "",
       });
     } catch {
       setReport({
@@ -663,6 +671,7 @@ export default function HomeClient() {
         rotation: null,
         strategies: [],
         riskCalendar: [],
+        summary: "",
       });
     }
   };
@@ -757,6 +766,7 @@ export default function HomeClient() {
       rotation: null,
       strategies: [],
       riskCalendar: [],
+      summary: "",
     });
 
     setTimeout(() => {
@@ -911,7 +921,6 @@ export default function HomeClient() {
               <h4 className="text-sm font-semibold text-white">Plataforma</h4>
               <ul className="mt-3 space-y-2 text-sm">
                 <li><Link href="/" className="transition-colors hover:text-white">Inicio</Link></li>
-                <li><Link href="/dados" className="transition-colors hover:text-white">Dados</Link></li>
                 <li><Link href="/mapa" className="transition-colors hover:text-white">Mapa interativo</Link></li>
               </ul>
             </div>

@@ -41,6 +41,42 @@ export async function GET(request: Request) {
 
     const cropNames = coverCrops.crops.slice(0, 6).map((c) => c.name);
 
+    const totalYears = timeline.timeline.length;
+    const bestYear = timeline.timeline.reduce((a, b) => ((b.yield_sc_ha ?? 0) > (a.yield_sc_ha ?? 0) ? b : a), timeline.timeline[0]);
+    const worstYear = timeline.timeline.reduce((a, b) => ((b.yield_sc_ha ?? 0) < (a.yield_sc_ha ?? 0) ? b : a), timeline.timeline[0]);
+    const avgYield = totalYears > 0 ? timeline.timeline.reduce((s, y) => s + (y.yield_sc_ha ?? 0), 0) / totalYears : 0;
+
+    const riskMonths = site.q2?.months ?? [];
+    const frostMonths = riskMonths
+      .map((m: any, i: number) => ({ i, v: m.frost ?? 0 }))
+      .filter((m: any) => m.v > 0.3)
+      .map((m: any) => ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"][m.i]);
+    const dryMonths = riskMonths
+      .map((m: any, i: number) => ({ i, v: m.dry_spell ?? 0 }))
+      .filter((m: any) => m.v > 0.3)
+      .map((m: any) => ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"][m.i]);
+
+    const lines: string[] = [];
+    lines.push(`${site.point.name} tem ${totalYears} anos de dados satelitais. Media historica: ${avgYield.toFixed(1)} sc/ha de soja, ${avgRain?.toFixed(0) ?? "—"} mm de chuva/ano, temperatura media de ${avgTemp?.toFixed(1) ?? "—"} C.`);
+    if (bestYear && worstYear) {
+      const bY = bestYear.yield_sc_ha ?? 0;
+      const wY = worstYear.yield_sc_ha ?? 0;
+      lines.push(`Melhor safra: ${bestYear.year} com ${bY.toFixed(1)} sc/ha. Pior: ${worstYear.year} com ${wY.toFixed(1)} sc/ha — diferenca de ${(bY - wY).toFixed(0)} sacas.`);
+    }
+    if (frostMonths.length > 0) {
+      lines.push(`Geada e risco real: aparece em mais de 3 a cada 10 anos nos meses de ${frostMonths.join(", ")}.`);
+    }
+    if (dryMonths.length > 0) {
+      lines.push(`Estiagens prolongadas concentram-se em ${dryMonths.join(", ")}.`);
+    }
+    if (yearData) {
+      const yVal = yearData.yield_sc_ha ?? 0;
+      const diff = yVal - avgYield;
+      const dir = diff > 0 ? "acima" : "abaixo";
+      lines.push(`Safra ${selectedYear}: ${yVal.toFixed(1)} sc/ha (${Math.abs(diff).toFixed(1)} ${dir} da media), ${yearData.annual_rain_mm?.toFixed(0) ?? "—"} mm de chuva.`);
+    }
+    const summary = lines.join(" ");
+
     return NextResponse.json({
       municipality: site.point.name,
       uf: site.point.state,
@@ -78,6 +114,7 @@ export async function GET(request: Request) {
         sequence: s.sequence,
       })),
       riskCalendar: site.q2.months,
+      summary,
     });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });

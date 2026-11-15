@@ -23,7 +23,12 @@ export async function POST(request: Request) {
     site_id?: string;
   } = body;
 
-  if (!anonymous_id || !message) {
+  if (
+    typeof anonymous_id !== "string" ||
+    typeof message !== "string" ||
+    !anonymous_id ||
+    !message
+  ) {
     return Response.json(
       { error: "anonymous_id and message are required" },
       { status: 400 }
@@ -35,6 +40,13 @@ export async function POST(request: Request) {
       { error: "Message too long (max 2000 characters)" },
       { status: 400 }
     );
+  }
+
+  if (session_id && typeof session_id !== "string") {
+    return Response.json({ error: "Invalid session_id" }, { status: 400 });
+  }
+  if (site_id && typeof site_id !== "string") {
+    return Response.json({ error: "Invalid site_id" }, { status: 400 });
   }
 
   const db = createAdminClient();

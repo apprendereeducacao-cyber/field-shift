@@ -1,10 +1,15 @@
 import { createAdminClient } from "@/lib/supabase";
+import { timingSafeEqual } from "crypto";
 
 export async function DELETE(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const secret = searchParams.get("secret");
+  const auth = request.headers.get("authorization") ?? "";
+  const expected = `Bearer ${process.env.CLEANUP_SECRET}`;
 
-  if (!secret || secret !== process.env.CLEANUP_SECRET) {
+  if (
+    !process.env.CLEANUP_SECRET ||
+    Buffer.byteLength(auth) !== Buffer.byteLength(expected) ||
+    !timingSafeEqual(Buffer.from(auth), Buffer.from(expected))
+  ) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 

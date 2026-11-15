@@ -1,0 +1,709 @@
+{
+  "built_utc": "2026-11-15T13:23:27Z",
+  "status": {
+    "precheck": "ready",
+    "satellite_indicators": "placeholder",
+    "slope": "ready",
+    "residue": "ready"
+  },
+  "precheck": {
+    "generated_at": "2026-11-15T02:54:44+00:00",
+    "site": "cruz-alta",
+    "label": "pre-check, not official",
+    "norm": {
+      "in": "IN SPA/MAPA 2/2025",
+      "portaria": "Portaria SPA/MAPA 209/2026",
+      "subsidy": "Resolução CGSR 111/2026",
+      "subsidy_pct": {
+        "NM1": 20,
+        "NM2": 30,
+        "NM3": 35,
+        "NM4": 40
+      },
+      "subsidy_budget_note": "Resolução CGSR 111/2026 (art. 2) sets R$ 1,000,000.00 for soybean in the ZarcNM pilot for 2026, shared by Paraná, Santa Catarina, Rio Grande do Sul and Mato Grosso do Sul (states as reported by Agrolink, 7 Aug 2026). The rate applies only while that budget lasts, and only to fields classified by Embrapa's method; payment depends on federal funds.",
+      "subsidy_brl_per_ha_note": "null: no published average soybean premium per hectare for Rio Grande do Sul was found. The PSR 2024 report (Atlas do Seguro Rural) gives only the national soybean figures (R$ 2,007 million of premium on 4.83 million ha, about R$ 415/ha in 2024) and RS totals for all crops; neither is a Rio Grande do Sul soybean premium, so no R$/ha is estimated.",
+      "subsidy_source_note": "Percentages and budget read on the Legismap transcription of the resolution (DOU 29/04/2026); the DOU PDF was not opened."
+    },
+    "paths": [
+      {
+        "id": "soy-wheat",
+        "label": "Soybean - wheat",
+        "summary": "pre-check: 3 of 6 indicators observable; NM range 2-3 if soil tests are at level 4; contour to confirm",
+        "indicators": [
+          {
+            "code": "V%",
+            "name": "Base saturation (V%) in the 0-20 cm layer",
+            "name_pt": "Saturação por bases (V%) na camada 0 a 20 cm",
+            "level_min": null,
+            "level_max": null,
+            "observable": false,
+            "basis": "not observable from satellite: needs soil test (georeferenced samples, accredited lab; IN 2/2025 items 4.1-III and 7).",
+            "source": "S1 (IN 2/2025, item 2.1-I and Table 1 row 1)"
+          },
+          {
+            "code": "Ca",
+            "name": "Calcium (Ca, cmolc/dm3) in the 20-40 cm layer",
+            "name_pt": "Teor de cálcio (Ca) na camada 20 a 40 cm",
+            "level_min": null,
+            "level_max": null,
+            "observable": false,
+            "basis": "not observable from satellite: needs soil test (georeferenced samples, accredited lab; IN 2/2025 items 4.1-III and 7).",
+            "source": "S1 (IN 2/2025, item 2.1-II and Table 1 row 2)"
+          },
+          {
+            "code": "m%",
+            "name": "Aluminium saturation (m%) in the 20-40 cm layer",
+            "name_pt": "Saturação por alumínio (m%) na camada 20 a 40 cm",
+            "level_min": null,
+            "level_max": null,
+            "observable": false,
+            "basis": "not observable from satellite: needs soil test (georeferenced samples, accredited lab; IN 2/2025 items 4.1-III and 7).",
+            "source": "S1 (IN 2/2025, item 2.1-III and Table 1 row 3)"
+          },
+          {
+            "code": "T",
+            "name": "Time (T) without soil tillage, complete years",
+            "name_pt": "Tempo (T) sem revolvimento do solo (anos)",
+            "observable": true,
+            "level_min": 4,
+            "level_max": 4,
+            "basis": "Assumed continuous no-till for at least 8 complete years (level 4), the same for the three paths. Not measured: the norm dates the last tillage from sudden changes in the satellite time series (item 6.8); a Landsat time-series check is still pending and could confirm or lower this. 5-7 years gives level 3, 3-4 years level 2, under 3 years level 1.",
+            "source": "S1 (items 2.3, 6.8); assumption"
+          },
+          {
+            "code": "C",
+            "name": "Soil cover (C) with straw before sowing the main crop, %",
+            "name_pt": "Cobertura do solo (C) com palhada em pré-semeadura da cultura principal (%)",
+            "observable": true,
+            "level_min": 2,
+            "level_max": 3,
+            "cover_pct_min": 41.3,
+            "cover_pct_max": 89.2,
+            "basis": "Straw on 1, 16 and 30 November from the straw clock: 2.22-4.12 t/ha (arithmetic from measured half-lives, not a field measurement). Converted to cover with Gregory (1982), cover = 1 - exp(-Am x kg/ha), Am (mass-to-cover coefficient: hectares of ground covered per kg of straw) 0.00024-0.00054 ha/kg (wheat stems only to complete wheat residue; no Am for black oat was found, wheat values used): 41-89% cover. The norm measures C with NDTI in the month before sowing (IN 2/2025 item 6.7); no NDTI threshold was calibrated here.",
+            "source": "S4; S5; S6"
+          },
+          {
+            "code": "D",
+            "name": "Diversity (D) of crops in rotation in the last 3 agricultural years",
+            "name_pt": "Diversidade (D) de cultivos nos últimos três anos agrícolas",
+            "observable": true,
+            "level_min": 2,
+            "level_max": 2,
+            "basis": "6 crops (3 soybean + 3 wheat), 2 species, 2 families: level 2. No cover crop, so level 3 is not met; wheat as the main winter crop is not a 3rd crop or autumn-window grass (item 2.4-I). Counted: 6 crops, 2 species, 2 families.",
+            "source": "S1 (Table 1 row 6, item 2.4); S5"
+          }
+        ],
+        "nm_range": {
+          "min": 2,
+          "max": 3,
+          "condition": "if all 3 soil-test indicators (V%, Ca, m%) are at level 4, contour sowing is confirmed (or slope < 3%), the soil is deeper than 1 m, and no-till holds for 8+ years"
+        },
+        "nm_range_by_soil_level": {
+          "1": {
+            "min": 1,
+            "max": 1
+          },
+          "2": {
+            "min": 2,
+            "max": 2
+          },
+          "3": {
+            "min": 2,
+            "max": 3
+          },
+          "4": {
+            "min": 2,
+            "max": 3
+          }
+        },
+        "locks": [
+          {
+            "rule": "slope >= 3% requires contour sowing on at least 75% of the area in the last year, else NM1",
+            "citation": "IN 2/2025, item 3.2.1-I",
+            "status": "to confirm",
+            "note": "Assumed compliant in the level range. The slope comes from NASADEM (item 6.3); contour sowing is not checked here."
+          },
+          {
+            "rule": "two or more consecutive soybean crops (soja sobre soja) -> NM1",
+            "citation": "IN 2/2025, item 3.2.1-II",
+            "status": "does not apply",
+            "note": "A winter crop sits between the soybean crops."
+          },
+          {
+            "rule": "legume-only crop before or after soybean, without other species -> at most NM2",
+            "citation": "IN 2/2025, item 3.2.1-III",
+            "status": "does not apply",
+            "note": "The winter crop includes a grass (wheat, or black oat in the oat + vetch consortium)."
+          },
+          {
+            "rule": "two or more indicators at level 1 -> NM1; two at level 2, or one at 1 and one at 2 -> NM2",
+            "citation": "IN 2/2025, item 3.2.1-IV",
+            "status": "depends on levels",
+            "note": "Included in the level range for every combination of the ranges above."
+          },
+          {
+            "rule": "mean at level 3-4 with m% at level 1 -> NM2; with m% at level 2 -> NM3",
+            "citation": "IN 2/2025, item 3.2.1-V",
+            "status": "needs soil test",
+            "note": "m% is a soil-test indicator; the by-soil-level table shows its effect."
+          },
+          {
+            "rule": "the class is limited to the NM whose root depth (40/60/80/100 cm) is below the useful soil depth Zus; Zus < 50 cm stays at NM1",
+            "citation": "Portaria 209/2026, item 2.4",
+            "status": "to confirm",
+            "note": "Assumed deep soil in the level range; needs a soil profile, not visible from satellite."
+          }
+        ],
+        "subsidy_pct_range": {
+          "min": 30,
+          "max": 35
+        },
+        "subsidy_brl_per_ha": null,
+        "notes": [
+          "pre-check: 3 of 6 indicators observable; NM range 2-3 if soil tests are at level 4; contour to confirm",
+          "At the low end of the straw-cover range (C level 2) C and D are both at level 2, which caps the class at NM2 (item 3.2.1-IV-b); at C level 3 the mean is exactly 3.50, still NM3."
+        ]
+      },
+      {
+        "id": "soy-cover",
+        "label": "Soybean - cover (black oat + common vetch)",
+        "summary": "pre-check: 3 of 6 indicators observable; NM range 3-4 if soil tests are at level 4; contour to confirm",
+        "indicators": [
+          {
+            "code": "V%",
+            "name": "Base saturation (V%) in the 0-20 cm layer",
+            "name_pt": "Saturação por bases (V%) na camada 0 a 20 cm",
+            "level_min": null,
+            "level_max": null,
+            "observable": false,
+            "basis": "not observable from satellite: needs soil test (georeferenced samples, accredited lab; IN 2/2025 items 4.1-III and 7).",
+            "source": "S1 (IN 2/2025, item 2.1-I and Table 1 row 1)"
+          },
+          {
+            "code": "Ca",
+            "name": "Calcium (Ca, cmolc/dm3) in the 20-40 cm layer",
+            "name_pt": "Teor de cálcio (Ca) na camada 20 a 40 cm",
+            "level_min": null,
+            "level_max": null,
+            "observable": false,
+            "basis": "not observable from satellite: needs soil test (georeferenced samples, accredited lab; IN 2/2025 items 4.1-III and 7).",
+            "source": "S1 (IN 2/2025, item 2.1-II and Table 1 row 2)"
+          },
+          {
+            "code": "m%",
+            "name": "Aluminium saturation (m%) in the 20-40 cm layer",
+            "name_pt": "Saturação por alumínio (m%) na camada 20 a 40 cm",
+            "level_min": null,
+            "level_max": null,
+            "observable": false,
+            "basis": "not observable from satellite: needs soil test (georeferenced samples, accredited lab; IN 2/2025 items 4.1-III and 7).",
+            "source": "S1 (IN 2/2025, item 2.1-III and Table 1 row 3)"
+          },
+          {
+            "code": "T",
+            "name": "Time (T) without soil tillage, complete years",
+            "name_pt": "Tempo (T) sem revolvimento do solo (anos)",
+            "observable": true,
+            "level_min": 4,
+            "level_max": 4,
+            "basis": "Assumed continuous no-till for at least 8 complete years (level 4), the same for the three paths. Not measured: the norm dates the last tillage from sudden changes in the satellite time series (item 6.8); a Landsat time-series check is still pending and could confirm or lower this. 5-7 years gives level 3, 3-4 years level 2, under 3 years level 1.",
+            "source": "S1 (items 2.3, 6.8); assumption"
+          },
+          {
+            "code": "C",
+            "name": "Soil cover (C) with straw before sowing the main crop, %",
+            "name_pt": "Cobertura do solo (C) com palhada em pré-semeadura da cultura principal (%)",
+            "observable": true,
+            "level_min": 2,
+            "level_max": 4,
+            "cover_pct_min": 47.1,
+            "cover_pct_max": 98.8,
+            "basis": "Straw on 1, 16 and 30 November from the straw clock: 2.65-8.15 t/ha (arithmetic from measured half-lives, not a field measurement). Converted to cover with Gregory (1982), cover = 1 - exp(-Am x kg/ha), Am (mass-to-cover coefficient: hectares of ground covered per kg of straw) 0.00024-0.00054 ha/kg (wheat stems only to complete wheat residue; no Am for black oat was found, wheat values used): 47-99% cover. The norm measures C with NDTI in the month before sowing (IN 2/2025 item 6.7); no NDTI threshold was calibrated here.",
+            "source": "S4; S5; S6"
+          },
+          {
+            "code": "D",
+            "name": "Diversity (D) of crops in rotation in the last 3 agricultural years",
+            "name_pt": "Diversidade (D) de cultivos nos últimos três anos agrícolas",
+            "observable": true,
+            "level_min": 3,
+            "level_max": 3,
+            "basis": "6 crops (3 soybean + 3 black oat/vetch covers), 3 species, 2 families. Cover time 93-199 days (sown 15 Apr-31 May, desiccated 1 Sep-31 Oct): if more than 4 months it meets level 3 by '1 cover of more than 4 months' (with a grass, item 2.4-IV); if not, by '3 covers of more than 45 days each'. Level 4 needs 4 species. Counted: 6 crops, 3 species, 2 families.",
+            "source": "S1 (Table 1 row 6, item 2.4); S5"
+          }
+        ],
+        "nm_range": {
+          "min": 3,
+          "max": 4,
+          "condition": "if all 3 soil-test indicators (V%, Ca, m%) are at level 4, contour sowing is confirmed (or slope < 3%), the soil is deeper than 1 m, and no-till holds for 8+ years"
+        },
+        "nm_range_by_soil_level": {
+          "1": {
+            "min": 1,
+            "max": 1
+          },
+          "2": {
+            "min": 2,
+            "max": 2
+          },
+          "3": {
+            "min": 3,
+            "max": 3
+          },
+          "4": {
+            "min": 3,
+            "max": 4
+          }
+        },
+        "locks": [
+          {
+            "rule": "slope >= 3% requires contour sowing on at least 75% of the area in the last year, else NM1",
+            "citation": "IN 2/2025, item 3.2.1-I",
+            "status": "to confirm",
+            "note": "Assumed compliant in the level range. The slope comes from NASADEM (item 6.3); contour sowing is not checked here."
+          },
+          {
+            "rule": "two or more consecutive soybean crops (soja sobre soja) -> NM1",
+            "citation": "IN 2/2025, item 3.2.1-II",
+            "status": "does not apply",
+            "note": "A winter crop sits between the soybean crops."
+          },
+          {
+            "rule": "legume-only crop before or after soybean, without other species -> at most NM2",
+            "citation": "IN 2/2025, item 3.2.1-III",
+            "status": "does not apply",
+            "note": "The winter crop includes a grass (wheat, or black oat in the oat + vetch consortium)."
+          },
+          {
+            "rule": "two or more indicators at level 1 -> NM1; two at level 2, or one at 1 and one at 2 -> NM2",
+            "citation": "IN 2/2025, item 3.2.1-IV",
+            "status": "depends on levels",
+            "note": "Included in the level range for every combination of the ranges above."
+          },
+          {
+            "rule": "mean at level 3-4 with m% at level 1 -> NM2; with m% at level 2 -> NM3",
+            "citation": "IN 2/2025, item 3.2.1-V",
+            "status": "needs soil test",
+            "note": "m% is a soil-test indicator; the by-soil-level table shows its effect."
+          },
+          {
+            "rule": "the class is limited to the NM whose root depth (40/60/80/100 cm) is below the useful soil depth Zus; Zus < 50 cm stays at NM1",
+            "citation": "Portaria 209/2026, item 2.4",
+            "status": "to confirm",
+            "note": "Assumed deep soil in the level range; needs a soil profile, not visible from satellite."
+          }
+        ],
+        "subsidy_pct_range": {
+          "min": 35,
+          "max": 40
+        },
+        "subsidy_brl_per_ha": null,
+        "notes": [
+          "pre-check: 3 of 6 indicators observable; NM range 3-4 if soil tests are at level 4; contour to confirm",
+          "NM4 needs C at level 3 or 4 (60% cover or more before sowing); at C level 2 the mean is 3.50 and the class is NM3."
+        ]
+      },
+      {
+        "id": "soy-fallow",
+        "label": "Soybean - winter fallow",
+        "summary": "pre-check: 3 of 6 indicators observable; NM range 1-2 if soil tests are at level 4; contour to confirm",
+        "indicators": [
+          {
+            "code": "V%",
+            "name": "Base saturation (V%) in the 0-20 cm layer",
+            "name_pt": "Saturação por bases (V%) na camada 0 a 20 cm",
+            "level_min": null,
+            "level_max": null,
+            "observable": false,
+            "basis": "not observable from satellite: needs soil test (georeferenced samples, accredited lab; IN 2/2025 items 4.1-III and 7).",
+            "source": "S1 (IN 2/2025, item 2.1-I and Table 1 row 1)"
+          },
+          {
+            "code": "Ca",
+            "name": "Calcium (Ca, cmolc/dm3) in the 20-40 cm layer",
+            "name_pt": "Teor de cálcio (Ca) na camada 20 a 40 cm",
+            "level_min": null,
+            "level_max": null,
+            "observable": false,
+            "basis": "not observable from satellite: needs soil test (georeferenced samples, accredited lab; IN 2/2025 items 4.1-III and 7).",
+            "source": "S1 (IN 2/2025, item 2.1-II and Table 1 row 2)"
+          },
+          {
+            "code": "m%",
+            "name": "Aluminium saturation (m%) in the 20-40 cm layer",
+            "name_pt": "Saturação por alumínio (m%) na camada 20 a 40 cm",
+            "level_min": null,
+            "level_max": null,
+            "observable": false,
+            "basis": "not observable from satellite: needs soil test (georeferenced samples, accredited lab; IN 2/2025 items 4.1-III and 7).",
+            "source": "S1 (IN 2/2025, item 2.1-III and Table 1 row 3)"
+          },
+          {
+            "code": "T",
+            "name": "Time (T) without soil tillage, complete years",
+            "name_pt": "Tempo (T) sem revolvimento do solo (anos)",
+            "observable": true,
+            "level_min": 4,
+            "level_max": 4,
+            "basis": "Assumed continuous no-till for at least 8 complete years (level 4), the same for the three paths. Not measured: the norm dates the last tillage from sudden changes in the satellite time series (item 6.8); a Landsat time-series check is still pending and could confirm or lower this. 5-7 years gives level 3, 3-4 years level 2, under 3 years level 1.",
+            "source": "S1 (items 2.3, 6.8); assumption"
+          },
+          {
+            "code": "C",
+            "name": "Soil cover (C) with straw before sowing the main crop, %",
+            "name_pt": "Cobertura do solo (C) com palhada em pré-semeadura da cultura principal (%)",
+            "observable": true,
+            "level_min": 1,
+            "level_max": 2,
+            "cover_pct_min": null,
+            "cover_pct_max": null,
+            "basis": "No winter straw in the straw clock (no winter crop). Level 1 (C < 30%) if the fallow is kept clean; level 2 cannot be excluded because the April soybean residue and winter weeds or volunteers are not modelled (the Cruz Alta trial gives no soybean half-life).",
+            "source": "S4; S5"
+          },
+          {
+            "code": "D",
+            "name": "Diversity (D) of crops in rotation in the last 3 agricultural years",
+            "name_pt": "Diversidade (D) de cultivos nos últimos três anos agrícolas",
+            "observable": true,
+            "level_min": 1,
+            "level_max": 1,
+            "basis": "3 crops (soybean only), 1 species, 1 family: fewer than the 4 crops of level 2, so level 1. Counted: 3 crops, 1 species, 1 families.",
+            "source": "S1 (Table 1 row 6, item 2.4); S5"
+          }
+        ],
+        "nm_range": {
+          "min": 1,
+          "max": 2,
+          "condition": "if all 3 soil-test indicators (V%, Ca, m%) are at level 4, contour sowing is confirmed (or slope < 3%), the soil is deeper than 1 m, and no-till holds for 8+ years"
+        },
+        "nm_range_by_soil_level": {
+          "1": {
+            "min": 1,
+            "max": 1
+          },
+          "2": {
+            "min": 1,
+            "max": 2
+          },
+          "3": {
+            "min": 1,
+            "max": 2
+          },
+          "4": {
+            "min": 1,
+            "max": 2
+          }
+        },
+        "locks": [
+          {
+            "rule": "slope >= 3% requires contour sowing on at least 75% of the area in the last year, else NM1",
+            "citation": "IN 2/2025, item 3.2.1-I",
+            "status": "to confirm",
+            "note": "Assumed compliant in the level range. The slope comes from NASADEM (item 6.3); contour sowing is not checked here."
+          },
+          {
+            "rule": "two or more consecutive soybean crops (soja sobre soja) -> NM1",
+            "citation": "IN 2/2025, item 3.2.1-II",
+            "status": "applies under the literal reading",
+            "note": "Soybean every summer with nothing in winter: read literally, the soybean crops are consecutive. The norm does not say whether a fallow winter breaks the sequence; the level range keeps both readings."
+          },
+          {
+            "rule": "legume-only crop before or after soybean, without other species -> at most NM2",
+            "citation": "IN 2/2025, item 3.2.1-III",
+            "status": "applies",
+            "note": "The crop before and after each soybean is soybean, a legume."
+          },
+          {
+            "rule": "two or more indicators at level 1 -> NM1; two at level 2, or one at 1 and one at 2 -> NM2",
+            "citation": "IN 2/2025, item 3.2.1-IV",
+            "status": "depends on levels",
+            "note": "Included in the level range for every combination of the ranges above."
+          },
+          {
+            "rule": "mean at level 3-4 with m% at level 1 -> NM2; with m% at level 2 -> NM3",
+            "citation": "IN 2/2025, item 3.2.1-V",
+            "status": "needs soil test",
+            "note": "m% is a soil-test indicator; the by-soil-level table shows its effect."
+          },
+          {
+            "rule": "the class is limited to the NM whose root depth (40/60/80/100 cm) is below the useful soil depth Zus; Zus < 50 cm stays at NM1",
+            "citation": "Portaria 209/2026, item 2.4",
+            "status": "to confirm",
+            "note": "Assumed deep soil in the level range; needs a soil profile, not visible from satellite."
+          }
+        ],
+        "subsidy_pct_range": {
+          "min": 20,
+          "max": 30
+        },
+        "subsidy_brl_per_ha": null,
+        "notes": [
+          "pre-check: 3 of 6 indicators observable; NM range 1-2 if soil tests are at level 4; contour to confirm",
+          "D is at level 1 whatever the straw: one more indicator at level 1 gives NM1 (item 3.2.1-IV-a). Without the soy-on-soy reading the best case is NM2."
+        ]
+      }
+    ],
+    "caveats": [
+      "Pre-check, not a certificate: the official class is produced only by Embrapa's SINM after the three data subsets are registered by accredited agents (IN 2/2025, items 4.1-4.6).",
+      "3 of the 6 indicators (V%, Ca, m%) need a soil test (0-20 and 20-40 cm, accredited lab, valid 24 months, item 7.8); they are not observable from satellite. The by-soil-level table gives the NM range with all three soil-test indicators at the same level n (1-4); mixed soil levels are not tabulated.",
+      "Contour sowing on slopes >= 3% (item 3.2.1-I) and the useful soil depth (Portaria 209/2026 item 2.4) are assumed compliant; either can force NM1.",
+      "Straw cover is arithmetic: straw clock (one trial's half-lives, scenario windows) converted with Gregory's mass-to-cover relation using wheat coefficients from US measurements. No NDTI threshold was calibrated against field cover.",
+      "T (years without tillage) is an assumption (8+ years of no-till) until the Landsat series is checked.",
+      "The ZarcNM subsidy for soybean has a budget of R$ 1 million in 2026 for four states (Resolução CGSR 111/2026).",
+      "Portaria 209/2026 item 2.1 speaks of 'sete indicadores'; IN 2/2025 Table 1, which this pre-check follows, lists six."
+    ],
+    "sources": [
+      {
+        "id": "S1",
+        "label": "Instrução Normativa SPA/MAPA nº 2, de 8 de julho de 2025, Annex (soybean), DOU 09/07/2025, ed. 127, seção 1, p. 3",
+        "url": null
+      },
+      {
+        "id": "S2",
+        "label": "Portaria SPA/MAPA nº 209, de 30 de junho de 2026 (ZarcNM soybean, Rio Grande do Sul, 2026/27), DOU 03/07/2026, seção 1",
+        "url": "https://www.gov.br/agricultura/pt-br/assuntos/riscos-seguro/programa-nacional-de-zoneamento-agricola-de-risco-climatico/portarias/safra-vigente/rio-grande-do-sul"
+      },
+      {
+        "id": "S3",
+        "label": "Resolução CGSR nº 111, de 28 de abril de 2026 (Legismap transcription)",
+        "url": "https://legismap.com.br/leis-e-normas/resolucao-cgsr-n-111-de-28-04-2026"
+      },
+      {
+        "id": "S3b",
+        "label": "Agrolink, 07/08/2026, 'Seguro rural em agosto: PSR reserva R$ 1 milhão para soja' (states of the pilot)",
+        "url": "https://www.agrolink.com.br/noticias/seguro-rural-em-agosto--psr-reserva-r--1-milhao-para-soja_517600.html"
+      },
+      {
+        "id": "S4",
+        "label": "FieldShift straw clock (analysis/storms-bare-soil/results/straw_clock.json): half-lives from Campos et al. (2011), initial straw from Aita & Giacomini (2003) and Santos et al. (2019)",
+        "url": "https://github.com/FieldShift-SpaceApp/fieldshift/tree/main/analysis/storms-bare-soil"
+      },
+      {
+        "id": "S5",
+        "label": "Santos et al. (ed.) (2019), Sistemas de produção para cereais de inverno: três décadas de estudos, Embrapa (winter species, oat + vetch consortium)",
+        "url": "https://www.alice.cnptia.embrapa.br/alice/bitstream/doc/1111855/1/ID446652019LVSistemasdeproducao.pdf"
+      },
+      {
+        "id": "S6",
+        "label": "McCool, D.K.; Sharratt, B.S.; Krauss, H.A.; McClellan, R.C. (2006). Residue characteristics for wind and water erosion control. 14th ISCO Conference, Marrakech (quotes Gregory, J.M. 1982, Trans. ASAE 25:1333-1337, Am for wheat residue)",
+        "url": "https://topsoil.nserl.purdue.edu/isco/isco14/5%20Erosion%20Process%20&%20Control/Oral/T5-McCool-Residue%20Characteristics%20for%20Windl-USA.pdf"
+      },
+      {
+        "id": "S7",
+        "label": "MAPA, Relatório Geral PSR 2024, Table 11 (national soybean premium and area)",
+        "url": "https://www.gov.br/agricultura/pt-br/assuntos/riscos-seguro/seguro-rural/dados/relatorios/relatorio-geral-psr-2024.pdf"
+      }
+    ]
+  },
+  "satellite_indicators": null,
+  "slope": {
+    "source": "NASADEM (NASA JPL, 1 arc-second, SRTM-based, year-2000 surface) via the Microsoft Planetary Computer collection 'nasadem' (anonymous); reprojected bilinearly to UTM 22S at 30 m; slope = 100 x the magnitude of the elevation gradient (numpy.gradient, central differences)",
+    "nasadem_items": [
+      "NASADEM_HGT_s29w054"
+    ],
+    "cropland_mask": "ESA WorldCover 2021 class 40, >= 50% of the 30 m pixel, inside IBGE municipality 4306106",
+    "cropland_pixels_30m": 1165563,
+    "cropland_ha": 104901,
+    "norm_rule": "IN SPA/MAPA 2/2025 item 3.2.1 I: slope >= 3% requires contour sowing (or sowing on the level) on at least 75% of the area in the last year, otherwise the management level is NM1. The norm defines no other slope class.",
+    "norm_classes_pct_of_cropland": {
+      "slope_lt_3": 12.6,
+      "slope_ge_3": 87.4
+    },
+    "context_classes_pct_of_cropland": {
+      "0-3": 12.6,
+      "3-8": 48.7,
+      "8-20": 38.3,
+      "20-45": 0.4,
+      "ge_45": 0.0
+    },
+    "context_classes_note": "Relief classes used by Embrapa soil surveys (flat 0-3%, gently undulating 3-8%, undulating 8-20%, strongly undulating 20-45%); context only, not classes of the norm.",
+    "slope_pct_quantiles": {
+      "10": 2.6,
+      "25": 4.4,
+      "50": 6.8,
+      "75": 9.7,
+      "90": 12.3
+    },
+    "slope_pct_mean": 7.25,
+    "warning": "The satellite and the DEM do not see contour sowing, terraces or sowing on the level: they only say where the rule applies (slope >= 3%), not whether the field complies. NASADEM noise at 30 m inflates slope on gentle relief; a field's mean slope (item 6.3) can differ from the pixel shares here.",
+    "quadrats": [
+      {
+        "quadrant_id": "CA-Q1",
+        "lat": -28.77507,
+        "lon": -53.75102,
+        "slope_class_rule": "0-3%",
+        "slope_mean_pct_nasadem": 2.75,
+        "elevation_mean_m_nasadem": 394.9
+      },
+      {
+        "quadrant_id": "CA-Q2",
+        "lat": -28.55894,
+        "lon": -53.59518,
+        "slope_class_rule": "3-8%",
+        "slope_mean_pct_nasadem": 5.9,
+        "elevation_mean_m_nasadem": 446.0
+      },
+      {
+        "quadrant_id": "CA-Q3",
+        "lat": -28.62604,
+        "lon": -53.48027,
+        "slope_class_rule": ">= 8%",
+        "slope_mean_pct_nasadem": 8.88,
+        "elevation_mean_m_nasadem": 419.4
+      }
+    ],
+    "quadrats_rule_ge_3pct": {
+      "CA-Q1": false,
+      "CA-Q2": true,
+      "CA-Q3": true
+    }
+  },
+  "subsidy_by_level": {
+    "NM1": 20,
+    "NM2": 30,
+    "NM3": 35,
+    "NM4": 40
+  },
+  "budget_note": {
+    "brl_million": 1,
+    "crop": "soybean",
+    "states": 4
+  },
+  "rule_locks": [
+    "Slope ≥ 3% without contour planting on 75% of the area → NM1.",
+    "Two indicators at level 1 → NM1."
+  ],
+  "links": {
+    "precheck": "https://github.com/FieldShift-SpaceApp/fieldshift/tree/main/analysis/zarcnm-precheck",
+    "residue": "https://github.com/FieldShift-SpaceApp/fieldshift/tree/main/analysis/residue-landsat"
+  },
+  "interpretations": [
+    "\"More than 4 months\" = more than 121.75 days (4 average months).",
+    "The 6-crop minimum of level 3 applies to both sides of its \"OU\".",
+    "At level 4, the \"2 covers of more than 45 days\" are in addition to the cover of more than 4 months (3 covers in all).",
+    "When several locks apply, the most restrictive wins (item 3.2 only says they have priority over the mean).",
+    "\"Consecutive soybean crops\": the norm does not say whether a fallow winter breaks the sequence. Read literally, soybean-fallow-soybean is consecutive; the pre-check keeps both readings in the range.",
+    "An item 2.4-I grass counts as one cover of more than 45 days."
+  ],
+  "subsidy_brl_per_ha_note": "null: no published average soybean premium per hectare for Rio Grande do Sul was found. The PSR 2024 report (Atlas do Seguro Rural) gives only the national soybean figures (R$ 2,007 million of premium on 4.83 million ha, about R$ 415/ha in 2024) and RS totals for all crops; neither is a Rio Grande do Sul soybean premium, so no R$/ha is estimated.",
+  "precheck_generated_at": "2026-11-15T02:54:44+00:00",
+  "residue": {
+    "before": {
+      "date": "1991-11-04",
+      "sensor": "Landsat 5 TM",
+      "pct_of_clear_cropland": {
+        "green": 61.9,
+        "straw": 18.2,
+        "bare": 20.0
+      }
+    },
+    "after": {
+      "date": "2026-10-20",
+      "sensor": "HLS S30",
+      "pct_of_clear_cropland": {
+        "green": 79.3,
+        "straw": 20.4,
+        "bare": 0.3
+      },
+      "clear_fraction": 0.871
+    },
+    "thresholds": {
+      "ndvi_green_min": 0.3,
+      "ndti_bare_below": 0.06
+    },
+    "attribution": "NASA/USGS Landsat; NASA HLS; ESA WorldCover 2021 (contains modified Copernicus Sentinel data 2021); IBGE municipal mesh 2022",
+    "image": "/soil-level/residue-before-after.png",
+    "cropland_km2": 1049,
+    "epochs_spring": {
+      "1984-1994": 5.7,
+      "1995-2004": 0.7,
+      "2005-2014": 0.3,
+      "2015-2026": 0.3
+    },
+    "caveats": [
+      "No field calibration: 'probable bare soil' is a spectral inference with a threshold chosen by this analysis, not a measured residue cover.",
+      "NDTI is sensitive to soil and residue moisture (Quemada and Daughtry 2016) and to kaolinite-rich soils (Hively et al. 2021); the Oxisols of Cruz Alta are kaolinitic.",
+      "Different sensors (TM, ETM+, OLI, OLI-2, MSI) without a field-based cross-calibration of NDTI.",
+      "One cropland mask (WorldCover 2021) for 40 years: fields that changed use are misclassified."
+    ]
+  },
+  "alternate": {
+    "id": "alternate",
+    "label": "Alternate wheat and cover",
+    "derived": true,
+    "derived_how": "Derived here with the functions of analysis/zarcnm-precheck (straw_indicator, level_diversity, level_years_without_tillage, nm_range): straw cover C is the union of the wheat and cover ranges, diversity D is computed for the 3-year sequences W-C-W and C-W-C with 93 and 199 days of cover, T assumed 8+ years as in the other paths, no soy-on-soy and no legume-only succession.",
+    "indicators": {
+      "T": [
+        4,
+        4
+      ],
+      "C": [
+        2,
+        4
+      ],
+      "D": [
+        2,
+        3
+      ]
+    },
+    "diversity_by_sequence": [
+      {
+        "cover_days": 93,
+        "winters": "TCT",
+        "level": 2
+      },
+      {
+        "cover_days": 93,
+        "winters": "CTC",
+        "level": 2
+      },
+      {
+        "cover_days": 199,
+        "winters": "TCT",
+        "level": 3
+      },
+      {
+        "cover_days": 199,
+        "winters": "CTC",
+        "level": 3
+      }
+    ],
+    "nm_range": {
+      "min": 2,
+      "max": 4,
+      "condition": "if all 3 soil-test indicators (V%, Ca, m%) are at level 4, contour sowing is confirmed (or slope < 3%), the soil is deeper than 1 m, and no-till holds for 8+ years"
+    },
+    "nm_range_by_soil_level": {
+      "1": {
+        "min": 1,
+        "max": 1
+      },
+      "2": {
+        "min": 2,
+        "max": 2
+      },
+      "3": {
+        "min": 2,
+        "max": 3
+      },
+      "4": {
+        "min": 2,
+        "max": 4
+      }
+    },
+    "subsidy_pct_range": {
+      "min": 30,
+      "max": 40
+    }
+  },
+  "fingerprint": {
+    "same_path_every_year_pct": 5.3,
+    "never_fallow_pct": 97.3,
+    "fallow_pct_max_2020_2025": 0.58,
+    "fallow_pct_min_2020_2025": 0.26,
+    "years": "2020-2026",
+    "cropland_ha": 104898,
+    "image_maps": "/fingerprint/rotation-fingerprint-maps.png",
+    "image_gif": "/fingerprint/rotation-fingerprint.gif"
+  }
+}

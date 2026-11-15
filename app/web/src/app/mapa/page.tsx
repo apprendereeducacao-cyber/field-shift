@@ -11,11 +11,13 @@ export default async function Mapa() {
   ]);
 
   return (
-    <MapaClient
-      ndviTiles={ndviTiles}
-      topography={topography}
-      site={site}
-      mapbiomas={mapbiomas}
-    />
+    <div className="-mx-4 -my-6 sm:-mx-6">
+      <MapaClient
+        ndviTiles={ndviTiles}
+        topography={topography}
+        site={site}
+        mapbiomas={mapbiomas}
+      />
+    </div>
   );
 }

@@ -2,39 +2,40 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useLang } from "@/lib/i18n";
 
 const SUMMER_CROPS = [
-  { value: "soja", label: "Soja" },
-  { value: "milho", label: "Milho" },
-  { value: "outro", label: "Outro" },
-  { value: "nenhum", label: "Nenhum" },
+  { value: "soja", en: "Soybean", label: "Soja" },
+  { value: "milho", en: "Corn", label: "Milho" },
+  { value: "outro", en: "Other", label: "Outro" },
+  { value: "nenhum", en: "None", label: "Nenhum" },
 ];
 
 const WINTER_CROPS = [
-  { value: "trigo", label: "Trigo" },
-  { value: "aveia_preta", label: "Aveia Preta" },
-  { value: "ervilhaca", label: "Ervilhaca" },
-  { value: "nabo_forrageiro", label: "Nabo Forrageiro" },
-  { value: "azevem", label: "Azevem" },
-  { value: "canola", label: "Canola" },
-  { value: "pousio", label: "Pousio (não plantou nada)" },
-  { value: "outro", label: "Outro" },
+  { value: "trigo", en: "Wheat", label: "Trigo" },
+  { value: "aveia_preta", en: "Black oat", label: "Aveia Preta" },
+  { value: "ervilhaca", en: "Common vetch", label: "Ervilhaca" },
+  { value: "nabo_forrageiro", en: "Forage radish", label: "Nabo Forrageiro" },
+  { value: "azevem", en: "Ryegrass", label: "Azevem" },
+  { value: "canola", en: "Canola", label: "Canola" },
+  { value: "pousio", en: "Fallow (nothing planted)", label: "Pousio (não plantou nada)" },
+  { value: "outro", en: "Other", label: "Outro" },
 ];
 
 const YIELD_RESULTS = [
-  { value: "boa", label: "Boa (acima da média)" },
-  { value: "normal", label: "Normal" },
-  { value: "ruim", label: "Ruim (abaixo da média)" },
-  { value: "perda_total", label: "Perda total" },
+  { value: "boa", en: "Good (above average)", label: "Boa (acima da média)" },
+  { value: "normal", en: "Normal", label: "Normal" },
+  { value: "ruim", en: "Poor (below average)", label: "Ruim (abaixo da média)" },
+  { value: "perda_total", en: "Total loss", label: "Perda total" },
 ];
 
 const PROBLEMS = [
-  { value: "nenhum", label: "Nenhum problema grave" },
-  { value: "seca", label: "Seca" },
-  { value: "chuva_demais", label: "Chuva demais" },
-  { value: "praga_doenca", label: "Praga ou doenca" },
-  { value: "solo_compactado", label: "Solo compactado" },
-  { value: "geada", label: "Geada" },
+  { value: "nenhum", en: "No serious problem", label: "Nenhum problema grave" },
+  { value: "seca", en: "Drought", label: "Seca" },
+  { value: "chuva_demais", en: "Too much rain", label: "Chuva demais" },
+  { value: "praga_doenca", en: "Pest or disease", label: "Praga ou doenca" },
+  { value: "solo_compactado", en: "Compacted soil", label: "Solo compactado" },
+  { value: "geada", en: "Frost", label: "Geada" },
 ];
 
 type YearData = {
@@ -54,6 +55,7 @@ type ProducerData = {
 };
 
 const YEAR_LABELS = ["Ano 1 (mais recente)", "Ano 2"];
+const YEAR_LABELS_EN = ["Year 1 (most recent)", "Year 2"];
 
 const DEFAULT_YEAR: YearData = {
   label: "",
@@ -74,8 +76,9 @@ function SelectField({
   label: string;
   value: string;
   onChange: (v: string) => void;
-  options: { value: string; label: string }[];
+  options: { value: string; en: string; label: string }[];
 }) {
+  const { t } = useLang();
   return (
     <div>
       <label htmlFor={id} className="mb-1 block text-sm text-muted-foreground">
@@ -89,7 +92,7 @@ function SelectField({
       >
         {options.map((opt) => (
           <option key={opt.value} value={opt.value}>
-            {opt.label}
+            {t(opt.en, opt.label)}
           </option>
         ))}
       </select>
@@ -150,6 +153,7 @@ export default function ProdutorPage() {
   const [usedGreenManure, setUsedGreenManure] = useState(false);
   const [saved, setSaved] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const { t } = useLang();
 
   useEffect(() => {
     try {
@@ -201,14 +205,16 @@ export default function ProdutorPage() {
       <div className="mx-auto max-w-3xl">
         <header className="mb-10">
           <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">
-            Sua Lavoura
+            {t("Your Field", "Sua Lavoura")}
           </p>
           <h1 className="mt-2 text-3xl font-bold text-foreground">
-            Conte a historia da sua lavoura
+            {t("Tell us your field's story", "Conte a historia da sua lavoura")}
           </h1>
           <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
-            Responda sobre os últimos 2 anos. Isso ajuda a gente a recomendar o
-            melhor manejo de inverno pra você.
+            {t(
+              "Answer about the last 2 years. This helps us recommend the best winter management for you.",
+              "Responda sobre os últimos 2 anos. Isso ajuda a gente a recomendar o melhor manejo de inverno pra você.",
+            )}
           </p>
         </header>
 
@@ -219,33 +225,33 @@ export default function ProdutorPage() {
               className="rounded-[24px] border border-border bg-card p-6"
             >
               <h2 className="mb-5 text-lg font-semibold text-foreground">
-                {year.label}
+                {t(YEAR_LABELS_EN[i] ?? year.label, year.label)}
               </h2>
               <div className="grid gap-4 sm:grid-cols-2">
                 <SelectField
                   id={`summer-${i}`}
-                  label="O que plantou no verão?"
+                  label={t("What did you plant in summer?", "O que plantou no verão?")}
                   value={year.summer_crop}
                   onChange={(v) => updateYear(i, "summer_crop", v)}
                   options={SUMMER_CROPS}
                 />
                 <SelectField
                   id={`winter-${i}`}
-                  label="O que plantou no inverno?"
+                  label={t("What did you plant in winter?", "O que plantou no inverno?")}
                   value={year.winter_crop}
                   onChange={(v) => updateYear(i, "winter_crop", v)}
                   options={WINTER_CROPS}
                 />
                 <SelectField
                   id={`yield-${i}`}
-                  label="Como foi a safra de verão?"
+                  label={t("How was the summer harvest?", "Como foi a safra de verão?")}
                   value={year.yield_result}
                   onChange={(v) => updateYear(i, "yield_result", v)}
                   options={YIELD_RESULTS}
                 />
                 <SelectField
                   id={`problem-${i}`}
-                  label="Qual foi o maior problema?"
+                  label={t("What was the main problem?", "Qual foi o maior problema?")}
                   value={year.main_problem}
                   onChange={(v) => updateYear(i, "main_problem", v)}
                   options={PROBLEMS}
@@ -256,12 +262,12 @@ export default function ProdutorPage() {
 
           <section className="space-y-3">
             <h2 className="text-lg font-semibold text-foreground">
-              Sobre a sua propriedade
+              {t("About your farm", "Sobre a sua propriedade")}
             </h2>
             <Toggle
               id="cattle"
-              label="Tem gado na propriedade?"
-              description="Se sim, culturas que servem de pasto no inverno ganham prioridade"
+              label={t("Do you have cattle on the farm?", "Tem gado na propriedade?")}
+              description={t("If so, crops that work as winter pasture get priority", "Se sim, culturas que servem de pasto no inverno ganham prioridade")}
               checked={hasCattle}
               onChange={(v) => {
                 setHasCattle(v);
@@ -270,8 +276,8 @@ export default function ProdutorPage() {
             />
             <Toggle
               id="compaction"
-              label="O solo está compactado?"
-              description="Se a água empoça ou a raiz não desce, o solo pode estar compactado"
+              label={t("Is the soil compacted?", "O solo está compactado?")}
+              description={t("If water ponds or roots cannot go deep, the soil may be compacted", "Se a água empoça ou a raiz não desce, o solo pode estar compactado")}
               checked={soilCompacted}
               onChange={(v) => {
                 setSoilCompacted(v);
@@ -280,8 +286,8 @@ export default function ProdutorPage() {
             />
             <Toggle
               id="green-manure"
-              label="Já usou adubo verde alguma vez?"
-              description="Ervilhaca, crotalaria, nabo — qualquer planta pra melhorar o solo"
+              label={t("Have you ever used green manure?", "Já usou adubo verde alguma vez?")}
+              description={t("Vetch, crotalaria, radish — any plant to improve the soil", "Ervilhaca, crotalaria, nabo — qualquer planta pra melhorar o solo")}
               checked={usedGreenManure}
               onChange={(v) => {
                 setUsedGreenManure(v);
@@ -295,23 +301,25 @@ export default function ProdutorPage() {
               onClick={handleSave}
               className="h-11 w-full rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover sm:w-auto sm:px-12"
             >
-              Salvar meu histórico
+              {t("Save my history", "Salvar meu histórico")}
             </button>
 
             {saved && (
               <div className="w-full rounded-[24px] border border-status-success/30 bg-status-success-bg p-5 text-center">
                 <p className="text-sm font-medium text-status-success">
-                  Histórico salvo com sucesso
+                  {t("History saved", "Histórico salvo com sucesso")}
                 </p>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  Agora a gente pode cruzar seus dados com 44 anos de clima e
-                  recomendar o melhor manejo.
+                  {t(
+                    "Now we can cross your data with 44 years of climate and recommend the best management.",
+                    "Agora a gente pode cruzar seus dados com 44 anos de clima e recomendar o melhor manejo.",
+                  )}
                 </p>
                 <Link
                   href="/recomendacao"
                   className="mt-4 inline-block h-11 rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-hover"
                 >
-                  Ver minha recomendação
+                  {t("See my recommendation", "Ver minha recomendação")}
                 </Link>
               </div>
             )}

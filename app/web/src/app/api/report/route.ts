@@ -8,9 +8,14 @@ import {
   getSite,
 } from "@/lib/supabase-data";
 
+const MONTHS_PT = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+const MONTHS_EN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const year = searchParams.get("year");
+  // Idioma do texto do resumo (padrão: inglês). Os números são os mesmos nos dois.
+  const en = searchParams.get("lang") !== "pt";
 
   try {
     const siteId = await getDefaultSiteId();
@@ -50,13 +55,33 @@ export async function GET(request: Request) {
     const frostMonths = riskMonths
       .map((m: any, i: number) => ({ i, v: m.frost ?? 0 }))
       .filter((m: any) => m.v > 0.3)
-      .map((m: any) => ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"][m.i]);
+      .map((m: any) => (en ? MONTHS_EN : MONTHS_PT)[m.i]);
     const dryMonths = riskMonths
       .map((m: any, i: number) => ({ i, v: m.dry_spell ?? 0 }))
       .filter((m: any) => m.v > 0.3)
-      .map((m: any) => ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"][m.i]);
+      .map((m: any) => (en ? MONTHS_EN : MONTHS_PT)[m.i]);
 
     const lines: string[] = [];
+    if (en) {
+      lines.push(`${site.point.name} has ${totalYears} years of satellite data. Historical average: ${avgYield.toFixed(1)} bags/ha of soybean, ${avgRain?.toFixed(0) ?? "—"} mm of rain/year, mean temperature of ${avgTemp?.toFixed(1) ?? "—"} C.`);
+      if (bestYear && worstYear) {
+        const bY = bestYear.yield_sc_ha ?? 0;
+        const wY = worstYear.yield_sc_ha ?? 0;
+        lines.push(`Best season: ${bestYear.year} with ${bY.toFixed(1)} bags/ha. Worst: ${worstYear.year} with ${wY.toFixed(1)} bags/ha — a gap of ${(bY - wY).toFixed(0)} bags.`);
+      }
+      if (frostMonths.length > 0) {
+        lines.push(`Frost is a real risk: it shows up in more than 3 out of 10 years in ${frostMonths.join(", ")}.`);
+      }
+      if (dryMonths.length > 0) {
+        lines.push(`Long dry spells concentrate in ${dryMonths.join(", ")}.`);
+      }
+      if (yearData) {
+        const yVal = yearData.yield_sc_ha ?? 0;
+        const diff = yVal - avgYield;
+        const dir = diff > 0 ? "above" : "below";
+        lines.push(`${selectedYear} season: ${yVal.toFixed(1)} bags/ha (${Math.abs(diff).toFixed(1)} ${dir} average), ${yearData.annual_rain_mm?.toFixed(0) ?? "—"} mm of rain.`);
+      }
+    } else {
     lines.push(`${site.point.name} tem ${totalYears} anos de dados satelitais. Media historica: ${avgYield.toFixed(1)} sc/ha de soja, ${avgRain?.toFixed(0) ?? "—"} mm de chuva/ano, temperatura media de ${avgTemp?.toFixed(1) ?? "—"} C.`);
     if (bestYear && worstYear) {
       const bY = bestYear.yield_sc_ha ?? 0;
@@ -74,6 +99,7 @@ export async function GET(request: Request) {
       const diff = yVal - avgYield;
       const dir = diff > 0 ? "acima" : "abaixo";
       lines.push(`Safra ${selectedYear}: ${yVal.toFixed(1)} sc/ha (${Math.abs(diff).toFixed(1)} ${dir} da media), ${yearData.annual_rain_mm?.toFixed(0) ?? "—"} mm de chuva.`);
+    }
     }
     const summary = lines.join(" ");
 
@@ -100,6 +126,7 @@ export async function GET(request: Request) {
       coverCrops: cropNames,
       rotation: topStrategy
         ? {
+            id: topStrategy.id,
             name: topStrategy.name,
             subtitle: topStrategy.subtitle,
             scores: topStrategy.scores,
@@ -108,6 +135,7 @@ export async function GET(request: Request) {
           }
         : null,
       strategies: strategies.slice(0, 3).map((s) => ({
+        id: s.id,
         name: s.name,
         subtitle: s.subtitle,
         totalScore: s.total_score,

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import { useLang, type Lang } from "@/lib/i18n";
 import type {
   NdviTilesData,
   TopographyData,
@@ -43,6 +44,23 @@ const LAND_USE_LABELS: Record<string, string> = {
   agricultura_geral: "Agricultura geral",
 };
 
+const LAND_USE_LABELS_EN: Record<string, string> = {
+  soja: "Soybean",
+  urbano_outros: "Urban/Other",
+  floresta: "Forest",
+  outras_lavouras: "Other crops",
+  campo_nativo: "Native grassland",
+  agua: "Water",
+  silvicultura: "Planted forest",
+  pastagem: "Pasture",
+  lavoura_perene: "Perennial crops",
+  agricultura_geral: "General agriculture",
+};
+
+function landUseLabel(key: string, lang: Lang) {
+  return (lang === "pt" ? LAND_USE_LABELS : LAND_USE_LABELS_EN)[key] ?? key;
+}
+
 type LayerKey =
   | "relevo"
   | "temperatura"
@@ -55,7 +73,9 @@ type LayerKey =
 type LayerConfig = {
   key: LayerKey;
   label: string;
+  labelEn: string;
   description: string;
+  descriptionEn: string;
   icon: string;
   zIndex: number;
 };
@@ -64,49 +84,63 @@ const LAYER_CONFIGS: LayerConfig[] = [
   {
     key: "relevo",
     label: "Relevo",
+    labelEn: "Terrain",
     description: "SRTM 30m",
+    descriptionEn: "SRTM 30m",
     icon: "M",
     zIndex: 400,
   },
   {
     key: "temperatura",
     label: "Temperatura",
+    labelEn: "Temperature",
     description: "MODIS LST satelite",
+    descriptionEn: "MODIS LST satellite",
     icon: "T",
     zIndex: 410,
   },
   {
     key: "ndvi",
     label: "NDVI",
+    labelEn: "NDVI",
     description: "Sentinel-2 10m",
+    descriptionEn: "Sentinel-2 10m",
     icon: "N",
     zIndex: 420,
   },
   {
     key: "precipitacao",
     label: "Precipitacao",
+    labelEn: "Precipitation",
     description: "GPM IMERG satelite",
+    descriptionEn: "GPM IMERG satellite",
     icon: "P",
     zIndex: 430,
   },
   {
     key: "umidade-solo",
     label: "Umidade do Solo",
+    labelEn: "Soil Moisture",
     description: "SMAP L4 satelite",
+    descriptionEn: "SMAP L4 satellite",
     icon: "U",
     zIndex: 440,
   },
   {
     key: "uso-do-solo",
     label: "Uso do Solo",
+    labelEn: "Land Use",
     description: "MapBiomas Col. 9",
+    descriptionEn: "MapBiomas Col. 9",
     icon: "S",
     zIndex: 450,
   },
   {
     key: "ecostress",
     label: "ECOSTRESS",
+    labelEn: "ECOSTRESS",
     description: "NASA ECOSTRESS 70m",
+    descriptionEn: "NASA ECOSTRESS 70m",
     icon: "E",
     zIndex: 455,
   },
@@ -114,9 +148,17 @@ const LAYER_CONFIGS: LayerConfig[] = [
 
 type LayerState = { visible: boolean; opacity: number };
 
-const MONTH_NAMES_SHORT = [
+const MONTH_NAMES_SHORT_PT = [
   "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
   "Jul", "Ago", "Set", "Out", "Nov", "Dez",
+];
+const MONTH_NAMES_SHORT_EN = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
+const MONTH_NAMES_FULL_EN = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
 ];
 
 function elevationColor(ratio: number): string {
@@ -178,6 +220,13 @@ export default function MapaClient({
 }: Props) {
   const avgTmax = site.q1?.temperature_c?.avg_tmax ?? 25.4;
   const meanElev = topography.summary.mean_elevation_m;
+  const { lang, t: tr } = useLang();
+  const MONTH_NAMES_SHORT = lang === "pt" ? MONTH_NAMES_SHORT_PT : MONTH_NAMES_SHORT_EN;
+  // Popups do Leaflet são montados fora do React: leem o idioma atual por ref.
+  const langRef = useRef<Lang>(lang);
+  useEffect(() => {
+    langRef.current = lang;
+  }, [lang]);
 
   const tempFromElevation = useCallback(
     (elev: number) => avgTmax + ((meanElev - elev) * 0.65) / 100,
@@ -404,22 +453,25 @@ export default function MapaClient({
         { icon: siteIcon, zIndexOffset: 1000 },
       ).addTo(map);
 
-      const popupContent = `
+      const popupContent = () => {
+        const pt = langRef.current === "pt";
+        return `
         <div style="font-family:system-ui;font-size:13px;line-height:1.5;min-width:180px;background:#FFFFFF;color:#151A17;padding:8px;border-radius:12px">
           <div style="font-weight:700;font-size:14px;margin-bottom:4px">${site.point.name}</div>
           <div style="color:#4B5C50;font-size:11px;margin-bottom:8px">${site.point.state} | ${site.point.lat.toFixed(4)}, ${site.point.lon.toFixed(4)}</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-size:12px">
-            <span style="color:#4B5C50">Elevacao media</span>
+            <span style="color:#4B5C50">${pt ? "Elevacao media" : "Mean elevation"}</span>
             <span style="font-weight:600">${meanElev}m</span>
-            <span style="color:#4B5C50">Tmax media</span>
+            <span style="color:#4B5C50">${pt ? "Tmax media" : "Mean Tmax"}</span>
             <span style="font-weight:600">${avgTmax.toFixed(1)}°C</span>
-            <span style="color:#4B5C50">Desnivel</span>
+            <span style="color:#4B5C50">${pt ? "Desnivel" : "Relief"}</span>
             <span style="font-weight:600">${topography.summary.range_m}m</span>
-            <span style="color:#4B5C50">Pts topografia</span>
+            <span style="color:#4B5C50">${pt ? "Pts topografia" : "Topography pts"}</span>
             <span style="font-weight:600">${topography.points.length}</span>
           </div>
         </div>
       `;
+      };
       siteMarkerRef.current.bindPopup(popupContent, {
         maxWidth: 280,
         className: "fs-popup",
@@ -439,19 +491,20 @@ export default function MapaClient({
         const elevRange = topography.summary.max_elevation_m - topography.summary.min_elevation_m || 1;
         const elevRatio = (elev - topography.summary.min_elevation_m) / elevRange;
 
+        const pt = langRef.current === "pt";
         const popup = L.popup()
           .setLatLng(e.latlng)
           .setContent(
             `<div style="font-family:system-ui;font-size:12px;line-height:1.6;min-width:160px;background:#FFFFFF;color:#151A17;padding:8px;border-radius:12px">
-              <div style="font-weight:700;font-size:13px;margin-bottom:4px;border-bottom:1px solid #D6E5D8;padding-bottom:4px">Dados do ponto</div>
+              <div style="font-weight:700;font-size:13px;margin-bottom:4px;border-bottom:1px solid #D6E5D8;padding-bottom:4px">${pt ? "Dados do ponto" : "Point data"}</div>
               <div style="display:grid;grid-template-columns:auto 1fr;gap:2px 10px">
                 <span style="color:#4B5C50">Latitude</span><span>${lat.toFixed(5)}</span>
                 <span style="color:#4B5C50">Longitude</span><span>${lng.toFixed(5)}</span>
-                <span style="color:#4B5C50">Elevacao</span>
+                <span style="color:#4B5C50">${pt ? "Elevacao" : "Elevation"}</span>
                 <span style="font-weight:600">${elev.toFixed(0)}m
                   <span style="display:inline-block;width:10px;height:10px;border-radius:2px;vertical-align:middle;margin-left:4px;background:${elevationColor(elevRatio)}"></span>
                 </span>
-                <span style="color:#4B5C50">Temp. max est.</span>
+                <span style="color:#4B5C50">${pt ? "Temp. max est." : "Est. max temp."}</span>
                 <span style="font-weight:600">${temp.toFixed(1)}°C</span>
               </div>
             </div>`,
@@ -753,7 +806,7 @@ export default function MapaClient({
           pane: "uso-do-solo",
         })
           .bindTooltip(
-            `<strong>${LAND_USE_LABELS[key] ?? key}</strong><br/>${val.pct}% — ${val.area_ha.toLocaleString("pt-BR")} ha`,
+            () => `<strong>${landUseLabel(key, langRef.current)}</strong><br/>${val.pct}% — ${val.area_ha.toLocaleString(langRef.current === "pt" ? "pt-BR" : "en-US")} ha`,
             { sticky: true },
           )
           .addTo(group);
@@ -875,7 +928,9 @@ export default function MapaClient({
   const ndviLabel =
     ndviMode === "yearly" && currentYearNdvi
       ? currentYearNdvi.label
-      : currentNdvi?.name;
+      : lang === "pt"
+        ? currentNdvi?.name
+        : currentNdvi && MONTH_NAMES_FULL_EN[ndviMonth - 1];
 
   const currentLst = hasLstTiles ? mapTiles.lst.monthly.find((t) => t.month === lstMonth) : null;
   const currentPrecip = hasPrecipTiles ? mapTiles.precipitation.monthly.find((t) => t.month === precipMonth) : null;
@@ -902,7 +957,7 @@ export default function MapaClient({
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
             <path d="M2 4h12M2 8h12M2 12h12" />
           </svg>
-          Camadas
+          {tr("Layers", "Camadas")}
           {visibleCount > 0 && (
             <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
               {visibleCount}
@@ -921,7 +976,8 @@ export default function MapaClient({
               }
             }}
             className="flex h-9 w-9 items-center justify-center rounded-full bg-card/95 text-muted-foreground shadow-lg backdrop-blur-sm hover:text-foreground"
-            title="Resetar vista"
+            title={tr("Reset view", "Resetar vista")}
+            aria-label={tr("Reset view", "Resetar vista")}
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
               <circle cx="8" cy="8" r="3" />
@@ -931,7 +987,8 @@ export default function MapaClient({
           <button
             onClick={toggleFullscreen}
             className="flex h-9 w-9 items-center justify-center rounded-full bg-card/95 text-muted-foreground shadow-lg backdrop-blur-sm hover:text-foreground"
-            title={isFullscreen ? "Sair do fullscreen" : "Fullscreen"}
+            title={isFullscreen ? tr("Exit fullscreen", "Sair do fullscreen") : tr("Fullscreen", "Fullscreen")}
+            aria-label={isFullscreen ? tr("Exit fullscreen", "Sair do fullscreen") : tr("Fullscreen", "Fullscreen")}
           >
             {isFullscreen ? (
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
@@ -988,10 +1045,10 @@ export default function MapaClient({
                       </span>
                       <div className="min-w-0 flex-1">
                         <div className="text-sm font-semibold leading-tight">
-                          {cfg.label}
+                          {tr(cfg.labelEn, cfg.label)}
                         </div>
                         <div className="text-[10px] leading-tight text-stone-400">
-                          {noData ? "Sem dados (rode o script GEE)" : cfg.description}
+                          {noData ? tr("No data (run the GEE script)", "Sem dados (rode o script GEE)") : tr(cfg.descriptionEn, cfg.description)}
                         </div>
                       </div>
                       {!noData && (
@@ -1086,7 +1143,7 @@ export default function MapaClient({
                           : "text-stone-400"
                       }`}
                     >
-                      Mensal
+                      {tr("Monthly", "Mensal")}
                     </button>
                     <button
                       onClick={() => {
@@ -1099,7 +1156,7 @@ export default function MapaClient({
                           : "text-stone-400"
                       }`}
                     >
-                      Anual
+                      {tr("Yearly", "Anual")}
                     </button>
                   </div>
                 )}
@@ -1161,7 +1218,7 @@ export default function MapaClient({
               <div className="mt-3 border-t border-border pt-3">
                 <div className="mb-2 flex items-center justify-between">
                   <span className="text-xs font-semibold text-foreground">
-                    Precipitacao — {MONTH_NAMES_SHORT[precipMonth - 1]}
+                    {tr("Precipitation", "Precipitacao")} — {MONTH_NAMES_SHORT[precipMonth - 1]}
                   </span>
                   {currentPrecip && (
                     <span className="rounded-full bg-status-info-bg px-2 py-0.5 text-[10px] font-bold text-status-info">
@@ -1191,8 +1248,8 @@ export default function MapaClient({
                     ))}
                   </div>
                   <div className="mt-0.5 flex justify-between text-[8px] text-stone-400">
-                    <span>Seco</span>
-                    <span>Chuvoso</span>
+                    <span>{tr("Dry", "Seco")}</span>
+                    <span>{tr("Rainy", "Chuvoso")}</span>
                   </div>
                 </div>
               </div>
@@ -1203,7 +1260,7 @@ export default function MapaClient({
               <div className="mt-3 border-t border-border pt-3">
                 <div className="mb-2 flex items-center justify-between">
                   <span className="text-xs font-semibold text-foreground">
-                    Umidade Solo — {MONTH_NAMES_SHORT[smMonth - 1]}
+                    {tr("Soil Moisture", "Umidade Solo")} — {MONTH_NAMES_SHORT[smMonth - 1]}
                   </span>
                   {currentSm && (
                     <span className="rounded-full bg-forest-50 px-2 py-0.5 text-[10px] font-bold text-moisture-600">
@@ -1233,8 +1290,8 @@ export default function MapaClient({
                     ))}
                   </div>
                   <div className="mt-0.5 flex justify-between text-[8px] text-stone-400">
-                    <span>Seco</span>
-                    <span>Umido</span>
+                    <span>{tr("Dry", "Seco")}</span>
+                    <span>{tr("Wet", "Umido")}</span>
                   </div>
                 </div>
               </div>
@@ -1282,7 +1339,7 @@ export default function MapaClient({
                 </div>
                 {currentEco && (
                   <p className="mt-1 text-[9px] text-stone-400">
-                    {currentEco.n_images} imagens | 70m resolucao
+                    {currentEco.n_images} {tr("images | 70m resolution", "imagens | 70m resolucao")}
                   </p>
                 )}
               </div>
@@ -1292,7 +1349,7 @@ export default function MapaClient({
             {layers.relevo.visible && (
               <div className="mt-3 border-t border-border pt-3">
                 <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-stone-400">
-                  Elevacao
+                  {tr("Elevation", "Elevacao")}
                 </p>
                 <div className="flex items-center gap-1">
                   <span className="text-[10px] text-muted-foreground">
@@ -1317,16 +1374,16 @@ export default function MapaClient({
             {layers.temperatura.visible && (
               <div className="mt-3 border-t border-border pt-3">
                 <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-stone-400">
-                  {hasLstTiles ? "Temperatura de superficie (LST)" : "Temperatura max. estimada"}
+                  {hasLstTiles ? tr("Land surface temperature (LST)", "Temperatura de superficie (LST)") : tr("Estimated max temperature", "Temperatura max. estimada")}
                 </p>
                 <div className="flex items-center gap-1">
-                  <span className="text-[10px] text-muted-foreground">Frio</span>
+                  <span className="text-[10px] text-muted-foreground">{tr("Cold", "Frio")}</span>
                   <div className="flex h-2 flex-1 overflow-hidden rounded-full">
                     {["#1E88E5", "#42A5F5", "#FDD835", "#FF9800", "#E65100"].map((c) => (
                       <div key={c} className="flex-1" style={{ backgroundColor: c }} />
                     ))}
                   </div>
-                  <span className="text-[10px] text-muted-foreground">Quente</span>
+                  <span className="text-[10px] text-muted-foreground">{tr("Hot", "Quente")}</span>
                 </div>
               </div>
             )}
@@ -1335,7 +1392,7 @@ export default function MapaClient({
               <div className="mt-3 border-t border-border pt-3">
                 <div className="mb-1.5 flex items-center justify-between">
                   <p className="text-[10px] font-semibold uppercase tracking-wider text-stone-400">
-                    Uso do solo
+                    {tr("Land use", "Uso do solo")}
                     {hasMbRaster && mbYears.length > 0
                       ? ` — ${mbYears[mbYearIdx]?.year}`
                       : " — 2023"}
@@ -1367,7 +1424,7 @@ export default function MapaClient({
                         style={{ backgroundColor: LAND_USE_COLORS[key] ?? "#666" }}
                       />
                       <span className="flex-1 text-[11px] text-muted-foreground">
-                        {LAND_USE_LABELS[key] ?? key}
+                        {landUseLabel(key, lang)}
                       </span>
                       <span className="font-mono text-[10px] text-stone-400">
                         {val.pct}%
@@ -1381,7 +1438,7 @@ export default function MapaClient({
             {/* Info footer */}
             <div className="mt-3 border-t border-border pt-2">
               <p className="text-[9px] leading-relaxed text-stone-400">
-                Clique no mapa para ver dados do ponto. SRTM (elevacao) | MODIS LST (temperatura) | Sentinel-2 (NDVI) | GPM (precipitacao) | SMAP (umidade) | MapBiomas (uso do solo) | NASA ECOSTRESS (LST 70m)
+                {tr("Click the map to see point data. SRTM (elevation) | MODIS LST (temperature) | Sentinel-2 (NDVI) | GPM (precipitation) | SMAP (moisture) | MapBiomas (land use) | NASA ECOSTRESS (LST 70m)", "Clique no mapa para ver dados do ponto. SRTM (elevacao) | MODIS LST (temperatura) | Sentinel-2 (NDVI) | GPM (precipitacao) | SMAP (umidade) | MapBiomas (uso do solo) | NASA ECOSTRESS (LST 70m)")}
               </p>
             </div>
           </div>
@@ -1392,9 +1449,9 @@ export default function MapaClient({
       <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-[500] flex items-end justify-between p-3">
         <div className="pointer-events-auto rounded-full bg-card/90 px-4 py-1.5 text-[11px] text-muted-foreground shadow-lg backdrop-blur-sm">
           <span className="font-semibold text-foreground">
-            Municipio de {site.point.name}
+            {tr("Municipality of", "Municipio de")} {site.point.name}
           </span>{" "}
-          — {site.point.state} | Elev. media {meanElev}m | {topography.points.length} pontos topograficos
+          — {site.point.state} | {tr("Mean elev.", "Elev. media")} {meanElev}m | {topography.points.length} {tr("topographic points", "pontos topograficos")}
         </div>
       </div>
 

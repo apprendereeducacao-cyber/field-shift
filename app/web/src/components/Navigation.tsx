@@ -4,15 +4,42 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { useLang } from "@/lib/i18n";
 
 const NAV_ITEMS = [
-  { href: "/", label: "Inicio" },
-  { href: "/mapa", label: "Mapa" },
+  { href: "/", en: "Home", pt: "Início" },
+  { href: "/mapa", en: "Map", pt: "Mapa" },
 ];
+
+function LangToggle() {
+  const { lang, setLang, t } = useLang();
+  return (
+    <div
+      role="group"
+      aria-label={t("Language", "Idioma")}
+      className="flex items-center rounded-full border border-stone-600 p-0.5 text-xs font-semibold"
+    >
+      {(["en", "pt"] as const).map((code) => (
+        <button
+          key={code}
+          type="button"
+          onClick={() => setLang(code)}
+          aria-pressed={lang === code}
+          className={`rounded-full px-2.5 py-1 transition-colors ${
+            lang === code ? "bg-lime-signal text-shell" : "text-stone-300 hover:text-white"
+          }`}
+        >
+          {code.toUpperCase()}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 export default function Navigation() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const { t } = useLang();
 
   return (
     <nav className="sticky top-0 z-50 bg-shell" style={{ height: 72 }}>
@@ -41,19 +68,24 @@ export default function Navigation() {
                     : "text-stone-300 hover:text-white"
                 }`}
               >
-                {item.label}
+                {t(item.en, item.pt)}
                 {isActive && (
                   <span className="absolute bottom-0.5 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-lime-signal" />
                 )}
               </Link>
             );
           })}
+          <div className="ml-3">
+            <LangToggle />
+          </div>
         </div>
 
-        <button
+        <div className="flex items-center gap-2 md:hidden">
+          <LangToggle />
+          <button
           onClick={() => setMenuOpen(!menuOpen)}
           className="flex h-10 w-10 items-center justify-center rounded-full text-stone-300 hover:text-white md:hidden"
-          aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
+          aria-label={menuOpen ? t("Close menu", "Fechar menu") : t("Open menu", "Abrir menu")}
         >
           {menuOpen ? (
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -65,6 +97,7 @@ export default function Navigation() {
             </svg>
           )}
         </button>
+        </div>
       </div>
 
       {menuOpen && (
@@ -81,7 +114,7 @@ export default function Navigation() {
                 }`}
               >
                 {isActive && <span className="h-1.5 w-1.5 rounded-full bg-lime-signal" />}
-                {item.label}
+                {t(item.en, item.pt)}
               </Link>
             );
           })}

@@ -6,6 +6,8 @@ import Image from "next/image";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Sphere, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
+import { useLang } from "@/lib/i18n";
+import { cropLabel, seasonLabel, strategyName } from "@/lib/i18n-terms";
 
 const DATA_PARTNERS = [
   "NASA POWER",
@@ -22,10 +24,12 @@ const DATA_PARTNERS = [
   "SRTM",
 ];
 
+const MONTH_NAMES_SHORT_EN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const MONTH_NAMES_SHORT = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 const RISK_KEYS = ["dry_spell", "heat", "heavy_rain", "frost"] as const;
 const RISK_LABELS: Record<string, string> = { dry_spell: "Seca longa", heat: "Calor forte", heavy_rain: "Chuvarada", frost: "Geada" };
-function riskText(v: number) { return `${Math.round(v * 10)} em 10`; }
+const RISK_LABELS_EN: Record<string, string> = { dry_spell: "Long dry spell", heat: "Extreme heat", heavy_rain: "Heavy rain", frost: "Frost" };
+function riskText(v: number, word: string) { return `${Math.round(v * 10)} ${word} 10`; }
 function riskColor(v: number) {
   if (v <= 0) return "bg-stone-50 text-stone-400";
   if (v <= 0.2) return "bg-emerald-100 text-emerald-700";
@@ -53,65 +57,65 @@ type ReportData = {
   yearData: { yield: number; rain: number; temp: number; spiDjf: number } | null;
   topCrops: string[];
   coverCrops: string[];
-  rotation: { name: string; subtitle: string; scores: Record<string, number>; totalScore: number; sequence: { crop: string; season: string }[] } | null;
-  strategies: { name: string; subtitle: string; totalScore: number; sequence: { crop: string; season: string }[] }[];
+  rotation: { id?: string; name: string; subtitle: string; scores: Record<string, number>; totalScore: number; sequence: { crop: string; season: string }[] } | null;
+  strategies: { id?: string; name: string; subtitle: string; totalScore: number; sequence: { crop: string; season: string }[] }[];
   riskCalendar: { dry_spell: number; heat: number; heavy_rain: number; frost: number }[];
   summary: string;
 };
 
 /* ── Producer Form Data ── */
 const SUMMER_CROPS = [
-  { value: "soja", label: "Soja" },
-  { value: "milho", label: "Milho" },
-  { value: "feijao", label: "Feijao" },
-  { value: "outro", label: "Outro" },
-  { value: "nenhum", label: "Nenhum" },
+  { value: "soja", en: "Soybean", label: "Soja" },
+  { value: "milho", en: "Corn", label: "Milho" },
+  { value: "feijao", en: "Beans", label: "Feijão" },
+  { value: "outro", en: "Other", label: "Outro" },
+  { value: "nenhum", en: "None", label: "Nenhum" },
 ];
 
 const SAFRINHA_CROPS = [
-  { value: "soja_safrinha", label: "Soja safrinha (ciclo curto)" },
-  { value: "milho_safrinha", label: "Milho safrinha" },
-  { value: "feijao", label: "Feijao" },
-  { value: "sorgo", label: "Sorgo" },
-  { value: "girassol", label: "Girassol" },
-  { value: "milheto", label: "Milheto (cobertura)" },
-  { value: "brachiaria", label: "Brachiaria (cobertura)" },
-  { value: "crotalaria", label: "Crotalaria (adubo verde)" },
-  { value: "pousio", label: "Nao plantou safrinha" },
+  { value: "soja_safrinha", en: "Double-crop soybean (short cycle)", label: "Soja safrinha (ciclo curto)" },
+  { value: "milho_safrinha", en: "Double-crop corn (safrinha)", label: "Milho safrinha" },
+  { value: "feijao", en: "Beans", label: "Feijão" },
+  { value: "sorgo", en: "Sorghum", label: "Sorgo" },
+  { value: "girassol", en: "Sunflower", label: "Girassol" },
+  { value: "milheto", en: "Pearl millet (cover crop)", label: "Milheto (cobertura)" },
+  { value: "brachiaria", en: "Brachiaria (cover crop)", label: "Brachiaria (cobertura)" },
+  { value: "crotalaria", en: "Crotalaria (green manure)", label: "Crotalária (adubo verde)" },
+  { value: "pousio", en: "No double crop", label: "Não plantou safrinha" },
 ];
 
 const WINTER_CROPS = [
-  { value: "trigo", label: "Trigo (renda)" },
-  { value: "aveia_preta", label: "Aveia-preta (cobertura)" },
-  { value: "aveia_branca", label: "Aveia-branca (grao)" },
-  { value: "centeio", label: "Centeio" },
-  { value: "canola", label: "Canola (renda)" },
-  { value: "ervilhaca", label: "Ervilhaca (fixa nitrogenio)" },
-  { value: "nabo_forrageiro", label: "Nabo forrageiro (descompacta)" },
-  { value: "azevem", label: "Azevem (pastagem)" },
-  { value: "aveia_ervilhaca", label: "Aveia-preta + Ervilhaca (mix)" },
-  { value: "centeio_nabo", label: "Centeio + Nabo (mix)" },
-  { value: "aveia_ervilhaca_nabo", label: "Aveia + Ervilhaca + Nabo (triplo)" },
-  { value: "pousio", label: "Pousio (nao plantou nada)" },
-  { value: "outro", label: "Outro" },
+  { value: "trigo", en: "Wheat (cash crop)", label: "Trigo (renda)" },
+  { value: "aveia_preta", en: "Black oat (cover crop)", label: "Aveia-preta (cobertura)" },
+  { value: "aveia_branca", en: "White oat (grain)", label: "Aveia-branca (grão)" },
+  { value: "centeio", en: "Rye", label: "Centeio" },
+  { value: "canola", en: "Canola (cash crop)", label: "Canola (renda)" },
+  { value: "ervilhaca", en: "Common vetch (fixes nitrogen)", label: "Ervilhaca (fixa nitrogênio)" },
+  { value: "nabo_forrageiro", en: "Forage radish (breaks compaction)", label: "Nabo forrageiro (descompacta)" },
+  { value: "azevem", en: "Ryegrass (pasture)", label: "Azevém (pastagem)" },
+  { value: "aveia_ervilhaca", en: "Black oat + vetch (mix)", label: "Aveia-preta + Ervilhaca (mix)" },
+  { value: "centeio_nabo", en: "Rye + forage radish (mix)", label: "Centeio + Nabo (mix)" },
+  { value: "aveia_ervilhaca_nabo", en: "Oat + vetch + radish (triple mix)", label: "Aveia + Ervilhaca + Nabo (triplo)" },
+  { value: "pousio", en: "Fallow (nothing planted)", label: "Pousio (não plantou nada)" },
+  { value: "outro", en: "Other", label: "Outro" },
 ];
 
 const YIELD_RESULTS = [
-  { value: "boa", label: "Boa (acima da média)" },
-  { value: "normal", label: "Normal" },
-  { value: "ruim", label: "Ruim (abaixo da média)" },
-  { value: "perda_total", label: "Perda total" },
+  { value: "boa", en: "Good (above average)", label: "Boa (acima da média)" },
+  { value: "normal", en: "Normal", label: "Normal" },
+  { value: "ruim", en: "Poor (below average)", label: "Ruim (abaixo da média)" },
+  { value: "perda_total", en: "Total loss", label: "Perda total" },
 ];
 
 const PROBLEMS = [
-  { value: "nenhum", label: "Nenhum problema grave" },
-  { value: "seca", label: "Seca / estiagem" },
-  { value: "chuva_demais", label: "Excesso de chuva" },
-  { value: "praga_doenca", label: "Praga ou doença" },
-  { value: "nematoides", label: "Nematóides" },
-  { value: "solo_compactado", label: "Solo compactado" },
-  { value: "geada", label: "Geada" },
-  { value: "granizo", label: "Granizo" },
+  { value: "nenhum", en: "No serious problem", label: "Nenhum problema grave" },
+  { value: "seca", en: "Drought / dry spell", label: "Seca / estiagem" },
+  { value: "chuva_demais", en: "Too much rain", label: "Excesso de chuva" },
+  { value: "praga_doenca", en: "Pest or disease", label: "Praga ou doença" },
+  { value: "nematoides", en: "Nematodes", label: "Nematóides" },
+  { value: "solo_compactado", en: "Compacted soil", label: "Solo compactado" },
+  { value: "geada", en: "Frost", label: "Geada" },
+  { value: "granizo", en: "Hail", label: "Granizo" },
 ];
 
 
@@ -152,20 +156,6 @@ function GlobeScene() {
   );
 }
 
-const SEASON_LABEL: Record<string, string> = {
-  summer: "Verao", safrinha: "Safrinha", winter: "Inverno", winter_late: "Pos-colheita inverno", winter_mix: "Inverno consorcio",
-};
-const CROP_DISPLAY: Record<string, string> = {
-  aveia_preta_ervilhaca: "Aveia-preta + Ervilhaca (mix)",
-  centeio_nabo: "Centeio + Nabo forrageiro (mix)",
-  brachiaria_ruziziensis: "Brachiaria ruziziensis",
-  nabo_forrageiro: "Nabo forrageiro",
-  aveia_preta: "Aveia-preta",
-};
-function formatCrop(name: string) {
-  if (CROP_DISPLAY[name]) return CROP_DISPLAY[name];
-  return name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-}
 
 const AVAILABLE_CITIES = ["cruz alta"];
 
@@ -182,6 +172,7 @@ function ProducerForm({ municipality, onComplete }: { municipality: string; onCo
   const labels = [`${thisYear - 1}/${thisYear}`, `${thisYear - 2}/${thisYear - 1}`];
   const [seasons, setSeasons] = useState<SeasonData[]>([{ ...EMPTY_SEASON }, { ...EMPTY_SEASON }]);
   const [soilCompacted, setSoilCompacted] = useState(false);
+  const { t } = useLang();
 
   useEffect(() => {
     try {
@@ -209,46 +200,46 @@ function ProducerForm({ municipality, onComplete }: { municipality: string; onCo
   return (
     <section className="mx-auto w-full max-w-2xl space-y-5 px-4 py-10 sm:px-10">
       <div className="text-center">
-        <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Sobre sua lavoura</p>
+        <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">{t("About your field", "Sobre sua lavoura")}</p>
         <h2 className="mt-2 text-[28px] font-light leading-tight tracking-[-0.02em] text-foreground sm:text-[32px]">
-          Conte sobre {municipality}
+          {t("Tell us about", "Conte sobre")} {municipality}
         </h2>
         <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-          Informe o que plantou nas 2 ultimas safras para recomendacoes personalizadas.
+          {t("Tell us what you planted in the last 2 seasons to get personalized recommendations.", "Informe o que plantou nas 2 últimas safras para recomendações personalizadas.")}
         </p>
       </div>
 
       {seasons.map((s, i) => (
         <div key={i} className="rounded-[24px] border border-border bg-card p-6 space-y-4">
-          <h3 className="text-base font-semibold text-foreground">Safra {labels[i]}</h3>
+          <h3 className="text-base font-semibold text-foreground">{t("Season", "Safra")} {labels[i]}</h3>
           <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground uppercase tracking-wide">Verao</label>
+            <label className="mb-1 block text-xs font-medium text-muted-foreground uppercase tracking-wide">{t("Summer", "Verão")}</label>
             <select value={s.summer} onChange={(e) => update(i, "summer", e.target.value)} className={sel}>
-              {SUMMER_CROPS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              {SUMMER_CROPS.map((o) => <option key={o.value} value={o.value}>{t(o.en, o.label)}</option>)}
             </select>
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground uppercase tracking-wide">Safrinha</label>
+            <label className="mb-1 block text-xs font-medium text-muted-foreground uppercase tracking-wide">{t("Double crop (safrinha)", "Safrinha")}</label>
             <select value={s.safrinha} onChange={(e) => update(i, "safrinha", e.target.value)} className={sel}>
-              {SAFRINHA_CROPS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              {SAFRINHA_CROPS.map((o) => <option key={o.value} value={o.value}>{t(o.en, o.label)}</option>)}
             </select>
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground uppercase tracking-wide">Inverno</label>
+            <label className="mb-1 block text-xs font-medium text-muted-foreground uppercase tracking-wide">{t("Winter", "Inverno")}</label>
             <select value={s.winter} onChange={(e) => update(i, "winter", e.target.value)} className={sel}>
-              {WINTER_CROPS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              {WINTER_CROPS.map((o) => <option key={o.value} value={o.value}>{t(o.en, o.label)}</option>)}
             </select>
           </div>
           <div className="border-t border-border pt-3">
-            <label className="mb-1 block text-xs font-medium text-muted-foreground uppercase tracking-wide">Resultado do verao</label>
+            <label className="mb-1 block text-xs font-medium text-muted-foreground uppercase tracking-wide">{t("Summer yield", "Resultado do verão")}</label>
             <select value={s.yield_result} onChange={(e) => update(i, "yield_result", e.target.value)} className={sel}>
-              {YIELD_RESULTS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              {YIELD_RESULTS.map((o) => <option key={o.value} value={o.value}>{t(o.en, o.label)}</option>)}
             </select>
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground uppercase tracking-wide">Maior problema</label>
+            <label className="mb-1 block text-xs font-medium text-muted-foreground uppercase tracking-wide">{t("Main problem", "Maior problema")}</label>
             <select value={s.problem} onChange={(e) => update(i, "problem", e.target.value)} className={sel}>
-              {PROBLEMS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              {PROBLEMS.map((o) => <option key={o.value} value={o.value}>{t(o.en, o.label)}</option>)}
             </select>
           </div>
         </div>
@@ -256,10 +247,10 @@ function ProducerForm({ municipality, onComplete }: { municipality: string; onCo
 
       <div className="flex cursor-pointer items-center justify-between rounded-[24px] border border-border bg-card p-4" onClick={() => setSoilCompacted(!soilCompacted)}>
         <div>
-          <p className="text-sm font-medium text-foreground">O solo esta compactado?</p>
-          <p className="mt-0.5 text-xs text-muted-foreground">Se a agua empoca ou a raiz nao desce, pode estar compactado. Isso muda a recomendacao de cobertura.</p>
+          <p className="text-sm font-medium text-foreground">{t("Is the soil compacted?", "O solo está compactado?")}</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">{t("If water ponds or roots cannot go deep, the soil may be compacted. This changes the cover crop recommendation.", "Se a água empoça ou a raiz não desce, pode estar compactado. Isso muda a recomendação de cobertura.")}</p>
         </div>
-        <button role="switch" aria-checked={soilCompacted} onClick={(e) => { e.stopPropagation(); setSoilCompacted(!soilCompacted); }}
+        <button role="switch" aria-checked={soilCompacted} aria-label={t("Compacted soil", "Solo compactado")} onClick={(e) => { e.stopPropagation(); setSoilCompacted(!soilCompacted); }}
           className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${soilCompacted ? "bg-primary" : "bg-muted"}`}>
           <span className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow-xs transition-transform ${soilCompacted ? "translate-x-5" : "translate-x-0"}`} />
         </button>
@@ -267,10 +258,10 @@ function ProducerForm({ municipality, onComplete }: { municipality: string; onCo
 
       <div className="flex flex-col items-center gap-3 pt-2">
         <button onClick={handleSubmit} className="h-11 w-full rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover sm:w-auto sm:px-12">
-          Ver meu relatorio
+          {t("See my report", "Ver meu relatório")}
         </button>
         <button onClick={() => onComplete()} className="text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground">
-          Pular — ver relatorio sem personalizar
+          {t("Skip — see the report without personalizing", "Pular — ver relatório sem personalizar")}
         </button>
       </div>
     </section>
@@ -281,6 +272,7 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
   const [aiQuestion, setAiQuestion] = useState("");
   const [aiAnswer, setAiAnswer] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
+  const { lang, t } = useLang();
 
   const askAI = async () => {
     if (!aiQuestion.trim() || aiLoading) return;
@@ -292,7 +284,9 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           anonymous_id: "home-report",
-          message: `Contexto: ${report.municipality}, ${report.uf}, safra ${report.selectedYear}. ${aiQuestion}`,
+          message: lang === "pt"
+            ? `Contexto: ${report.municipality}, ${report.uf}, safra ${report.selectedYear}. ${aiQuestion}`
+            : `Context: ${report.municipality}, ${report.uf}, ${report.selectedYear} season. ${aiQuestion}`,
         }),
       });
       if (!res.ok || !res.body) throw new Error("request failed");
@@ -311,9 +305,9 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
           } catch { /* partial line */ }
         }
       }
-      if (!text) setAiAnswer("Sem resposta do agronomo. Tente reformular.");
+      if (!text) setAiAnswer(t("No answer from the agronomist. Try rephrasing.", "Sem resposta do agrônomo. Tente reformular."));
     } catch {
-      setAiAnswer("Erro ao consultar o agronomo. Tente novamente.");
+      setAiAnswer(t("Could not reach the agronomist. Please try again.", "Erro ao consultar o agrônomo. Tente novamente."));
     }
     setAiLoading(false);
   };
@@ -323,7 +317,7 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
       <section className="mx-auto w-full max-w-4xl px-4 py-12 sm:px-10">
         <div className="flex flex-col items-center gap-4">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-          <p className="text-sm text-muted-foreground">Analisando {report.municipality}, {report.uf}...</p>
+          <p className="text-sm text-muted-foreground">{t("Analyzing", "Analisando")} {report.municipality}, {report.uf}...</p>
         </div>
       </section>
     );
@@ -332,13 +326,13 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
   return (
     <section className="mx-auto w-full max-w-4xl space-y-6 px-4 py-12 sm:px-10">
       <div className="flex flex-col items-center gap-3 text-center">
-        <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Relatorio climatico</p>
+        <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">{t("Climate report", "Relatório climático")}</p>
         <h2 className="text-[32px] font-light leading-tight tracking-[-0.02em] text-foreground sm:text-[40px]">
           {report.municipality}, {report.uf}
         </h2>
         {report.years.length > 0 && (
           <div className="flex items-center gap-2">
-            <label className="text-sm text-muted-foreground">Safra:</label>
+            <label className="text-sm text-muted-foreground">{t("Season:", "Safra:")}</label>
             <select
               value={report.selectedYear}
               onChange={(e) => onYearChange(parseInt(e.target.value, 10))}
@@ -360,38 +354,38 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <div className="rounded-[24px] border border-border bg-card p-5 text-center">
-          <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">Risco</p>
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">{t("Risk", "Risco")}</p>
           <p className="mt-2 text-[36px] font-light tabular-nums text-primary">{report.riskScore ?? "—"}</p>
-          <p className="text-xs text-muted-foreground">{report.riskLabel ? formatCrop(report.riskLabel) : "de 100"}</p>
+          <p className="text-xs text-muted-foreground">{report.riskLabel ? cropLabel(report.riskLabel, lang) : t("out of 100", "de 100")}</p>
         </div>
         <div className="rounded-[24px] border border-border bg-card p-5 text-center">
-          <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">Temperatura</p>
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">{t("Temperature", "Temperatura")}</p>
           <p className="mt-2 text-[36px] font-light tabular-nums text-ember-600">{report.yearData?.temp?.toFixed(1) ?? report.avgTemp?.toFixed(1) ?? "—"}</p>
-          <p className="text-xs text-muted-foreground">graus C</p>
+          <p className="text-xs text-muted-foreground">{t("°C", "graus C")}</p>
         </div>
         <div className="rounded-[24px] border border-border bg-card p-5 text-center">
-          <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">Chuva</p>
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">{t("Rainfall", "Chuva")}</p>
           <p className="mt-2 text-[36px] font-light tabular-nums text-rain-600">{report.yearData?.rain?.toFixed(0) ?? report.avgRain?.toFixed(0) ?? "—"}</p>
-          <p className="text-xs text-muted-foreground">mm/ano</p>
+          <p className="text-xs text-muted-foreground">{t("mm/year", "mm/ano")}</p>
         </div>
         <div className="rounded-[24px] border border-border bg-card p-5 text-center">
-          <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">Produtividade</p>
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">{t("Yield", "Produtividade")}</p>
           <p className="mt-2 text-[36px] font-light tabular-nums text-leaf-600">{report.yearData?.yield?.toFixed(1) ?? "—"}</p>
-          <p className="text-xs text-muted-foreground">sc/ha</p>
+          <p className="text-xs text-muted-foreground">{t("bags/ha", "sc/ha")}</p>
         </div>
       </div>
 
       {/* ── Calendario de riscos ── */}
       {report.riskCalendar?.length === 12 && (
         <div className="rounded-[24px] border border-border bg-card p-6">
-          <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Calendário de riscos</p>
-          <p className="mt-1 text-sm text-muted-foreground">De cada 10 anos, quantas vezes cada problema aconteceu em cada mês.</p>
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">{t("Risk calendar", "Calendário de riscos")}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{t("Out of every 10 years, how many times each problem happened in each month.", "De cada 10 anos, quantas vezes cada problema aconteceu em cada mês.")}</p>
           <div className="mt-4 overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr>
-                  <th className="py-2 px-2 text-left text-xs text-muted-foreground font-medium">Risco</th>
-                  {MONTH_NAMES_SHORT.map((m) => (
+                  <th className="py-2 px-2 text-left text-xs text-muted-foreground font-medium">{t("Risk", "Risco")}</th>
+                  {(lang === "pt" ? MONTH_NAMES_SHORT : MONTH_NAMES_SHORT_EN).map((m) => (
                     <th key={m} className="py-2 px-1 text-center text-xs text-muted-foreground font-medium min-w-[44px]">{m}</th>
                   ))}
                 </tr>
@@ -399,11 +393,11 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
               <tbody>
                 {RISK_KEYS.map((key) => (
                   <tr key={key} className="border-t border-border">
-                    <td className="py-2.5 px-2 text-xs text-muted-foreground font-medium whitespace-nowrap">{RISK_LABELS[key]}</td>
+                    <td className="py-2.5 px-2 text-xs text-muted-foreground font-medium whitespace-nowrap">{lang === "pt" ? RISK_LABELS[key] : RISK_LABELS_EN[key]}</td>
                     {report.riskCalendar.map((month, i) => (
                       <td key={i} className="py-2.5 px-1 text-center">
                         <span className={`inline-block w-full rounded py-0.5 px-0.5 text-[10px] font-semibold ${riskColor(month[key])}`}>
-                          {riskText(month[key])}
+                          {riskText(month[key], t("in", "em"))}
                         </span>
                       </td>
                     ))}
@@ -413,19 +407,19 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
             </table>
           </div>
           <div className="flex flex-wrap gap-3 mt-3 text-[10px] text-stone-400">
-            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-emerald-100" /> Raro</span>
-            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-amber-100" /> Às vezes</span>
-            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-orange-100" /> Frequente</span>
-            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-red-100" /> Quase todo ano</span>
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-emerald-100" /> {t("Rare", "Raro")}</span>
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-amber-100" /> {t("Sometimes", "Às vezes")}</span>
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-orange-100" /> {t("Frequent", "Frequente")}</span>
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-red-100" /> {t("Almost every year", "Quase todo ano")}</span>
           </div>
         </div>
       )}
 
       <div>
         <div className="mb-4 text-center">
-          <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Escolha sua estrategia</p>
-          <h3 className="mt-1 text-lg font-semibold text-foreground">3 planos de rotacao para {report.municipality}</h3>
-          <p className="mt-1 text-sm text-muted-foreground">Baseado em 44 anos de dados climaticos e regras agronomicas</p>
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">{t("Choose your strategy", "Escolha sua estratégia")}</p>
+          <h3 className="mt-1 text-lg font-semibold text-foreground">{t("3 rotation plans for", "3 planos de rotação para")} {report.municipality}</h3>
+          <p className="mt-1 text-sm text-muted-foreground">{t("Based on 44 years of climate data and agronomic rules", "Baseado em 44 anos de dados climáticos e regras agronômicas")}</p>
         </div>
 
         {report.strategies.length > 0 ? (
@@ -433,11 +427,11 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
             {report.strategies.slice(0, 3).map((s, i) => (
               <div key={i} className={`relative rounded-[24px] border bg-card p-6 transition-shadow hover:shadow-md ${i === 0 ? "border-primary shadow-sm" : "border-border"}`}>
                 {i === 0 && (
-                  <span className="absolute -top-3 left-6 rounded-full bg-primary px-3 py-0.5 text-[10px] font-bold tracking-wide text-primary-foreground uppercase">Recomendada</span>
+                  <span className="absolute -top-3 left-6 rounded-full bg-primary px-3 py-0.5 text-[10px] font-bold tracking-wide text-primary-foreground uppercase">{t("Recommended", "Recomendada")}</span>
                 )}
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-base font-semibold text-foreground">{s.name}</p>
+                    <p className="text-base font-semibold text-foreground">{strategyName(s.id, s.name, lang)}</p>
                     <p className="mt-0.5 text-sm text-muted-foreground">{s.subtitle}</p>
                   </div>
                   <div className="text-right">
@@ -448,7 +442,7 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
                 <div className="mt-4 flex flex-wrap gap-1.5">
                   {s.sequence.map((seq, j) => (
                     <span key={j} className="rounded-full bg-forest-50 px-3 py-1 text-xs font-medium text-primary">
-                      {formatCrop(seq.crop)} <span className="text-stone-400">({SEASON_LABEL[seq.season] ?? seq.season})</span>
+                      {cropLabel(seq.crop, lang)} <span className="text-stone-400">({seasonLabel(seq.season, lang)})</span>
                     </span>
                   ))}
                 </div>
@@ -457,12 +451,12 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
           </div>
         ) : report.rotation ? (
           <div className="rounded-[24px] border border-primary bg-card p-6 shadow-sm">
-            <p className="text-base font-semibold text-foreground">{report.rotation.name}</p>
+            <p className="text-base font-semibold text-foreground">{strategyName(report.rotation.id, report.rotation.name, lang)}</p>
             <p className="mt-0.5 text-sm text-muted-foreground">{report.rotation.subtitle}</p>
             <div className="mt-3 flex flex-wrap gap-1.5">
               {report.rotation.sequence.map((s, i) => (
                 <span key={i} className="rounded-full bg-forest-50 px-3 py-1 text-xs font-medium text-primary">
-                  {formatCrop(s.crop)} <span className="text-stone-400">({SEASON_LABEL[s.season] ?? s.season})</span>
+                  {cropLabel(s.crop, lang)} <span className="text-stone-400">({seasonLabel(s.season, lang)})</span>
                 </span>
               ))}
             </div>
@@ -473,10 +467,10 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
           </div>
         ) : (
           <div className="rounded-[24px] border border-border bg-card p-6">
-            <p className="text-sm text-muted-foreground">Culturas indicadas para a regiao:</p>
+            <p className="text-sm text-muted-foreground">{t("Crops suited to the region:", "Culturas indicadas para a região:")}</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {report.topCrops.map((c) => (
-                <span key={c} className="rounded-full bg-forest-50 px-3 py-1 text-sm font-medium text-primary">{c}</span>
+                <span key={c} className="rounded-full bg-forest-50 px-3 py-1 text-sm font-medium text-primary">{lang === "pt" ? c : cropLabel(c, lang)}</span>
               ))}
             </div>
           </div>
@@ -484,28 +478,28 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
       </div>
 
       <div className="rounded-[24px] border border-border bg-card p-6">
-        <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Mix de cobertura recomendados</p>
-        <p className="mt-2 text-sm text-muted-foreground">Combinacoes de plantas que equilibram palhada, nitrogenio e descompactacao:</p>
+        <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">{t("Recommended cover crop mixes", "Mix de cobertura recomendados")}</p>
+        <p className="mt-2 text-sm text-muted-foreground">{t("Plant combinations that balance straw, nitrogen and breaking up compaction:", "Combinações de plantas que equilibram palhada, nitrogênio e descompactação:")}</p>
         <div className="mt-4 space-y-3">
           <div className="rounded-xl border border-border bg-muted/50 p-4">
-            <p className="text-sm font-semibold text-foreground">Aveia-preta + Ervilhaca</p>
-            <p className="mt-1 text-xs text-muted-foreground">Graminea (palhada duradoura, C:N alta) + leguminosa (fixa 80-120 kg N/ha). O mix mais usado no Sul.</p>
+            <p className="text-sm font-semibold text-foreground">{t("Black oat + vetch", "Aveia-preta + Ervilhaca")}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{t("Grass (long-lasting straw, high C:N) + legume (fixes 80-120 kg N/ha). The most used mix in southern Brazil.", "Gramínea (palhada duradoura, C:N alta) + leguminosa (fixa 80-120 kg N/ha). O mix mais usado no Sul.")}</p>
           </div>
           <div className="rounded-xl border border-border bg-muted/50 p-4">
-            <p className="text-sm font-semibold text-foreground">Centeio + Nabo forrageiro</p>
-            <p className="mt-1 text-xs text-muted-foreground">Centeio resiste a geada forte (-8C) e gera palha. Nabo descompacta 20-40 cm e cicla nutrientes.</p>
+            <p className="text-sm font-semibold text-foreground">{t("Rye + forage radish", "Centeio + Nabo forrageiro")}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{t("Rye withstands hard frost (-8C) and produces straw. Radish breaks up compaction at 20-40 cm and cycles nutrients.", "Centeio resiste a geada forte (-8C) e gera palha. Nabo descompacta 20-40 cm e cicla nutrientes.")}</p>
           </div>
           <div className="rounded-xl border border-border bg-muted/50 p-4">
-            <p className="text-sm font-semibold text-foreground">Aveia-preta + Ervilhaca + Nabo</p>
-            <p className="mt-1 text-xs text-muted-foreground">Triplo mix: palhada + nitrogenio + descompactacao. Ideal para solos degradados ou compactados.</p>
+            <p className="text-sm font-semibold text-foreground">{t("Black oat + vetch + forage radish", "Aveia-preta + Ervilhaca + Nabo")}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{t("Triple mix: straw + nitrogen + breaking up compaction. Ideal for degraded or compacted soils.", "Triplo mix: palhada + nitrogênio + descompactação. Ideal para solos degradados ou compactados.")}</p>
           </div>
         </div>
         {report.coverCrops.length > 0 && (
           <div className="mt-4 border-t border-border pt-3">
-            <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">Plantas disponiveis na regiao</p>
+            <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">{t("Plants available in the region", "Plantas disponíveis na região")}</p>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {report.coverCrops.map((c) => (
-                <span key={c} className="rounded-full bg-status-success-bg px-2.5 py-0.5 text-xs font-medium text-status-success">{c}</span>
+                <span key={c} className="rounded-full bg-status-success-bg px-2.5 py-0.5 text-xs font-medium text-status-success">{lang === "pt" ? c : cropLabel(c, lang)}</span>
               ))}
             </div>
           </div>
@@ -514,15 +508,15 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
 
       {/* ── AI Agronomo ── */}
       <div className="rounded-[24px] border border-border bg-card p-6">
-        <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Consultar agronomo IA</p>
-        <p className="mt-1 text-sm text-muted-foreground">Pergunte sobre manejo, rotacao ou clima para {report.municipality}</p>
+        <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">{t("Ask the AI agronomist", "Consultar agrônomo IA")}</p>
+        <p className="mt-1 text-sm text-muted-foreground">{t("Ask about management, rotation or climate for", "Pergunte sobre manejo, rotação ou clima para")} {report.municipality}</p>
         <div className="mt-3 flex gap-2">
           <input
             type="text"
             value={aiQuestion}
             onChange={(e) => setAiQuestion(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && askAI()}
-            placeholder="Ex: Qual a melhor epoca para plantar aveia-preta?"
+            placeholder={t("e.g. When is the best time to sow black oat?", "Ex: Qual a melhor época para plantar aveia-preta?")}
             className="flex-1 rounded-full border border-border bg-muted px-4 py-2.5 text-sm text-foreground placeholder:text-stone-400 outline-none focus:border-primary"
           />
           <button
@@ -530,7 +524,7 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
             disabled={aiLoading || !aiQuestion.trim()}
             className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover disabled:opacity-50"
           >
-            {aiLoading ? "..." : "Perguntar"}
+            {aiLoading ? "..." : t("Ask", "Perguntar")}
           </button>
         </div>
         {aiAnswer && (
@@ -542,10 +536,10 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
 
       <div className="flex justify-center gap-3">
         <Link href="/painel" className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover">
-          Ver painel completo
+          {t("Open full dashboard", "Ver painel completo")}
         </Link>
         <Link href="/mapa" className="rounded-full border border-border bg-card px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted">
-          Abrir mapa
+          {t("Open map", "Abrir mapa")}
         </Link>
       </div>
     </section>
@@ -554,6 +548,7 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
 
 /* ── Unavailable City Notice ── */
 function UnavailableCity({ name, uf, onReset }: { name: string; uf: string; onReset: () => void }) {
+  const { t } = useLang();
   return (
     <section className="mx-auto w-full max-w-2xl px-4 py-16 text-center sm:px-10">
       <div className="rounded-[24px] border border-border bg-card p-8">
@@ -565,16 +560,16 @@ function UnavailableCity({ name, uf, onReset }: { name: string; uf: string; onRe
         </div>
         <h2 className="text-xl font-semibold text-foreground">{name}, {uf}</h2>
         <p className="mt-3 text-sm text-muted-foreground">
-          Ainda nao disponivel para este municipio. No momento, apenas <strong className="text-foreground">Cruz Alta - RS</strong> esta liberada com dados completos de satelite.
+          {t("Not available for this municipality yet. Right now only", "Ainda não disponível para este município. No momento, apenas")} <strong className="text-foreground">Cruz Alta - RS</strong> {t("has full satellite data.", "está liberada com dados completos de satélite.")}
         </p>
         <p className="mt-2 text-xs text-muted-foreground">
-          Estamos expandindo para mais municipios em breve.
+          {t("We are expanding to more municipalities soon.", "Estamos expandindo para mais municípios em breve.")}
         </p>
         <button
           onClick={onReset}
           className="mt-6 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
         >
-          Buscar outro municipio
+          {t("Search another municipality", "Buscar outro município")}
         </button>
       </div>
     </section>
@@ -594,6 +589,7 @@ export default function HomeClient() {
   const reportRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
   const searchTimeout = useRef<ReturnType<typeof setTimeout>>(null);
+  const { lang, t } = useLang();
 
   const municipiosCache = useRef<Municipality[] | null>(null);
 
@@ -623,7 +619,7 @@ export default function HomeClient() {
 
   const fetchReport = async (municipality: string, uf: string, year?: number) => {
     try {
-      const url = year ? `/api/report?year=${year}` : "/api/report";
+      const url = year ? `/api/report?year=${year}&lang=${lang}` : `/api/report?lang=${lang}`;
       const res = await fetch(url);
       const data = await res.json();
       if (data.error) throw new Error(data.error);
@@ -783,7 +779,7 @@ export default function HomeClient() {
             <div className="absolute inset-0 overflow-hidden rounded-full" style={{ maskImage: "radial-gradient(circle, rgba(0,0,0,1) 30%, rgba(0,0,0,0.6) 55%, transparent 72%)", WebkitMaskImage: "radial-gradient(circle, rgba(0,0,0,1) 30%, rgba(0,0,0,0.6) 55%, transparent 72%)" }}>
               <Image
                 src="/hero-satellite.jpg"
-                alt="Sensoriamento remoto agricola por satelite"
+                alt={t("Agricultural satellite remote sensing", "Sensoriamento remoto agrícola por satélite")}
                 width={520}
                 height={520}
                 className="h-full w-full object-cover"
@@ -799,7 +795,7 @@ export default function HomeClient() {
 
         <div className="relative z-10 flex flex-col items-center px-4 text-center">
           <h1 className="text-[44px] font-light leading-[1.1] tracking-[-0.035em] text-stone-50 sm:text-[56px]">
-            Adapte sua lavoura<br />com dados da NASA
+            {t("Adapt your farm", "Adapte sua lavoura")}<br />{t("with NASA data", "com dados da NASA")}
           </h1>
 
           <div className="relative mt-8 w-full max-w-md">
@@ -812,12 +808,14 @@ export default function HomeClient() {
                 value={query}
                 onChange={(e) => handleInputChange(e.target.value)}
                 onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
-                placeholder="Buscar municipio..."
+                placeholder={t("Search municipality (Brazil)...", "Buscar município...")}
+                aria-label={t("Search municipality", "Buscar município")}
                 className="flex-1 bg-transparent text-sm text-stone-100 placeholder:text-stone-500 outline-none"
               />
               {query && (
                 <button
                   onClick={handleReset}
+                  aria-label={t("Clear search", "Limpar busca")}
                   className="ml-2 text-stone-400 hover:text-stone-200"
                 >
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -853,7 +851,7 @@ export default function HomeClient() {
       {/* ── SATELITES PARCEIROS ── */}
       <section className="border-y border-border bg-shell py-8 overflow-hidden">
         <h2 className="text-center text-lg font-semibold tracking-[-0.01em] text-white sm:text-xl">
-          Satélites Parceiros
+          {t("Partner satellites & data", "Satélites Parceiros")}
         </h2>
         <div className="relative mt-5">
           <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-shell to-transparent" />
@@ -905,18 +903,18 @@ export default function HomeClient() {
                 className="h-7 w-auto"
               />
               <p className="mt-4 text-sm leading-relaxed">
-                Inteligencia agricola baseada em 44 anos de dados da NASA para ajudar produtores a tomar decisoes melhores sobre rotacao de culturas e manejo do solo.
+                {t("Agricultural intelligence built on 44 years of NASA data to help farmers make better decisions about crop rotation and soil management.", "Inteligência agrícola baseada em 44 anos de dados da NASA para ajudar produtores a tomar decisões melhores sobre rotação de culturas e manejo do solo.")}
               </p>
             </div>
             <div>
-              <h4 className="text-sm font-semibold text-white">Plataforma</h4>
+              <h4 className="text-sm font-semibold text-white">{t("Platform", "Plataforma")}</h4>
               <ul className="mt-3 space-y-2 text-sm">
-                <li><Link href="/" className="transition-colors hover:text-white">Inicio</Link></li>
-                <li><Link href="/mapa" className="transition-colors hover:text-white">Mapa interativo</Link></li>
+                <li><Link href="/" className="transition-colors hover:text-white">{t("Home", "Início")}</Link></li>
+                <li><Link href="/mapa" className="transition-colors hover:text-white">{t("Interactive map", "Mapa interativo")}</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="text-sm font-semibold text-white">Fontes de dados</h4>
+              <h4 className="text-sm font-semibold text-white">{t("Data sources", "Fontes de dados")}</h4>
               <ul className="mt-3 space-y-2 text-sm">
                 <li>NASA MODIS / ECOSTRESS</li>
                 <li>Sentinel-2 (ESA)</li>
@@ -926,17 +924,17 @@ export default function HomeClient() {
               </ul>
             </div>
             <div>
-              <h4 className="text-sm font-semibold text-white">Sobre</h4>
+              <h4 className="text-sm font-semibold text-white">{t("About", "Sobre")}</h4>
               <ul className="mt-3 space-y-2 text-sm">
                 <li>NASA Space Apps Challenge 2026</li>
-                <li>Cruz Alta, Rio Grande do Sul</li>
-                <li>Dados abertos e gratuitos</li>
+                <li>{t("Cruz Alta, Rio Grande do Sul, Brazil", "Cruz Alta, Rio Grande do Sul")}</li>
+                <li>{t("Open and free data", "Dados abertos e gratuitos")}</li>
               </ul>
             </div>
           </div>
           <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 sm:flex-row">
             <p className="text-xs">Stella Root — NASA Space Apps 2026</p>
-            <p className="text-xs">Dados de satelites publicos. Uso educacional e agricola.</p>
+            <p className="text-xs">{t("Public satellite data. For educational and agricultural use.", "Dados de satélites públicos. Uso educacional e agrícola.")}</p>
           </div>
         </div>
       </footer>

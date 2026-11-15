@@ -47,15 +47,39 @@ for (const [w, id] of [
   eq(`${w} x3, soil one level lower = ${id} soil 3`, asRange(r.nmSoil3), path(id)["3"]);
 }
 
+// Pelos valores do formulário (WINTER_CROPS do HomeClient), como a tela monta o Farm.
+const { EMPTY_ANSWERS, buildFarm } = await import("../src/lib/precheck-form.ts");
+const form = (winter, extra = {}) => buildFarm([winter, winter], { ...EMPTY_ANSWERS, olderWinter: winter, ...extra });
+const nm = (f) => {
+  const r = precheckFarm(f);
+  return { nm: asRange(r.nm), soilOneLower: asRange(r.nmSoil3) };
+};
+eq("form: aveia_ervilhaca x3 maps to oat_vetch", form("aveia_ervilhaca").winters, ["oat_vetch", "oat_vetch", "oat_vetch"]);
+eq("form: winter not selected maps to unknown", buildFarm(["", ""], EMPTY_ANSWERS).winters, ["unknown", "unknown", "unknown"]);
+eq("form: canola is not modelled", buildFarm(["canola", "trigo"], EMPTY_ANSWERS).winters, ["unknown", "wheat", "unknown"]);
+eq("form: bad soil number is dropped", buildFarm([], { ...EMPTY_ANSWERS, soilTest: "yes", soil: { v: "abc", cec: "", ca: "1,2", m: "" } }).soil, {
+  v: null,
+  cec: null,
+  ca: 1.2,
+  m: null,
+});
+
+const yes8 = { tillage: "8plus", contour: "yes" };
+eq("form: cover x3, 8+ yrs, contour = soy-cover", nm(form("aveia_ervilhaca", yes8)), { nm: path("soy-cover")["4"], soilOneLower: path("soy-cover")["3"] });
+eq("form: fallow x3, 8+ yrs, contour = soy-fallow", nm(form("pousio", yes8)), { nm: path("soy-fallow")["4"], soilOneLower: path("soy-fallow")["3"] });
+
 // O que o produtor vê sem responder o resto (anos sem revolver, contorno e análise: "não sei").
 console.log("\nCasos do formulário (resto em 'não sei'):");
 for (const [name, f] of [
-  ["cover x3", farm("oat_vetch")],
-  ["fallow x3", farm("fallow")],
-  ["all not sure", farm("unknown")],
+  ["cover x3", form("aveia_ervilhaca", { tillage: "unknown", contour: "unknown", soilTest: "unknown" })],
+  ["fallow x3", form("pousio", { tillage: "unknown", contour: "unknown", soilTest: "unknown" })],
+  ["all not sure", form("nao_sei", { tillage: "unknown", contour: "unknown", soilTest: "unknown" })],
+  ["cover x3 (8+ yrs, contour)", form("aveia_ervilhaca", yes8)],
+  ["fallow x3 (8+ yrs, contour)", form("pousio", yes8)],
 ]) {
   const r = precheckFarm(f);
-  console.log(`  ${name}: NM${r.nm[0]}-NM${r.nm[1]} (soil one level lower: NM${r.nmSoil3[0]}-NM${r.nmSoil3[1]})`);
+  const n = precheckFarm({ ...f, winters: ["oat_vetch", f.winters[0], f.winters[1]] }).nm;
+  console.log(`  ${name}: NM${r.nm[0]}-NM${r.nm[1]} (soil one level lower: NM${r.nmSoil3[0]}-NM${r.nmSoil3[1]}; next winter cover: NM${n[0]}-NM${n[1]})`);
 }
 // Contorno "não sei" inclui a leitura com declive ≥ 3% sem nível: o piso cai para NM1.
 eq("all not sure floor", precheckFarm(farm("unknown")).nm[0], 1);

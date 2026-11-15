@@ -30,6 +30,13 @@ export async function POST(request: Request) {
     );
   }
 
+  if (message.length > 2000) {
+    return Response.json(
+      { error: "Message too long (max 2000 characters)" },
+      { status: 400 }
+    );
+  }
+
   const db = createAdminClient();
   const resolvedSiteId = site_id ?? (await getDefaultSiteId());
 
@@ -53,6 +60,17 @@ export async function POST(request: Request) {
       );
     }
     sessionId = newSession.id;
+  } else {
+    const { data: owned } = await db
+      .from("chat_sessions")
+      .select("id")
+      .eq("id", sessionId)
+      .eq("anonymous_id", anonymous_id)
+      .single();
+
+    if (!owned) {
+      return Response.json({ error: "Session not found" }, { status: 404 });
+    }
   }
 
   const { data: existingMessages } = await db

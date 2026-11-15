@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import type { NdviTilesData, TopographyData, SiteData, MapBiomasData } from "@/lib/types";
 
 type Props = {
@@ -34,22 +34,32 @@ const LAND_USE_LABELS: Record<string, string> = {
   agricultura_geral: "Agricultura geral",
 };
 
-type Layer = "relevo" | "temperatura" | "ndvi" | "uso-do-solo";
+type LayerKey = "relevo" | "temperatura" | "ndvi" | "uso-do-solo";
 
-const LAYERS: { key: Layer; label: string }[] = [
-  { key: "relevo", label: "Relevo" },
-  { key: "temperatura", label: "Temperatura" },
-  { key: "ndvi", label: "NDVI" },
-  { key: "uso-do-solo", label: "Uso do Solo" },
+type LayerConfig = {
+  key: LayerKey;
+  label: string;
+  description: string;
+  zIndex: number;
+};
+
+const LAYER_CONFIGS: LayerConfig[] = [
+  { key: "relevo", label: "Relevo", description: "Elevacao SRTM/Copernicus DEM", zIndex: 400 },
+  { key: "temperatura", label: "Temperatura", description: "Tmax estimada por lapse rate", zIndex: 410 },
+  { key: "ndvi", label: "NDVI", description: "Vegetacao MODIS MOD13Q1 250m", zIndex: 420 },
+  { key: "uso-do-solo", label: "Uso do Solo", description: "MapBiomas Collection 9", zIndex: 430 },
 ];
+
+type LayerState = { visible: boolean; opacity: number };
 
 export default function MapaClient({ ndviTiles, topography, site, mapbiomas }: Props) {
   const avgTmax = site.q1?.temperature_c?.avg_tmax ?? 25.4;
   const meanElev = topography.summary.mean_elevation_m;
 
-  function tempFromElevation(elev: number): number {
-    return avgTmax + ((meanElev - elev) * 0.65) / 100;
-  }
+  const tempFromElevation = useCallback(
+    (elev: number) => avgTmax + ((meanElev - elev) * 0.65) / 100,
+    [avgTmax, meanElev]
+  );
 
   const LAND_USE = Object.entries(mapbiomas.current_state)
     .filter(([, val]) => val.pct > 0)
@@ -57,27 +67,40 @@ export default function MapaClient({ ndviTiles, topography, site, mapbiomas }: P
 
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
-  const overlaysRef = useRef<any[]>([]);
-  const ndviOverlayRef = useRef<any>(null);
   const mountedRef = useRef(true);
 
-  const [activeLayer, setActiveLayer] = useState<Layer>("relevo");
+  const relevoLayerRef = useRef<any>(null);
+  const tempLayerRef = useRef<any>(null);
+  const ndviLayerRef = useRef<any>(null);
+
+  const [layers, setLayers] = useState<Record<LayerKey, LayerState>>({
+    relevo: { visible: true, opacity: 0.7 },
+    temperatura: { visible: false, opacity: 0.7 },
+    ndvi: { visible: false, opacity: 0.75 },
+    "uso-do-solo": { visible: false, opacity: 1 },
+  });
   const [leafletReady, setLeafletReady] = useState(false);
   const [ndviMonth, setNdviMonth] = useState(1);
 
   const currentNdvi = ndviTiles.monthly_tiles.find((t) => t.month === ndviMonth);
 
+  function toggleLayer(key: LayerKey) {
+    setLayers((prev) => ({
+      ...prev,
+      [key]: { ...prev[key], visible: !prev[key].visible },
+    }));
+  }
+
+  function setOpacity(key: LayerKey, opacity: number) {
+    setLayers((prev) => ({
+      ...prev,
+      [key]: { ...prev[key], opacity },
+    }));
+  }
+
   useEffect(() => {
     mountedRef.current = true;
     if (!mapRef.current) return;
-
-    let scriptsLoaded = 0;
-    const SCRIPTS_NEEDED = 2;
-
-    function tryInit() {
-      scriptsLoaded++;
-      if (scriptsLoaded >= SCRIPTS_NEEDED) initMap();
-    }
 
     function initMap() {
       if (!mountedRef.current || !mapRef.current) return;
@@ -100,10 +123,7 @@ export default function MapaClient({ ndviTiles, topography, site, mapbiomas }: P
 
       L.tileLayer(
         "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-        {
-          attribution: "Esri, Maxar, Earthstar Geographics",
-          maxZoom: 19,
-        }
+        { attribution: "Esri, Maxar, Earthstar Geographics", maxZoom: 19 }
       ).addTo(map);
 
       L.tileLayer(
@@ -111,14 +131,19 @@ export default function MapaClient({ ndviTiles, topography, site, mapbiomas }: P
         { maxZoom: 19, opacity: 0.7 }
       ).addTo(map);
 
+      for (const cfg of LAYER_CONFIGS) {
+        if (!map.getPane(cfg.key)) {
+          map.createPane(cfg.key);
+          map.getPane(cfg.key)!.style.zIndex = String(cfg.zIndex);
+        }
+      }
+
       mapInstance.current = map;
       setLeafletReady(true);
     }
 
     function loadScript(src: string, onLoad: () => void) {
-      const existing = document.querySelector(
-        `script[src="${src}"]`
-      ) as HTMLScriptElement | null;
+      const existing = document.querySelector(`script[src="${src}"]`) as HTMLScriptElement | null;
       if (existing) {
         if ((window as any).L?.heatLayer || !src.includes("heat")) {
           onLoad();
@@ -136,8 +161,7 @@ export default function MapaClient({ ndviTiles, topography, site, mapbiomas }: P
     if (!document.querySelector('link[href*="leaflet.min.css"]')) {
       const link = document.createElement("link");
       link.rel = "stylesheet";
-      link.href =
-        "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css";
+      link.href = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css";
       document.head.appendChild(link);
     }
 
@@ -149,10 +173,9 @@ export default function MapaClient({ ndviTiles, topography, site, mapbiomas }: P
         () =>
           loadScript(
             "https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js",
-            tryInit
+            initMap
           )
       );
-      scriptsLoaded++;
     }
 
     return () => {
@@ -161,103 +184,97 @@ export default function MapaClient({ ndviTiles, topography, site, mapbiomas }: P
         mapInstance.current.remove();
         mapInstance.current = null;
       }
+      relevoLayerRef.current = null;
+      tempLayerRef.current = null;
+      ndviLayerRef.current = null;
       setLeafletReady(false);
     };
   }, [ndviTiles.center.lat, ndviTiles.center.lon, ndviTiles.zoom]);
 
   useEffect(() => {
-    if (!mapInstance.current || !leafletReady || !mountedRef.current) return;
+    if (!mapInstance.current || !leafletReady) return;
     const L = (window as any).L;
     const map = mapInstance.current;
 
-    overlaysRef.current.forEach((m) => {
-      try {
-        map.removeLayer(m);
-      } catch {
-        /* ok */
-      }
-    });
-    overlaysRef.current = [];
-    if (ndviOverlayRef.current) {
-      try {
-        map.removeLayer(ndviOverlayRef.current);
-      } catch {
-        /* ok */
-      }
-      ndviOverlayRef.current = null;
-    }
-
-    if (activeLayer === "relevo") {
+    if (layers.relevo.visible && !relevoLayerRef.current) {
       const { min_elevation_m: min, max_elevation_m: max } = topography.summary;
       const range = max - min || 1;
       const heatData = topography.points.map((p) => [
-        p.latitude,
-        p.longitude,
-        (p.elevation_m - min) / range,
+        p.latitude, p.longitude, (p.elevation_m - min) / range,
       ]);
-      const heat = L.heatLayer(heatData, {
-        radius: 10,
-        blur: 8,
-        maxZoom: 14,
-        max: 1.0,
-        gradient: {
-          0.0: "#1B5E20",
-          0.25: "#388E3C",
-          0.5: "#66BB6A",
-          0.75: "#FDD835",
-          1.0: "#E65100",
-        },
+      relevoLayerRef.current = L.heatLayer(heatData, {
+        radius: 10, blur: 8, maxZoom: 14, max: 1.0,
+        gradient: { 0.0: "#1B5E20", 0.25: "#388E3C", 0.5: "#66BB6A", 0.75: "#FDD835", 1.0: "#E65100" },
+        pane: "relevo",
       }).addTo(map);
-      overlaysRef.current.push(heat);
+    } else if (!layers.relevo.visible && relevoLayerRef.current) {
+      map.removeLayer(relevoLayerRef.current);
+      relevoLayerRef.current = null;
     }
 
-    if (activeLayer === "temperatura") {
+    if (layers.temperatura.visible && !tempLayerRef.current) {
       const temps = topography.points.map((p) => tempFromElevation(p.elevation_m));
       const minT = Math.min(...temps);
       const maxT = Math.max(...temps);
       const rangeT = maxT - minT || 1;
-
       const heatData = topography.points.map((p, i) => [
-        p.latitude,
-        p.longitude,
-        (temps[i] - minT) / rangeT,
+        p.latitude, p.longitude, (temps[i] - minT) / rangeT,
       ]);
-      const heat = L.heatLayer(heatData, {
-        radius: 10,
-        blur: 8,
-        maxZoom: 14,
-        max: 1.0,
-        gradient: {
-          0.0: "#1E88E5",
-          0.3: "#42A5F5",
-          0.5: "#FDD835",
-          0.7: "#FF9800",
-          1.0: "#E65100",
-        },
+      tempLayerRef.current = L.heatLayer(heatData, {
+        radius: 10, blur: 8, maxZoom: 14, max: 1.0,
+        gradient: { 0.0: "#1E88E5", 0.3: "#42A5F5", 0.5: "#FDD835", 0.7: "#FF9800", 1.0: "#E65100" },
+        pane: "temperatura",
       }).addTo(map);
-      overlaysRef.current.push(heat);
+    } else if (!layers.temperatura.visible && tempLayerRef.current) {
+      map.removeLayer(tempLayerRef.current);
+      tempLayerRef.current = null;
+    }
+  }, [layers.relevo.visible, layers.temperatura.visible, leafletReady, topography, tempFromElevation]);
+
+  useEffect(() => {
+    if (!mapInstance.current || !leafletReady) return;
+    const L = (window as any).L;
+    const map = mapInstance.current;
+
+    if (ndviLayerRef.current) {
+      map.removeLayer(ndviLayerRef.current);
+      ndviLayerRef.current = null;
     }
 
-    if (activeLayer === "ndvi") {
-      const url = currentNdvi?.tile_url;
-      if (url) {
-        if (!map.getPane("ndviPane")) {
-          map.createPane("ndviPane");
-          const pane = map.getPane("ndviPane")!;
-          pane.style.zIndex = "450";
-        }
-        ndviOverlayRef.current = L.tileLayer(url, {
-          opacity: 0.75,
-          maxZoom: 15,
-          pane: "ndviPane",
-        }).addTo(map);
-      }
+    if (layers.ndvi.visible && currentNdvi?.tile_url) {
+      ndviLayerRef.current = L.tileLayer(currentNdvi.tile_url, {
+        opacity: layers.ndvi.opacity,
+        maxZoom: 15,
+        pane: "ndvi",
+      }).addTo(map);
     }
-  }, [activeLayer, leafletReady, ndviMonth, currentNdvi, topography, ndviTiles]);
+  }, [layers.ndvi.visible, layers.ndvi.opacity, ndviMonth, currentNdvi, leafletReady]);
+
+  useEffect(() => {
+    if (relevoLayerRef.current && layers.relevo.visible) {
+      const pane = mapInstance.current?.getPane("relevo");
+      if (pane) pane.style.opacity = String(layers.relevo.opacity);
+    }
+  }, [layers.relevo.opacity, layers.relevo.visible]);
+
+  useEffect(() => {
+    if (tempLayerRef.current && layers.temperatura.visible) {
+      const pane = mapInstance.current?.getPane("temperatura");
+      if (pane) pane.style.opacity = String(layers.temperatura.opacity);
+    }
+  }, [layers.temperatura.opacity, layers.temperatura.visible]);
+
+  useEffect(() => {
+    if (ndviLayerRef.current) {
+      ndviLayerRef.current.setOpacity(layers.ndvi.opacity);
+    }
+  }, [layers.ndvi.opacity]);
 
   const ndviColor = currentNdvi?.ndvi_mean
     ? ndviTiles.palette[Math.min(Math.floor(currentNdvi.ndvi_mean * 10), 9)]
     : "#666";
+
+  const anyVisible = Object.values(layers).some((l) => l.visible);
 
   return (
     <div className="space-y-6">
@@ -266,91 +283,68 @@ export default function MapaClient({ ndviTiles, topography, site, mapbiomas }: P
           Mapa de Cruz Alta
         </h1>
         <p className="mt-2 text-sm text-text-muted">
-          Imagem de satelite real da regiao. Passe o mouse nos pontos para ver os
-          valores. Alterne entre as camadas abaixo.
+          Imagem de satelite real da regiao. Empilhe camadas e ajuste a
+          opacidade de cada uma independentemente.
         </p>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        {LAYERS.map((l) => (
-          <button
-            key={l.key}
-            onClick={() => setActiveLayer(l.key)}
-            className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-              activeLayer === l.key
-                ? "bg-primary text-white"
-                : "border border-border bg-bg-surface text-text-muted hover:text-text-primary"
-            }`}
-          >
-            {l.label}
-          </button>
-        ))}
+      {/* Layer cards */}
+      <div className="grid gap-3 sm:grid-cols-2">
+        {LAYER_CONFIGS.map((cfg) => {
+          const state = layers[cfg.key];
+          return (
+            <div
+              key={cfg.key}
+              className={`rounded-xl border p-3 transition-colors ${
+                state.visible
+                  ? "border-primary/40 bg-primary/[0.03]"
+                  : "border-border bg-surface"
+              }`}
+            >
+              <label className="flex cursor-pointer items-center gap-3">
+                <input
+                  type="checkbox"
+                  checked={state.visible}
+                  onChange={() => toggleLayer(cfg.key)}
+                  className="h-4 w-4 rounded border-border accent-primary"
+                />
+                <div>
+                  <span className="text-sm font-semibold text-text-primary">
+                    {cfg.label}
+                  </span>
+                  <p className="text-xs text-text-muted">{cfg.description}</p>
+                </div>
+              </label>
+              {state.visible && cfg.key !== "uso-do-solo" && (
+                <div className="mt-2 flex items-center gap-2 pl-7">
+                  <span className="text-[10px] text-text-dim">Opacidade</span>
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    value={Math.round(state.opacity * 100)}
+                    onChange={(e) =>
+                      setOpacity(cfg.key, Number(e.target.value) / 100)
+                    }
+                    className="flex-1 accent-primary"
+                  />
+                  <span className="w-8 text-right text-[10px] font-mono text-text-muted">
+                    {Math.round(state.opacity * 100)}%
+                  </span>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
+      {/* Map */}
       <div className="overflow-hidden rounded-xl border border-border">
         <div ref={mapRef} className="h-[500px] w-full bg-bg-surface-alt" />
       </div>
 
-      {activeLayer === "relevo" && (
-        <div className="rounded-lg border border-border bg-bg-surface p-4">
-          <p className="text-xs font-medium tracking-wider text-text-dim uppercase">
-            Legenda — Elevacao (mapa de calor)
-          </p>
-          <div className="mt-3 flex items-center gap-1">
-            <span className="text-xs text-text-muted">
-              {topography.summary.min_elevation_m}m
-            </span>
-            <div className="flex h-3 flex-1 overflow-hidden rounded-full">
-              {["#1B5E20", "#388E3C", "#66BB6A", "#FDD835", "#E65100"].map(
-                (c) => (
-                  <div
-                    key={c}
-                    className="flex-1"
-                    style={{ backgroundColor: c }}
-                  />
-                )
-              )}
-            </div>
-            <span className="text-xs text-text-muted">
-              {topography.summary.max_elevation_m}m
-            </span>
-          </div>
-          <p className="mt-3 text-xs text-text-dim">
-            Grade de {topography.points.length} pontos reais (SRTM). Desnivel de{" "}
-            {topography.summary.range_m}m na regiao. Fonte: SRTM/Copernicus DEM.
-          </p>
-        </div>
-      )}
-
-      {activeLayer === "temperatura" && (
-        <div className="rounded-lg border border-border bg-bg-surface p-4">
-          <p className="text-xs font-medium tracking-wider text-text-dim uppercase">
-            Legenda — Temperatura maxima estimada (mapa de calor)
-          </p>
-          <div className="mt-3 flex items-center gap-1">
-            <span className="text-xs text-text-muted">Frio</span>
-            <div className="flex h-3 flex-1 overflow-hidden rounded-full">
-              {["#1E88E5", "#42A5F5", "#FDD835", "#FF9800", "#E65100"].map(
-                (c) => (
-                  <div
-                    key={c}
-                    className="flex-1"
-                    style={{ backgroundColor: c }}
-                  />
-                )
-              )}
-            </div>
-            <span className="text-xs text-text-muted">Quente</span>
-          </div>
-          <p className="mt-3 text-xs text-text-dim">
-            Lapse rate de -0.65°C por 100m de altitude, aplicado sobre a media
-            regional de {avgTmax.toFixed(1)}°C (NASA POWER 1981-2025). Vales
-            tendem a ser mais quentes, topos mais frios.
-          </p>
-        </div>
-      )}
-
-      {activeLayer === "ndvi" && (
+      {/* NDVI month slider */}
+      {layers.ndvi.visible && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <span className="text-lg font-semibold text-text-primary">
@@ -375,42 +369,85 @@ export default function MapaClient({ ndviTiles, topography, site, mapbiomas }: P
             {ndviTiles.monthly_tiles.map((t) => (
               <span
                 key={t.month}
-                className={
-                  t.month === ndviMonth ? "font-bold text-primary-light" : ""
-                }
+                className={t.month === ndviMonth ? "font-bold text-primary-light" : ""}
               >
                 {t.name.slice(0, 3)}
               </span>
             ))}
           </div>
-          <div className="rounded-lg border border-border bg-bg-surface p-4">
-            <p className="text-xs font-medium tracking-wider text-text-dim uppercase">
-              Legenda NDVI
-            </p>
-            <div className="mt-2 flex h-4 overflow-hidden rounded-full">
-              {ndviTiles.palette.map((color, i) => (
-                <div
-                  key={i}
-                  className="flex-1"
-                  style={{ backgroundColor: color }}
-                />
+        </div>
+      )}
+
+      {/* Legends for visible layers */}
+      {layers.relevo.visible && (
+        <div className="rounded-lg border border-border bg-bg-surface p-4">
+          <p className="text-xs font-medium tracking-wider text-text-dim uppercase">
+            Legenda — Elevacao (mapa de calor)
+          </p>
+          <div className="mt-3 flex items-center gap-1">
+            <span className="text-xs text-text-muted">
+              {topography.summary.min_elevation_m}m
+            </span>
+            <div className="flex h-3 flex-1 overflow-hidden rounded-full">
+              {["#1B5E20", "#388E3C", "#66BB6A", "#FDD835", "#E65100"].map((c) => (
+                <div key={c} className="flex-1" style={{ backgroundColor: c }} />
               ))}
             </div>
-            <div className="mt-1 flex justify-between text-[10px] text-text-dim">
-              <span>0.0 — Solo nu</span>
-              <span>0.3 — Ralo</span>
-              <span>0.6 — Denso</span>
-              <span>0.9 — Maximo</span>
-            </div>
+            <span className="text-xs text-text-muted">
+              {topography.summary.max_elevation_m}m
+            </span>
           </div>
-          <p className="text-xs text-text-dim">
-            Media de 5 anos (2020-2024). MODIS MOD13Q1 250m via Google Earth
-            Engine.
+          <p className="mt-3 text-xs text-text-dim">
+            Grade de {topography.points.length} pontos reais (SRTM). Desnivel de{" "}
+            {topography.summary.range_m}m na regiao.
           </p>
         </div>
       )}
 
-      {activeLayer === "uso-do-solo" && (
+      {layers.temperatura.visible && (
+        <div className="rounded-lg border border-border bg-bg-surface p-4">
+          <p className="text-xs font-medium tracking-wider text-text-dim uppercase">
+            Legenda — Temperatura maxima estimada
+          </p>
+          <div className="mt-3 flex items-center gap-1">
+            <span className="text-xs text-text-muted">Frio</span>
+            <div className="flex h-3 flex-1 overflow-hidden rounded-full">
+              {["#1E88E5", "#42A5F5", "#FDD835", "#FF9800", "#E65100"].map((c) => (
+                <div key={c} className="flex-1" style={{ backgroundColor: c }} />
+              ))}
+            </div>
+            <span className="text-xs text-text-muted">Quente</span>
+          </div>
+          <p className="mt-3 text-xs text-text-dim">
+            Lapse rate de -0.65C por 100m de altitude sobre a media regional de{" "}
+            {avgTmax.toFixed(1)}C (NASA POWER 1981-2025).
+          </p>
+        </div>
+      )}
+
+      {layers.ndvi.visible && (
+        <div className="rounded-lg border border-border bg-bg-surface p-4">
+          <p className="text-xs font-medium tracking-wider text-text-dim uppercase">
+            Legenda NDVI
+          </p>
+          <div className="mt-2 flex h-4 overflow-hidden rounded-full">
+            {ndviTiles.palette.map((color, i) => (
+              <div key={i} className="flex-1" style={{ backgroundColor: color }} />
+            ))}
+          </div>
+          <div className="mt-1 flex justify-between text-[10px] text-text-dim">
+            <span>0.0 — Solo nu</span>
+            <span>0.3 — Ralo</span>
+            <span>0.6 — Denso</span>
+            <span>0.9 — Maximo</span>
+          </div>
+          <p className="mt-2 text-xs text-text-dim">
+            Media de 5 anos (2020-2024). MODIS MOD13Q1 250m via Google Earth Engine.
+          </p>
+        </div>
+      )}
+
+      {layers["uso-do-solo"].visible && (
         <div className="rounded-lg border border-border bg-bg-surface p-4">
           <p className="text-xs font-medium tracking-wider text-text-dim uppercase">
             Uso do solo atual — MapBiomas 2023
@@ -420,9 +457,7 @@ export default function MapaClient({ ndviTiles, topography, site, mapbiomas }: P
               <div key={key} className="flex items-center gap-3">
                 <span
                   className="inline-block h-3 w-3 shrink-0 rounded-full"
-                  style={{
-                    backgroundColor: LAND_USE_COLORS[key] ?? "#666",
-                  }}
+                  style={{ backgroundColor: LAND_USE_COLORS[key] ?? "#666" }}
                 />
                 <span className="min-w-[120px] text-sm text-text-secondary">
                   {LAND_USE_LABELS[key] ?? key}
@@ -445,11 +480,16 @@ export default function MapaClient({ ndviTiles, topography, site, mapbiomas }: P
             ))}
           </div>
           <p className="mt-4 text-xs text-text-dim">
-            Dados de cobertura e uso do solo num raio de 20km ao redor de Cruz
-            Alta. Fonte: MapBiomas Collection 9 (Landsat 30m, 1985-2023). A soja
-            domina com mais de 80% da area.
+            Cobertura num raio de 20km ao redor de Cruz Alta. Fonte: MapBiomas
+            Collection 9 (Landsat 30m, 1985-2023).
           </p>
         </div>
+      )}
+
+      {!anyVisible && (
+        <p className="py-8 text-center text-sm text-text-muted">
+          Selecione pelo menos uma camada acima para visualizar no mapa.
+        </p>
       )}
 
       <div className="rounded-lg border border-border bg-bg-surface p-4 text-xs text-text-dim">

@@ -25,9 +25,9 @@ const DATA_PARTNERS = [
 const MONTH_NAMES_SHORT = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 const RISK_KEYS = ["dry_spell", "heat", "heavy_rain", "frost"] as const;
 const RISK_LABELS: Record<string, string> = { dry_spell: "Seca longa", heat: "Calor forte", heavy_rain: "Chuvarada", frost: "Geada" };
-function riskText(v: number) { return v <= 0 ? "-" : `${Math.round(v * 10)} em 10`; }
+function riskText(v: number) { return `${Math.round(v * 10)} em 10`; }
 function riskColor(v: number) {
-  if (v <= 0) return "text-stone-400";
+  if (v <= 0) return "bg-stone-50 text-stone-400";
   if (v <= 0.2) return "bg-emerald-100 text-emerald-700";
   if (v <= 0.5) return "bg-amber-100 text-amber-700";
   if (v <= 0.75) return "bg-orange-100 text-orange-700";
@@ -109,26 +109,6 @@ const PROBLEMS = [
   { value: "granizo", label: "Granizo" },
 ];
 
-type YearFormData = {
-  label: string;
-  summer_crop: string;
-  safrinha_crop: string;
-  winter_crop: string;
-  yield_result: string;
-  main_problem: string;
-};
-
-const currentYear = new Date().getFullYear();
-const YEAR_LABELS = [`Safra ${currentYear - 1}/${currentYear}`, `Safra ${currentYear - 2}/${currentYear - 1}`];
-
-const DEFAULT_YEAR: YearFormData = {
-  label: "",
-  summer_crop: "soja",
-  safrinha_crop: "pousio",
-  winter_crop: "pousio",
-  yield_result: "normal",
-  main_problem: "nenhum",
-};
 
 function GlobeWireframe() {
   const meshRef = useRef<THREE.Mesh>(null);
@@ -181,15 +161,12 @@ function isAvailableCity(name: string): boolean {
 }
 
 /* ── Inline Producer Form ── */
-function ProducerForm({ municipality, availableYears, onComplete }: { municipality: string; availableYears: number[]; onComplete: (selectedYear: number) => void }) {
-  const defaultYear = availableYears[0] ?? new Date().getFullYear();
-  const [selectedYear, setSelectedYear] = useState(defaultYear);
-
-  const yearLabels = [`Safra ${selectedYear - 1}/${selectedYear}`, `Safra ${selectedYear - 2}/${selectedYear - 1}`];
-
-  const [yearsData, setYearsData] = useState<YearFormData[]>(
-    yearLabels.map((label) => ({ ...DEFAULT_YEAR, label }))
-  );
+function ProducerForm({ municipality, onComplete }: { municipality: string; onComplete: () => void }) {
+  const [summerCrop, setSummerCrop] = useState("soja");
+  const [safrinhaCrop, setSafrinhaCrop] = useState("pousio");
+  const [winterCrop, setWinterCrop] = useState("pousio");
+  const [yieldResult, setYieldResult] = useState("normal");
+  const [mainProblem, setMainProblem] = useState("nenhum");
   const [hasCattle, setHasCattle] = useState(false);
   const [soilCompacted, setSoilCompacted] = useState(false);
   const [usedGreenManure, setUsedGreenManure] = useState(false);
@@ -199,31 +176,25 @@ function ProducerForm({ municipality, availableYears, onComplete }: { municipali
       const raw = localStorage.getItem("fieldshift_produtor");
       if (raw) {
         const data = JSON.parse(raw);
-        if (data.years?.length === 2) {
-          setHasCattle(data.has_cattle ?? false);
-          setSoilCompacted(data.soil_compacted ?? false);
-          setUsedGreenManure(data.used_green_manure ?? false);
-        }
+        if (data.summer_crop) setSummerCrop(data.summer_crop);
+        if (data.safrinha_crop) setSafrinhaCrop(data.safrinha_crop);
+        if (data.winter_crop) setWinterCrop(data.winter_crop);
+        if (data.yield_result) setYieldResult(data.yield_result);
+        if (data.main_problem) setMainProblem(data.main_problem);
+        setHasCattle(data.has_cattle ?? false);
+        setSoilCompacted(data.soil_compacted ?? false);
+        setUsedGreenManure(data.used_green_manure ?? false);
       }
     } catch { /* ignore */ }
   }, []);
 
-  useEffect(() => {
-    const labels = [`Safra ${selectedYear - 1}/${selectedYear}`, `Safra ${selectedYear - 2}/${selectedYear - 1}`];
-    setYearsData((prev) => prev.map((y, i) => ({ ...y, label: labels[i] })));
-  }, [selectedYear]);
-
-  function updateYear(index: number, field: keyof YearFormData, value: string) {
-    setYearsData((prev) => {
-      const next = [...prev];
-      next[index] = { ...next[index], [field]: value };
-      return next;
-    });
-  }
-
   function handleSubmit() {
     const data = {
-      years: yearsData,
+      summer_crop: summerCrop,
+      safrinha_crop: safrinhaCrop,
+      winter_crop: winterCrop,
+      yield_result: yieldResult,
+      main_problem: mainProblem,
       has_cattle: hasCattle,
       soil_compacted: soilCompacted,
       used_green_manure: usedGreenManure,
@@ -232,77 +203,59 @@ function ProducerForm({ municipality, availableYears, onComplete }: { municipali
     try {
       localStorage.setItem("fieldshift_produtor", JSON.stringify(data));
     } catch { /* ignore */ }
-    onComplete(selectedYear);
+    onComplete();
   }
 
   function handleSkip() {
-    onComplete(selectedYear);
+    onComplete();
   }
 
+  const selectClass = "w-full rounded-full border border-border bg-muted px-4 py-2.5 text-sm text-foreground outline-none focus:border-primary";
+
   return (
-    <section className="mx-auto w-full max-w-3xl space-y-6 px-4 py-10 sm:px-10">
+    <section className="mx-auto w-full max-w-xl space-y-5 px-4 py-10 sm:px-10">
       <div className="text-center">
         <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Sobre sua lavoura</p>
         <h2 className="mt-2 text-[28px] font-light leading-tight tracking-[-0.02em] text-foreground sm:text-[32px]">
           Conte sobre {municipality}
         </h2>
-        <p className="mx-auto mt-2 max-w-lg text-sm text-muted-foreground">
-          Selecione o ano-safra de referencia e responda sobre as 2 safras anteriores.
+        <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+          Preencha o que plantou na ultima safra para receber recomendacoes personalizadas.
         </p>
       </div>
 
-      <div className="flex justify-center">
-        <div className="flex items-center gap-3 rounded-[24px] border border-border bg-card px-6 py-4">
-          <label className="text-sm font-medium text-foreground">Ano-safra de referencia:</label>
-          <select
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(parseInt(e.target.value, 10))}
-            className="rounded-full border border-border bg-muted px-4 py-2 text-sm font-semibold text-foreground outline-none focus:border-primary"
-          >
-            {availableYears.map((y) => (
-              <option key={y} value={y}>{y}/{y + 1}</option>
-            ))}
+      <div className="rounded-[24px] border border-border bg-card p-6 space-y-4">
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-foreground">Safra de verao</label>
+          <select value={summerCrop} onChange={(e) => setSummerCrop(e.target.value)} className={selectClass}>
+            {SUMMER_CROPS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </select>
+        </div>
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-foreground">Safrinha</label>
+          <select value={safrinhaCrop} onChange={(e) => setSafrinhaCrop(e.target.value)} className={selectClass}>
+            {SAFRINHA_CROPS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </select>
+        </div>
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-foreground">Safra de inverno</label>
+          <select value={winterCrop} onChange={(e) => setWinterCrop(e.target.value)} className={selectClass}>
+            {WINTER_CROPS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </select>
+        </div>
+        <div className="border-t border-border pt-4">
+          <label className="mb-1.5 block text-sm font-medium text-foreground">Como foi a ultima safra de verao?</label>
+          <select value={yieldResult} onChange={(e) => setYieldResult(e.target.value)} className={selectClass}>
+            {YIELD_RESULTS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </select>
+        </div>
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-foreground">Qual o maior problema da lavoura?</label>
+          <select value={mainProblem} onChange={(e) => setMainProblem(e.target.value)} className={selectClass}>
+            {PROBLEMS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
         </div>
       </div>
-
-      {yearsData.map((year, i) => (
-        <div key={i} className="rounded-[24px] border border-border bg-card p-6">
-          <h3 className="mb-4 text-base font-semibold text-foreground">{year.label}</h3>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="mb-1 block text-sm text-muted-foreground">O que plantou no verao?</label>
-              <select value={year.summer_crop} onChange={(e) => updateYear(i, "summer_crop", e.target.value)} className="w-full rounded-full border border-border bg-muted px-4 py-2 text-sm text-foreground outline-none focus:border-primary">
-                {SUMMER_CROPS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="mb-1 block text-sm text-muted-foreground">Plantou safrinha?</label>
-              <select value={year.safrinha_crop} onChange={(e) => updateYear(i, "safrinha_crop", e.target.value)} className="w-full rounded-full border border-border bg-muted px-4 py-2 text-sm text-foreground outline-none focus:border-primary">
-                {SAFRINHA_CROPS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="mb-1 block text-sm text-muted-foreground">O que plantou no inverno?</label>
-              <select value={year.winter_crop} onChange={(e) => updateYear(i, "winter_crop", e.target.value)} className="w-full rounded-full border border-border bg-muted px-4 py-2 text-sm text-foreground outline-none focus:border-primary">
-                {WINTER_CROPS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="mb-1 block text-sm text-muted-foreground">Como foi a safra de verão?</label>
-              <select value={year.yield_result} onChange={(e) => updateYear(i, "yield_result", e.target.value)} className="w-full rounded-full border border-border bg-muted px-4 py-2 text-sm text-foreground outline-none focus:border-primary">
-                {YIELD_RESULTS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="mb-1 block text-sm text-muted-foreground">Qual foi o maior problema?</label>
-              <select value={year.main_problem} onChange={(e) => updateYear(i, "main_problem", e.target.value)} className="w-full rounded-full border border-border bg-muted px-4 py-2 text-sm text-foreground outline-none focus:border-primary">
-                {PROBLEMS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
-            </div>
-          </div>
-        </div>
-      ))}
 
       <div className="space-y-3">
         <h3 className="text-base font-semibold text-foreground">Sobre a propriedade</h3>
@@ -326,10 +279,10 @@ function ProducerForm({ municipality, availableYears, onComplete }: { municipali
 
       <div className="flex flex-col items-center gap-3 pt-2">
         <button onClick={handleSubmit} className="h-11 w-full rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover sm:w-auto sm:px-12">
-          Salvar e ver relatorio
+          Ver meu relatorio
         </button>
         <button onClick={handleSkip} className="text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground">
-          Pular — ver relatorio direto
+          Pular — ver relatorio sem personalizar
         </button>
       </div>
     </section>
@@ -768,16 +721,17 @@ export default function HomeClient() {
     }, 300);
   };
 
-  const handleProducerComplete = (chosenYear: number) => {
+  const handleProducerComplete = () => {
     if (!selectedCity) return;
     setShowProducerForm(false);
     setProducerDone(true);
+    const latestYear = availableYears[0] ?? new Date().getFullYear();
     setReport({
       municipality: selectedCity.name,
       uf: selectedCity.uf,
       loading: true,
       years: [],
-      selectedYear: chosenYear,
+      selectedYear: latestYear,
       riskScore: null,
       riskLabel: null,
       avgTemp: null,
@@ -794,7 +748,7 @@ export default function HomeClient() {
       reportRef.current?.scrollIntoView({ behavior: "smooth" });
     }, 300);
 
-    fetchReport(selectedCity.name, selectedCity.uf, chosenYear);
+    fetchReport(selectedCity.name, selectedCity.uf, latestYear);
   };
 
   return (
@@ -911,7 +865,7 @@ export default function HomeClient() {
       {/* ── PRODUCER FORM (inline after city selection) ── */}
       {showProducerForm && selectedCity && !unavailableCity && (
         <div ref={formRef} style={{ background: "#DCE8DD", color: "#151A17" }}>
-          <ProducerForm municipality={selectedCity.name} availableYears={availableYears} onComplete={handleProducerComplete} />
+          <ProducerForm municipality={selectedCity.name} onComplete={handleProducerComplete} />
         </div>
       )}
 

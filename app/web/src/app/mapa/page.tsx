@@ -316,7 +316,7 @@ export default function MapaPage() {
       </div>
 
       <div className="overflow-hidden rounded-xl border border-border">
-        <div ref={mapRef} className="h-[320px] w-full bg-bg-surface-alt" />
+        <div ref={mapRef} className="h-[250px] w-full bg-bg-surface-alt" />
       </div>
 
       {activeLayer === "relevo" && (

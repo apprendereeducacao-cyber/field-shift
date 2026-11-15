@@ -6,6 +6,9 @@ import Image from "next/image";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Sphere, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
+import { DEFAULT_LANG, tx } from "@/lib/text";
+import { PolicyCard, PrecheckCard, PrecheckQuestions } from "@/components/FarmPrecheck";
+import { EMPTY_ANSWERS, buildFarm, hasUnmodelledWinter, type PrecheckAnswers } from "@/lib/precheck-form";
 
 const DATA_PARTNERS = [
   "NASA POWER",
@@ -94,6 +97,7 @@ const WINTER_CROPS = [
   { value: "aveia_ervilhaca_nabo", label: "Aveia + Ervilhaca + Nabo (triplo)" },
   { value: "pousio", label: "Pousio (nao plantou nada)" },
   { value: "outro", label: "Outro" },
+  { value: "nao_sei", label: "Nao sei" },
 ];
 
 const YIELD_RESULTS = [
@@ -175,13 +179,28 @@ function isAvailableCity(name: string): boolean {
 
 /* ── Inline Producer Form ── */
 type SeasonData = { summer: string; safrinha: string; winter: string; yield_result: string; problem: string };
-const EMPTY_SEASON: SeasonData = { summer: "soja", safrinha: "pousio", winter: "pousio", yield_result: "normal", problem: "nenhum" };
+// Inverno sem valor inicial ("Selecione..."): o padrao induz a resposta.
+const EMPTY_SEASON: SeasonData = { summer: "soja", safrinha: "pousio", winter: "", yield_result: "normal", problem: "nenhum" };
+
+// Respostas extras da pre-checagem ZarcNM, salvas junto no mesmo localStorage (nada sai do navegador).
+function loadPrecheck(): PrecheckAnswers {
+  try {
+    const raw = typeof window !== "undefined" ? localStorage.getItem("fieldshift_produtor") : null;
+    const p = raw ? JSON.parse(raw).precheck : null;
+    if (p && typeof p === "object") return { ...EMPTY_ANSWERS, ...p, soil: { ...EMPTY_ANSWERS.soil, ...(p.soil ?? {}) } };
+  } catch { /* ignore */ }
+  return EMPTY_ANSWERS;
+}
 
 function ProducerForm({ municipality, onComplete }: { municipality: string; onComplete: () => void }) {
   const thisYear = new Date().getFullYear();
   const labels = [`${thisYear - 1}/${thisYear}`, `${thisYear - 2}/${thisYear - 1}`];
   const [seasons, setSeasons] = useState<SeasonData[]>([{ ...EMPTY_SEASON }, { ...EMPTY_SEASON }]);
   const [soilCompacted, setSoilCompacted] = useState(false);
+  const [precheck, setPrecheck] = useState<PrecheckAnswers>(loadPrecheck);
+  const farm = buildFarm(seasons.map((s) => s.winter), precheck);
+  const allWinters = [...seasons.map((s) => s.winter), precheck.olderWinter];
+  const notSoybean = seasons.some((s) => s.summer !== "soja" || s.safrinha !== "pousio");
 
   useEffect(() => {
     try {
@@ -199,7 +218,7 @@ function ProducerForm({ municipality, onComplete }: { municipality: string; onCo
   }
 
   function handleSubmit() {
-    const data = { seasons, soil_compacted: soilCompacted, saved_at: new Date().toISOString() };
+    const data = { seasons, soil_compacted: soilCompacted, precheck, saved_at: new Date().toISOString() };
     try { localStorage.setItem("fieldshift_produtor", JSON.stringify(data)); } catch { /* ignore */ }
     onComplete();
   }
@@ -236,6 +255,7 @@ function ProducerForm({ municipality, onComplete }: { municipality: string; onCo
           <div>
             <label className="mb-1 block text-xs font-medium text-muted-foreground uppercase tracking-wide">Inverno</label>
             <select value={s.winter} onChange={(e) => update(i, "winter", e.target.value)} className={sel}>
+              <option value="" disabled>{tx({ en: "Select…", pt: "Selecione…" }, DEFAULT_LANG)}</option>
               {WINTER_CROPS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
           </div>
@@ -264,6 +284,10 @@ function ProducerForm({ municipality, onComplete }: { municipality: string; onCo
           <span className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow-xs transition-transform ${soilCompacted ? "translate-x-5" : "translate-x-0"}`} />
         </button>
       </div>
+
+      <PrecheckQuestions answers={precheck} onChange={setPrecheck} winterOptions={WINTER_CROPS} />
+      <PrecheckCard farm={farm} notes={{ unmodelledWinter: hasUnmodelledWinter(allWinters), notSoybean }} />
+      <PolicyCard />
 
       <div className="flex flex-col items-center gap-3 pt-2">
         <button onClick={handleSubmit} className="h-11 w-full rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover sm:w-auto sm:px-12">

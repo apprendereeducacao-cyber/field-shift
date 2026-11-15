@@ -63,32 +63,36 @@ type ReportData = {
 const SUMMER_CROPS = [
   { value: "soja", label: "Soja" },
   { value: "milho", label: "Milho" },
-  { value: "feijao", label: "Feijão" },
+  { value: "feijao", label: "Feijao" },
   { value: "outro", label: "Outro" },
   { value: "nenhum", label: "Nenhum" },
 ];
 
 const SAFRINHA_CROPS = [
+  { value: "soja_safrinha", label: "Soja safrinha (ciclo curto)" },
   { value: "milho_safrinha", label: "Milho safrinha" },
+  { value: "feijao", label: "Feijao" },
   { value: "sorgo", label: "Sorgo" },
-  { value: "feijao", label: "Feijão" },
   { value: "girassol", label: "Girassol" },
-  { value: "brachiaria", label: "Brachiaria (cobertura)" },
-  { value: "crotalaria", label: "Crotalária (adubo verde)" },
   { value: "milheto", label: "Milheto (cobertura)" },
-  { value: "pousio", label: "Não plantou safrinha" },
+  { value: "brachiaria", label: "Brachiaria (cobertura)" },
+  { value: "crotalaria", label: "Crotalaria (adubo verde)" },
+  { value: "pousio", label: "Nao plantou safrinha" },
 ];
 
 const WINTER_CROPS = [
-  { value: "trigo", label: "Trigo" },
-  { value: "aveia_preta", label: "Aveia-preta" },
+  { value: "trigo", label: "Trigo (renda)" },
+  { value: "aveia_preta", label: "Aveia-preta (cobertura)" },
+  { value: "aveia_branca", label: "Aveia-branca (grao)" },
   { value: "centeio", label: "Centeio" },
-  { value: "ervilhaca", label: "Ervilhaca" },
-  { value: "nabo_forrageiro", label: "Nabo forrageiro" },
-  { value: "azevem", label: "Azevém" },
-  { value: "canola", label: "Canola" },
-  { value: "consorcio", label: "Consórcio (aveia + ervilhaca)" },
-  { value: "pousio", label: "Pousio (não plantou nada)" },
+  { value: "canola", label: "Canola (renda)" },
+  { value: "ervilhaca", label: "Ervilhaca (fixa nitrogenio)" },
+  { value: "nabo_forrageiro", label: "Nabo forrageiro (descompacta)" },
+  { value: "azevem", label: "Azevem (pastagem)" },
+  { value: "aveia_ervilhaca", label: "Aveia-preta + Ervilhaca (mix)" },
+  { value: "centeio_nabo", label: "Centeio + Nabo (mix)" },
+  { value: "aveia_ervilhaca_nabo", label: "Aveia + Ervilhaca + Nabo (triplo)" },
+  { value: "pousio", label: "Pousio (nao plantou nada)" },
   { value: "outro", label: "Outro" },
 ];
 

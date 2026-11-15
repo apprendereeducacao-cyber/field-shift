@@ -214,7 +214,7 @@ export type TopographyData = {
     max_elevation_m: number;
     range_m: number;
     mean_elevation_m: number;
-    n_points: number;
+    n_points?: number;
   };
 };
 

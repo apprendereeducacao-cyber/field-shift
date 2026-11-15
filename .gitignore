@@ -39,3 +39,4 @@ app/web/.git/
 
 # Claude Code
 .claude/
+.vercel

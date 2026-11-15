@@ -846,7 +846,7 @@ export default function HomeClient() {
             {[...DATA_PARTNERS, ...DATA_PARTNERS].map((name, i) => (
               <div
                 key={i}
-                className="flex shrink-0 items-center justify-center rounded-[16px] border border-white/10 bg-[#165337] px-6 py-4 text-sm font-semibold text-white shadow-md"
+                className="flex shrink-0 items-center justify-center rounded-[16px] border-2 border-black bg-[#165337] px-6 py-4 text-sm font-semibold text-white shadow-md"
               >
                 {name}
               </div>
@@ -875,6 +875,56 @@ export default function HomeClient() {
           <CityReport report={report} onYearChange={handleYearChange} />
         </div>
       )}
+
+      {/* ── FOOTER ── */}
+      <footer className="bg-shell text-stone-400">
+        <div className="mx-auto max-w-[1440px] px-4 py-12 sm:px-10">
+          <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
+            <div>
+              <Image
+                src="/brand/stella-root-lockup-horizontal-white.png"
+                alt="Stella Root"
+                width={140}
+                height={28}
+                className="h-7 w-auto"
+              />
+              <p className="mt-4 text-sm leading-relaxed">
+                Inteligencia agricola baseada em 44 anos de dados da NASA para ajudar produtores a tomar decisoes melhores sobre rotacao de culturas e manejo do solo.
+              </p>
+            </div>
+            <div>
+              <h4 className="text-sm font-semibold text-white">Plataforma</h4>
+              <ul className="mt-3 space-y-2 text-sm">
+                <li><Link href="/" className="transition-colors hover:text-white">Inicio</Link></li>
+                <li><Link href="/dados" className="transition-colors hover:text-white">Dados</Link></li>
+                <li><Link href="/mapa" className="transition-colors hover:text-white">Mapa interativo</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-sm font-semibold text-white">Fontes de dados</h4>
+              <ul className="mt-3 space-y-2 text-sm">
+                <li>NASA MODIS / ECOSTRESS</li>
+                <li>Sentinel-2 (ESA)</li>
+                <li>NASA GPM / SMAP</li>
+                <li>SRTM / GRACE-FO</li>
+                <li>MapBiomas / IBGE</li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-sm font-semibold text-white">Sobre</h4>
+              <ul className="mt-3 space-y-2 text-sm">
+                <li>NASA Space Apps Challenge 2026</li>
+                <li>Cruz Alta, Rio Grande do Sul</li>
+                <li>Dados abertos e gratuitos</li>
+              </ul>
+            </div>
+          </div>
+          <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 sm:flex-row">
+            <p className="text-xs">Stella Root — NASA Space Apps 2026</p>
+            <p className="text-xs">Dados de satelites publicos. Uso educacional e agricola.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

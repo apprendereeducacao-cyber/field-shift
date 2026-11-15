@@ -45,37 +45,67 @@ type ReportData = {
   strategies: { name: string; subtitle: string; totalScore: number; sequence: { crop: string; season: string }[] }[];
 };
 
-function GlobeWireframe({ targetLat, targetLon }: { targetLat?: number; targetLon?: number }) {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const markerRef = useRef<THREE.Mesh>(null);
-  const haloRef = useRef<THREE.Mesh>(null);
-  const targetRotation = useRef<number | null>(null);
+/* ── Producer Form Data ── */
+const SUMMER_CROPS = [
+  { value: "soja", label: "Soja" },
+  { value: "milho", label: "Milho" },
+  { value: "outro", label: "Outro" },
+  { value: "nenhum", label: "Nenhum" },
+];
 
-  useEffect(() => {
-    if (targetLon !== undefined) {
-      targetRotation.current = THREE.MathUtils.degToRad(-targetLon - 90);
-    }
-  }, [targetLon]);
+const WINTER_CROPS = [
+  { value: "trigo", label: "Trigo" },
+  { value: "aveia_preta", label: "Aveia Preta" },
+  { value: "ervilhaca", label: "Ervilhaca" },
+  { value: "nabo_forrageiro", label: "Nabo Forrageiro" },
+  { value: "azevem", label: "Azevem" },
+  { value: "canola", label: "Canola" },
+  { value: "pousio", label: "Pousio (nao plantou nada)" },
+  { value: "outro", label: "Outro" },
+];
+
+const YIELD_RESULTS = [
+  { value: "boa", label: "Boa (acima da media)" },
+  { value: "normal", label: "Normal" },
+  { value: "ruim", label: "Ruim (abaixo da media)" },
+  { value: "perda_total", label: "Perda total" },
+];
+
+const PROBLEMS = [
+  { value: "nenhum", label: "Nenhum problema grave" },
+  { value: "seca", label: "Seca" },
+  { value: "chuva_demais", label: "Chuva demais" },
+  { value: "praga_doenca", label: "Praga ou doenca" },
+  { value: "solo_compactado", label: "Solo compactado" },
+  { value: "geada", label: "Geada" },
+];
+
+type YearFormData = {
+  label: string;
+  summer_crop: string;
+  winter_crop: string;
+  yield_result: string;
+  main_problem: string;
+};
+
+const currentYear = new Date().getFullYear();
+const YEAR_LABELS = [`Safra ${currentYear - 1}/${currentYear}`, `Safra ${currentYear - 2}/${currentYear - 1}`];
+
+const DEFAULT_YEAR: YearFormData = {
+  label: "",
+  summer_crop: "soja",
+  winter_crop: "pousio",
+  yield_result: "normal",
+  main_problem: "nenhum",
+};
+
+function GlobeWireframe() {
+  const meshRef = useRef<THREE.Mesh>(null);
 
   useFrame((_, delta) => {
     if (!meshRef.current) return;
-    if (targetRotation.current !== null) {
-      meshRef.current.rotation.y += (targetRotation.current - meshRef.current.rotation.y) * 0.03;
-    } else {
-      meshRef.current.rotation.y += delta * 0.12;
-    }
+    meshRef.current.rotation.y += delta * 0.12;
   });
-
-  const lat = targetLat ?? -28.6;
-  const lon = targetLon ?? -53.6;
-  const phi = THREE.MathUtils.degToRad(90 - lat);
-  const theta = THREE.MathUtils.degToRad(lon + 90);
-  const r = 2.01;
-  const markerPos: [number, number, number] = [
-    r * Math.sin(phi) * Math.cos(theta),
-    r * Math.cos(phi),
-    r * Math.sin(phi) * Math.sin(theta),
-  ];
 
   return (
     <group>
@@ -85,23 +115,11 @@ function GlobeWireframe({ targetLat, targetLon }: { targetLat?: number; targetLo
       <Sphere args={[1.98, 48, 48]}>
         <meshBasicMaterial color="#0B1A10" transparent opacity={0.92} />
       </Sphere>
-      {targetLat !== undefined && (
-        <>
-          <mesh ref={markerRef} position={markerPos}>
-            <sphereGeometry args={[0.05, 16, 16]} />
-            <meshBasicMaterial color="#E1F031" />
-          </mesh>
-          <mesh ref={haloRef} position={markerPos} rotation={[Math.PI / 2, 0, 0]}>
-            <ringGeometry args={[0.07, 0.11, 32]} />
-            <meshBasicMaterial color="#96E18E" transparent opacity={0.5} side={THREE.DoubleSide} />
-          </mesh>
-        </>
-      )}
     </group>
   );
 }
 
-function GlobeScene({ targetLat, targetLon }: { targetLat?: number; targetLon?: number }) {
+function GlobeScene() {
   return (
     <Canvas
       camera={{ position: [0, 0, 5.5], fov: 45 }}
@@ -111,7 +129,7 @@ function GlobeScene({ targetLat, targetLon }: { targetLat?: number; targetLon?: 
       <ambientLight intensity={0.3} />
       <pointLight position={[10, 10, 10]} intensity={0.5} />
       <Suspense fallback={null}>
-        <GlobeWireframe targetLat={targetLat} targetLon={targetLon} />
+        <GlobeWireframe />
       </Suspense>
       <OrbitControls enableZoom={false} enablePan={false} autoRotate={false} minPolarAngle={Math.PI / 3} maxPolarAngle={Math.PI / 1.5} />
     </Canvas>
@@ -123,6 +141,162 @@ const SEASON_LABEL: Record<string, string> = {
 };
 function formatCrop(name: string) {
   return name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+const AVAILABLE_CITIES = ["cruz alta"];
+
+function isAvailableCity(name: string): boolean {
+  return AVAILABLE_CITIES.includes(name.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, ""));
+}
+
+/* ── Inline Producer Form ── */
+function ProducerForm({ municipality, availableYears, onComplete }: { municipality: string; availableYears: number[]; onComplete: (selectedYear: number) => void }) {
+  const defaultYear = availableYears[0] ?? new Date().getFullYear();
+  const [selectedYear, setSelectedYear] = useState(defaultYear);
+
+  const yearLabels = [`Safra ${selectedYear - 1}/${selectedYear}`, `Safra ${selectedYear - 2}/${selectedYear - 1}`];
+
+  const [yearsData, setYearsData] = useState<YearFormData[]>(
+    yearLabels.map((label) => ({ ...DEFAULT_YEAR, label }))
+  );
+  const [hasCattle, setHasCattle] = useState(false);
+  const [soilCompacted, setSoilCompacted] = useState(false);
+  const [usedGreenManure, setUsedGreenManure] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("fieldshift_produtor");
+      if (raw) {
+        const data = JSON.parse(raw);
+        if (data.years?.length === 2) {
+          setHasCattle(data.has_cattle ?? false);
+          setSoilCompacted(data.soil_compacted ?? false);
+          setUsedGreenManure(data.used_green_manure ?? false);
+        }
+      }
+    } catch { /* ignore */ }
+  }, []);
+
+  useEffect(() => {
+    const labels = [`Safra ${selectedYear - 1}/${selectedYear}`, `Safra ${selectedYear - 2}/${selectedYear - 1}`];
+    setYearsData((prev) => prev.map((y, i) => ({ ...y, label: labels[i] })));
+  }, [selectedYear]);
+
+  function updateYear(index: number, field: keyof YearFormData, value: string) {
+    setYearsData((prev) => {
+      const next = [...prev];
+      next[index] = { ...next[index], [field]: value };
+      return next;
+    });
+  }
+
+  function handleSubmit() {
+    const data = {
+      years: yearsData,
+      has_cattle: hasCattle,
+      soil_compacted: soilCompacted,
+      used_green_manure: usedGreenManure,
+      saved_at: new Date().toISOString(),
+    };
+    try {
+      localStorage.setItem("fieldshift_produtor", JSON.stringify(data));
+    } catch { /* ignore */ }
+    onComplete(selectedYear);
+  }
+
+  function handleSkip() {
+    onComplete(selectedYear);
+  }
+
+  return (
+    <section className="mx-auto w-full max-w-3xl space-y-6 px-4 py-10 sm:px-10">
+      <div className="text-center">
+        <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Sobre sua lavoura</p>
+        <h2 className="mt-2 text-[28px] font-light leading-tight tracking-[-0.02em] text-foreground sm:text-[32px]">
+          Conte sobre {municipality}
+        </h2>
+        <p className="mx-auto mt-2 max-w-lg text-sm text-muted-foreground">
+          Selecione o ano-safra de referencia e responda sobre as 2 safras anteriores.
+        </p>
+      </div>
+
+      <div className="flex justify-center">
+        <div className="flex items-center gap-3 rounded-[24px] border border-border bg-card px-6 py-4">
+          <label className="text-sm font-medium text-foreground">Ano-safra de referencia:</label>
+          <select
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(parseInt(e.target.value, 10))}
+            className="rounded-full border border-border bg-muted px-4 py-2 text-sm font-semibold text-foreground outline-none focus:border-primary"
+          >
+            {availableYears.map((y) => (
+              <option key={y} value={y}>{y}/{y + 1}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {yearsData.map((year, i) => (
+        <div key={i} className="rounded-[24px] border border-border bg-card p-6">
+          <h3 className="mb-4 text-base font-semibold text-foreground">{year.label}</h3>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-sm text-muted-foreground">O que plantou no verao?</label>
+              <select value={year.summer_crop} onChange={(e) => updateYear(i, "summer_crop", e.target.value)} className="w-full rounded-full border border-border bg-muted px-4 py-2 text-sm text-foreground outline-none focus:border-primary">
+                {SUMMER_CROPS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="mb-1 block text-sm text-muted-foreground">O que plantou no inverno?</label>
+              <select value={year.winter_crop} onChange={(e) => updateYear(i, "winter_crop", e.target.value)} className="w-full rounded-full border border-border bg-muted px-4 py-2 text-sm text-foreground outline-none focus:border-primary">
+                {WINTER_CROPS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="mb-1 block text-sm text-muted-foreground">Como foi a safra de verao?</label>
+              <select value={year.yield_result} onChange={(e) => updateYear(i, "yield_result", e.target.value)} className="w-full rounded-full border border-border bg-muted px-4 py-2 text-sm text-foreground outline-none focus:border-primary">
+                {YIELD_RESULTS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="mb-1 block text-sm text-muted-foreground">Qual foi o maior problema?</label>
+              <select value={year.main_problem} onChange={(e) => updateYear(i, "main_problem", e.target.value)} className="w-full rounded-full border border-border bg-muted px-4 py-2 text-sm text-foreground outline-none focus:border-primary">
+                {PROBLEMS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </div>
+          </div>
+        </div>
+      ))}
+
+      <div className="space-y-3">
+        <h3 className="text-base font-semibold text-foreground">Sobre a propriedade</h3>
+        {[
+          { id: "cattle", label: "Tem gado na propriedade?", desc: "Culturas que servem de pasto no inverno ganham prioridade", checked: hasCattle, set: setHasCattle },
+          { id: "compact", label: "O solo esta compactado?", desc: "Se a agua empoca ou a raiz nao desce, pode estar compactado", checked: soilCompacted, set: setSoilCompacted },
+          { id: "green", label: "Ja usou adubo verde?", desc: "Ervilhaca, crotalaria, nabo — qualquer planta pra melhorar o solo", checked: usedGreenManure, set: setUsedGreenManure },
+        ].map((t) => (
+          <div key={t.id} className="flex cursor-pointer items-center justify-between rounded-[24px] border border-border bg-card p-4" onClick={() => t.set(!t.checked)}>
+            <div>
+              <p className="text-sm font-medium text-foreground">{t.label}</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">{t.desc}</p>
+            </div>
+            <button role="switch" aria-checked={t.checked} onClick={(e) => { e.stopPropagation(); t.set(!t.checked); }}
+              className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${t.checked ? "bg-primary" : "bg-muted"}`}>
+              <span className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow-xs transition-transform ${t.checked ? "translate-x-5" : "translate-x-0"}`} />
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex flex-col items-center gap-3 pt-2">
+        <button onClick={handleSubmit} className="h-11 w-full rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover sm:w-auto sm:px-12">
+          Salvar e ver relatorio
+        </button>
+        <button onClick={handleSkip} className="text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground">
+          Pular — ver relatorio direto
+        </button>
+      </div>
+    </section>
+  );
 }
 
 function CityReport({ report, onYearChange }: { report: ReportData; onYearChange: (year: number) => void }) {
@@ -313,13 +487,47 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
   );
 }
 
+/* ── Unavailable City Notice ── */
+function UnavailableCity({ name, uf, onReset }: { name: string; uf: string; onReset: () => void }) {
+  return (
+    <section className="mx-auto w-full max-w-2xl px-4 py-16 text-center sm:px-10">
+      <div className="rounded-[24px] border border-border bg-card p-8">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-muted">
+          <svg className="h-7 w-7 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+          </svg>
+        </div>
+        <h2 className="text-xl font-semibold text-foreground">{name}, {uf}</h2>
+        <p className="mt-3 text-sm text-muted-foreground">
+          Ainda nao disponivel para este municipio. No momento, apenas <strong className="text-foreground">Cruz Alta - RS</strong> esta liberada com dados completos de satelite.
+        </p>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Estamos expandindo para mais municipios em breve.
+        </p>
+        <button
+          onClick={onReset}
+          className="mt-6 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
+        >
+          Buscar outro municipio
+        </button>
+      </div>
+    </section>
+  );
+}
+
 export default function HomeClient() {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<Municipality[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedCity, setSelectedCity] = useState<{ name: string; uf: string; lat: number; lon: number } | null>(null);
   const [report, setReport] = useState<ReportData | null>(null);
+  const [unavailableCity, setUnavailableCity] = useState<{ name: string; uf: string } | null>(null);
+  const [showProducerForm, setShowProducerForm] = useState(false);
+  const [producerDone, setProducerDone] = useState(false);
+  const [availableYears, setAvailableYears] = useState<number[]>([]);
   const reportRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLDivElement>(null);
   const searchTimeout = useRef<ReturnType<typeof setTimeout>>(null);
 
   const municipiosCache = useRef<Municipality[] | null>(null);
@@ -396,6 +604,17 @@ export default function HomeClient() {
     fetchReport(report.municipality, report.uf, year);
   };
 
+  const handleReset = () => {
+    setQuery("");
+    setSuggestions([]);
+    setShowSuggestions(false);
+    setSelectedCity(null);
+    setReport(null);
+    setUnavailableCity(null);
+    setShowProducerForm(false);
+    setProducerDone(false);
+  };
+
   const selectCity = async (mun: Municipality) => {
     const uf = mun.microrregiao.mesorregiao.UF.sigla;
     setQuery(`${mun.nome}, ${uf}`);
@@ -416,12 +635,48 @@ export default function HomeClient() {
     } catch { /* use defaults */ }
 
     setSelectedCity({ name: mun.nome, uf, lat, lon });
+
+    if (!isAvailableCity(mun.nome)) {
+      setUnavailableCity({ name: mun.nome, uf });
+      setReport(null);
+      setShowProducerForm(false);
+      setProducerDone(false);
+      setTimeout(() => {
+        reportRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 300);
+      return;
+    }
+
+    setUnavailableCity(null);
+    setProducerDone(false);
+    setReport(null);
+
+    try {
+      const res = await fetch("/api/report");
+      const data = await res.json();
+      setAvailableYears(data.years ?? []);
+    } catch {
+      const fallback = Array.from({ length: 45 }, (_, i) => new Date().getFullYear() - i);
+      setAvailableYears(fallback);
+    }
+
+    setShowProducerForm(true);
+
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 300);
+  };
+
+  const handleProducerComplete = (chosenYear: number) => {
+    if (!selectedCity) return;
+    setShowProducerForm(false);
+    setProducerDone(true);
     setReport({
-      municipality: mun.nome,
-      uf,
+      municipality: selectedCity.name,
+      uf: selectedCity.uf,
       loading: true,
       years: [],
-      selectedYear: new Date().getFullYear(),
+      selectedYear: chosenYear,
       riskScore: null,
       riskLabel: null,
       avgTemp: null,
@@ -437,7 +692,7 @@ export default function HomeClient() {
       reportRef.current?.scrollIntoView({ behavior: "smooth" });
     }, 300);
 
-    fetchReport(mun.nome, uf);
+    fetchReport(selectedCity.name, selectedCity.uf, chosenYear);
   };
 
   return (
@@ -450,17 +705,30 @@ export default function HomeClient() {
       >
         <div className="absolute inset-0 opacity-50" style={{ backgroundImage: "radial-gradient(rgba(150,225,142,0.16) 1px, transparent 1px)", backgroundSize: "16px 16px" }} />
 
+        {/* Satellite image inside globe — circular clip with radial fade */}
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="relative h-[min(70vw,520px)] w-[min(70vw,520px)]">
+            <div className="absolute inset-0 overflow-hidden rounded-full" style={{ maskImage: "radial-gradient(circle, rgba(0,0,0,1) 30%, rgba(0,0,0,0.6) 55%, transparent 72%)", WebkitMaskImage: "radial-gradient(circle, rgba(0,0,0,1) 30%, rgba(0,0,0,0.6) 55%, transparent 72%)" }}>
+              <Image
+                src="/hero-satellite.jpg"
+                alt="Sensoriamento remoto agricola por satelite"
+                width={520}
+                height={520}
+                className="h-full w-full object-cover"
+                priority
+              />
+            </div>
+          </div>
+        </div>
+
         <div className="absolute inset-0 opacity-50">
-          <GlobeScene targetLat={selectedCity?.lat} targetLon={selectedCity?.lon} />
+          <GlobeScene />
         </div>
 
         <div className="relative z-10 flex flex-col items-center px-4 text-center">
           <h1 className="text-[44px] font-light leading-[1.1] tracking-[-0.035em] text-stone-50 sm:text-[56px]">
             Adapte sua lavoura<br />com dados da NASA
           </h1>
-          <p className="mt-4 max-w-md text-base text-stone-300" style={{ letterSpacing: "-0.005em" }}>
-            44 anos de dados climaticos, 7 camadas de satelite, inteligencia para decidir o melhor manejo
-          </p>
 
           <div className="relative mt-8 w-full max-w-md">
             <div className="flex items-center rounded-full border border-stone-700 bg-forest-900/80 px-5 py-3 backdrop-blur-md">
@@ -477,7 +745,7 @@ export default function HomeClient() {
               />
               {query && (
                 <button
-                  onClick={() => { setQuery(""); setSuggestions([]); setShowSuggestions(false); setSelectedCity(null); setReport(null); }}
+                  onClick={handleReset}
                   className="ml-2 text-stone-400 hover:text-stone-200"
                 >
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -531,8 +799,22 @@ export default function HomeClient() {
         </div>
       </section>
 
-      {/* ── CITY REPORT (appears after search) ── */}
-      {report && (
+      {/* ── UNAVAILABLE CITY NOTICE ── */}
+      {unavailableCity && (
+        <div ref={reportRef} style={{ background: "#DCE8DD", color: "#151A17" }}>
+          <UnavailableCity name={unavailableCity.name} uf={unavailableCity.uf} onReset={handleReset} />
+        </div>
+      )}
+
+      {/* ── PRODUCER FORM (inline after city selection) ── */}
+      {showProducerForm && selectedCity && !unavailableCity && (
+        <div ref={formRef} style={{ background: "#DCE8DD", color: "#151A17" }}>
+          <ProducerForm municipality={selectedCity.name} availableYears={availableYears} onComplete={handleProducerComplete} />
+        </div>
+      )}
+
+      {/* ── CITY REPORT (appears after producer form) ── */}
+      {report && producerDone && (
         <div ref={reportRef} style={{ background: "#DCE8DD", color: "#151A17" }}>
           <CityReport report={report} onYearChange={handleYearChange} />
         </div>

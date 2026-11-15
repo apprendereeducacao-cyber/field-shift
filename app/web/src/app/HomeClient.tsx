@@ -50,7 +50,8 @@ type ReportData = {
   riskLabel: string | null;
   avgTemp: number | null;
   avgRain: number | null;
-  yearData: { yield: number; rain: number; temp: number; spiDjf: number } | null;
+  yearData: { yield: number; rain: number; temp: number; spiDjf: number; enso: string | null } | null;
+  ensoImpact: { el_nino: { avg_yield_sc_ha: number; n_safras: number }; la_nina: { avg_yield_sc_ha: number; n_safras: number }; neutro: { avg_yield_sc_ha: number; n_safras: number } } | null;
   topCrops: string[];
   coverCrops: string[];
   rotation: { name: string; subtitle: string; scores: Record<string, number>; totalScore: number; sequence: { crop: string; season: string }[] } | null;
@@ -61,6 +62,7 @@ type ReportData = {
 
 /* ── Producer Form Data ── */
 const SUMMER_CROPS = [
+  { value: "", label: "Selecione" },
   { value: "soja", label: "Soja" },
   { value: "milho", label: "Milho" },
   { value: "feijao", label: "Feijao" },
@@ -69,6 +71,7 @@ const SUMMER_CROPS = [
 ];
 
 const SAFRINHA_CROPS = [
+  { value: "", label: "Selecione" },
   { value: "soja_safrinha", label: "Soja safrinha (ciclo curto)" },
   { value: "milho_safrinha", label: "Milho safrinha" },
   { value: "feijao", label: "Feijao" },
@@ -81,34 +84,37 @@ const SAFRINHA_CROPS = [
 ];
 
 const WINTER_CROPS = [
+  { value: "", label: "Selecione" },
+  { value: "pousio", label: "Pousio (nao plantou nada)" },
   { value: "trigo", label: "Trigo (renda)" },
   { value: "aveia_preta", label: "Aveia-preta (cobertura)" },
   { value: "aveia_branca", label: "Aveia-branca (grao)" },
   { value: "centeio", label: "Centeio" },
   { value: "canola", label: "Canola (renda)" },
-  { value: "ervilhaca", label: "Ervilhaca (fixa nitrogenio)" },
-  { value: "nabo_forrageiro", label: "Nabo forrageiro (descompacta)" },
+  { value: "ervilhaca", label: "Ervilhaca (fixa N)" },
+  { value: "nabo_forrageiro", label: "Nabo forrageiro" },
   { value: "azevem", label: "Azevem (pastagem)" },
-  { value: "aveia_ervilhaca", label: "Aveia-preta + Ervilhaca (mix)" },
+  { value: "aveia_ervilhaca", label: "Aveia + Ervilhaca (mix)" },
   { value: "centeio_nabo", label: "Centeio + Nabo (mix)" },
-  { value: "aveia_ervilhaca_nabo", label: "Aveia + Ervilhaca + Nabo (triplo)" },
-  { value: "pousio", label: "Pousio (nao plantou nada)" },
+  { value: "aveia_ervilhaca_nabo", label: "Triplo mix" },
   { value: "outro", label: "Outro" },
 ];
 
 const YIELD_RESULTS = [
-  { value: "boa", label: "Boa (acima da média)" },
+  { value: "", label: "Selecione" },
+  { value: "boa", label: "Boa (acima da media)" },
   { value: "normal", label: "Normal" },
-  { value: "ruim", label: "Ruim (abaixo da média)" },
+  { value: "ruim", label: "Ruim (abaixo da media)" },
   { value: "perda_total", label: "Perda total" },
 ];
 
 const PROBLEMS = [
+  { value: "", label: "Selecione" },
   { value: "nenhum", label: "Nenhum problema grave" },
   { value: "seca", label: "Seca / estiagem" },
   { value: "chuva_demais", label: "Excesso de chuva" },
-  { value: "praga_doenca", label: "Praga ou doença" },
-  { value: "nematoides", label: "Nematóides" },
+  { value: "praga_doenca", label: "Praga ou doenca" },
+  { value: "nematoides", label: "Nematoides" },
   { value: "solo_compactado", label: "Solo compactado" },
   { value: "geada", label: "Geada" },
   { value: "granizo", label: "Granizo" },
@@ -175,13 +181,69 @@ function isAvailableCity(name: string): boolean {
 
 /* ── Inline Producer Form ── */
 type SeasonData = { summer: string; safrinha: string; winter: string; yield_result: string; problem: string };
-const EMPTY_SEASON: SeasonData = { summer: "soja", safrinha: "pousio", winter: "pousio", yield_result: "normal", problem: "nenhum" };
+const EMPTY_SEASON: SeasonData = { summer: "", safrinha: "", winter: "", yield_result: "", problem: "" };
+
+function SelectField({
+  id, label, value, onChange, options, error,
+}: {
+  id: string; label: string; value: string; onChange: (v: string) => void;
+  options: { value: string; label: string }[]; error?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const selected = options.find((o) => o.value === value);
+
+  useEffect(() => {
+    function close(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative">
+      <label htmlFor={id} className="mb-1 block text-xs text-muted-foreground">{label}</label>
+      <button
+        id={id} type="button" onClick={() => setOpen(!open)}
+        className={`flex w-full items-center justify-between rounded-[12px] border px-3 py-2 text-sm outline-none transition-colors ${
+          error && !value ? "border-destructive bg-destructive/5"
+            : open ? "border-primary bg-muted" : "border-border bg-muted"
+        }`}
+      >
+        <span className={value ? "text-foreground" : "text-stone-400"}>
+          {selected?.label || "Selecione"}
+        </span>
+        <svg className={`h-4 w-4 text-stone-400 transition-transform ${open ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      {open && (
+        <div className="absolute left-0 right-0 z-20 mt-1 max-h-48 overflow-y-auto rounded-[12px] border border-border bg-card shadow-lg">
+          {options.filter((o) => o.value !== "").map((opt) => (
+            <button
+              key={opt.value} type="button"
+              onClick={() => { onChange(opt.value); setOpen(false); }}
+              className={`flex w-full items-center px-3 py-2 text-left text-sm transition-colors hover:bg-muted ${
+                opt.value === value ? "font-medium text-primary" : "text-foreground"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
+      {error && !value && <p className="mt-1 text-xs text-destructive">Obrigatorio</p>}
+    </div>
+  );
+}
 
 function ProducerForm({ municipality, onComplete }: { municipality: string; onComplete: () => void }) {
   const thisYear = new Date().getFullYear();
   const labels = [`${thisYear - 1}/${thisYear}`, `${thisYear - 2}/${thisYear - 1}`];
   const [seasons, setSeasons] = useState<SeasonData[]>([{ ...EMPTY_SEASON }, { ...EMPTY_SEASON }]);
   const [soilCompacted, setSoilCompacted] = useState(false);
+  const [showErrors, setShowErrors] = useState(false);
 
   useEffect(() => {
     try {
@@ -198,13 +260,17 @@ function ProducerForm({ municipality, onComplete }: { municipality: string; onCo
     setSeasons((prev) => { const next = [...prev]; next[i] = { ...next[i], [field]: value }; return next; });
   }
 
+  const isFormComplete = seasons.every(
+    (s) => s.summer && s.safrinha && s.winter && s.yield_result && s.problem
+  );
+
   function handleSubmit() {
+    if (!isFormComplete) { setShowErrors(true); return; }
     const data = { seasons, soil_compacted: soilCompacted, saved_at: new Date().toISOString() };
     try { localStorage.setItem("fieldshift_produtor", JSON.stringify(data)); } catch { /* ignore */ }
+    setShowErrors(false);
     onComplete();
   }
-
-  const sel = "w-full appearance-none rounded-xl border border-border bg-muted px-4 py-2 text-sm text-foreground outline-none focus:border-primary";
 
   return (
     <section className="mx-auto w-full max-w-2xl space-y-5 px-4 py-10 sm:px-10">
@@ -221,35 +287,14 @@ function ProducerForm({ municipality, onComplete }: { municipality: string; onCo
       {seasons.map((s, i) => (
         <div key={i} className="rounded-[24px] border border-border bg-card p-6 space-y-4">
           <h3 className="text-base font-semibold text-foreground">Safra {labels[i]}</h3>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground uppercase tracking-wide">Verao</label>
-            <select value={s.summer} onChange={(e) => update(i, "summer", e.target.value)} className={sel}>
-              {SUMMER_CROPS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-            </select>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <SelectField id={`summer-${i}`} label="Verao" value={s.summer} onChange={(v) => update(i, "summer", v)} options={SUMMER_CROPS} error={showErrors} />
+            <SelectField id={`safrinha-${i}`} label="Safrinha" value={s.safrinha} onChange={(v) => update(i, "safrinha", v)} options={SAFRINHA_CROPS} error={showErrors} />
           </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground uppercase tracking-wide">Safrinha</label>
-            <select value={s.safrinha} onChange={(e) => update(i, "safrinha", e.target.value)} className={sel}>
-              {SAFRINHA_CROPS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-            </select>
-          </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground uppercase tracking-wide">Inverno</label>
-            <select value={s.winter} onChange={(e) => update(i, "winter", e.target.value)} className={sel}>
-              {WINTER_CROPS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-            </select>
-          </div>
-          <div className="border-t border-border pt-3">
-            <label className="mb-1 block text-xs font-medium text-muted-foreground uppercase tracking-wide">Resultado do verao</label>
-            <select value={s.yield_result} onChange={(e) => update(i, "yield_result", e.target.value)} className={sel}>
-              {YIELD_RESULTS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-            </select>
-          </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground uppercase tracking-wide">Maior problema</label>
-            <select value={s.problem} onChange={(e) => update(i, "problem", e.target.value)} className={sel}>
-              {PROBLEMS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-            </select>
+          <SelectField id={`winter-${i}`} label="Inverno" value={s.winter} onChange={(v) => update(i, "winter", v)} options={WINTER_CROPS} error={showErrors} />
+          <div className="grid gap-3 sm:grid-cols-2 border-t border-border pt-3">
+            <SelectField id={`yield-${i}`} label="Resultado do verao" value={s.yield_result} onChange={(v) => update(i, "yield_result", v)} options={YIELD_RESULTS} error={showErrors} />
+            <SelectField id={`problem-${i}`} label="Maior problema" value={s.problem} onChange={(v) => update(i, "problem", v)} options={PROBLEMS} error={showErrors} />
           </div>
         </div>
       ))}
@@ -266,21 +311,104 @@ function ProducerForm({ municipality, onComplete }: { municipality: string; onCo
       </div>
 
       <div className="flex flex-col items-center gap-3 pt-2">
+        {showErrors && !isFormComplete && (
+          <div className="w-full rounded-[16px] border border-destructive/30 bg-destructive/5 p-4 text-center">
+            <p className="text-sm text-destructive">Preencha todos os campos antes de continuar.</p>
+          </div>
+        )}
         <button onClick={handleSubmit} className="h-11 w-full rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover sm:w-auto sm:px-12">
           Ver meu relatorio
-        </button>
-        <button onClick={() => onComplete()} className="text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground">
-          Pular — ver relatorio sem personalizar
         </button>
       </div>
     </section>
   );
 }
 
+type AnalogData = {
+  analog_years: { year: number; similarity_pct: number; matching_dimensions: string[]; diverging_dimensions: string[]; outcome: { yield_sc_ha: number | null; class: string; season_rain_mm: number; hot_days: number; enso: string } }[];
+  projection: { expected_yield_range: [number, number]; weighted_yield: number; confidence: string; outlook: "favoravel" | "neutro" | "atencao" | "risco"; outlook_label: string; action: string; risk_factors: string[]; positive_factors: string[]; recommendation: string; pct_vs_avg: number };
+};
+
 function CityReport({ report, onYearChange }: { report: ReportData; onYearChange: (year: number) => void }) {
   const [aiQuestion, setAiQuestion] = useState("");
   const [aiAnswer, setAiAnswer] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
+  const [analogData, setAnalogData] = useState<AnalogData | null>(null);
+  const [analogLoading, setAnalogLoading] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [yearOpen, setYearOpen] = useState(false);
+  const yearRef = useRef<HTMLDivElement>(null);
+  const [aiStrategies, setAiStrategies] = useState<any[] | null>(null);
+  const [aiStrategiesLoading, setAiStrategiesLoading] = useState(false);
+  const [expandedStrategy, setExpandedStrategy] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState<"rotacao" | "clima" | "riscos">("rotacao");
+
+  useEffect(() => {
+    if (!yearOpen) return;
+    function close(e: MouseEvent) {
+      if (yearRef.current && !yearRef.current.contains(e.target as Node)) setYearOpen(false);
+    }
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, [yearOpen]);
+
+  const latestAvailableYear = report.years.length > 0 ? Math.max(...report.years) : null;
+
+  useEffect(() => {
+    if (!latestAvailableYear || report.loading) return;
+    setAnalogLoading(true);
+    fetch(`/api/patterns?year=${latestAvailableYear}`)
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => { if (data && !data.error) setAnalogData(data); })
+      .catch(() => {})
+      .finally(() => setAnalogLoading(false));
+  }, [latestAvailableYear, report.loading]);
+
+  useEffect(() => {
+    if (!report.selectedYear || report.loading) return;
+    setAiStrategiesLoading(true);
+    setAiStrategies(null);
+    let producer = null;
+    try {
+      const raw = localStorage.getItem("fieldshift_produtor");
+      if (raw) {
+        const data = JSON.parse(raw);
+        const s = data.seasons?.[0] ?? data.years?.[0];
+        if (s) {
+          producer = {
+            summer: s.summer_crop ?? s.summer ?? "soja",
+            safrinha: s.safrinha ?? "nenhuma",
+            winter: s.winter_crop ?? s.winter ?? "pousio",
+            yield_result: s.yield_result ?? "normal",
+            problem: s.main_problem ?? s.problem ?? "nenhum",
+            soil_compacted: !!data.soil_compacted,
+          };
+        }
+      }
+    } catch {}
+    fetch("/api/rotation-ai", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        municipality: `${report.municipality}, ${report.uf}`,
+        climate: {
+          avgTemp: report.avgTemp,
+          avgRain: report.avgRain,
+          yield: report.yearData?.yield,
+        },
+        producer,
+        riskScore: report.riskScore,
+        riskLabel: report.riskLabel,
+        analogData,
+      }),
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data?.strategies) setAiStrategies(data.strategies);
+      })
+      .catch(() => {})
+      .finally(() => setAiStrategiesLoading(false));
+  }, [report.selectedYear, report.loading]);
 
   const askAI = async () => {
     if (!aiQuestion.trim() || aiLoading) return;
@@ -329,183 +457,369 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
     );
   }
 
+  const verdictLine = report.riskScore
+    ? report.riskScore >= 70
+      ? `Safra de risco elevado (${report.riskLabel ? formatCrop(report.riskLabel) : "alto"}). Atencao redobrada no manejo.`
+      : report.riskScore >= 40
+      ? `Risco moderado. Planeje cobertura de inverno e monitore a previsao.`
+      : `Risco baixo — boas condicoes para alta produtividade.`
+    : `Dados climaticos em analise para esta safra.`;
+
   return (
-    <section className="mx-auto w-full max-w-4xl space-y-6 px-4 py-12 sm:px-10">
-      <div className="flex flex-col items-center gap-3 text-center">
-        <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Relatorio climatico</p>
-        <h2 className="text-[32px] font-light leading-tight tracking-[-0.02em] text-foreground sm:text-[40px]">
+    <section className="mx-auto w-full max-w-4xl space-y-4 px-4 py-10 sm:px-10">
+      {/* ── Header ── */}
+      <div className="flex flex-col items-center gap-2 text-center">
+        <h2 className="text-2xl font-semibold tracking-[-0.02em] text-foreground sm:text-3xl">
           {report.municipality}, {report.uf}
         </h2>
-        {report.years.length > 0 && (
-          <div className="flex items-center gap-2">
-            <label className="text-sm text-muted-foreground">Safra:</label>
-            <select
-              value={report.selectedYear}
-              onChange={(e) => onYearChange(parseInt(e.target.value, 10))}
-              className="rounded-full border border-border bg-card px-4 py-1.5 text-sm font-semibold text-foreground outline-none focus:border-primary"
-            >
+      </div>
+
+      {/* ── Section tabs ── */}
+      <div className="flex justify-center gap-1 rounded-full border border-border bg-muted p-1">
+        {([["rotacao", "Rotacao"], ["clima", "Analise da Safra"], ["riscos", "Riscos"]] as const).map(([key, label]) => (
+          <button
+            key={key}
+            onClick={() => setActiveTab(key)}
+            className={`rounded-full px-5 py-1.5 text-sm font-medium transition-colors ${
+              activeTab === key ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === "clima" && (<>
+      {/* ── Year selector ── */}
+      {report.years.length > 0 && (
+        <div ref={yearRef} className="relative flex items-center justify-center gap-2">
+          <label className="text-sm text-muted-foreground">Safra:</label>
+          <button
+            type="button"
+            onClick={() => setYearOpen(!yearOpen)}
+            className={`flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-sm font-semibold outline-none transition-colors ${yearOpen ? "border-primary bg-card" : "border-border bg-card"} text-foreground`}
+          >
+            {report.selectedYear}/{report.selectedYear + 1}
+            <svg className={`h-3.5 w-3.5 text-stone-400 transition-transform ${yearOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          {yearOpen && (
+            <div className="absolute top-full z-20 mt-1 max-h-56 min-w-[140px] overflow-y-auto rounded-[12px] border border-border bg-card shadow-lg">
               {report.years.map((y) => (
-                <option key={y} value={y}>{y}/{y + 1}</option>
+                <button
+                  key={y}
+                  type="button"
+                  onClick={() => { onYearChange(y); setYearOpen(false); }}
+                  className={`flex w-full items-center px-4 py-2 text-left text-sm transition-colors hover:bg-muted ${y === report.selectedYear ? "font-semibold text-primary" : "text-foreground"}`}
+                >
+                  {y}/{y + 1}
+                </button>
               ))}
-            </select>
+            </div>
+          )}
+        </div>
+      )}
+      {/* ── Veredicto da safra (hero card) ── */}
+      <div className="rounded-[24px] border border-primary bg-primary/5 p-6">
+        <div className="flex items-center justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Veredicto da safra {report.selectedYear}/{(report.selectedYear ?? 0) + 1}</p>
+            <p className="mt-2 text-2xl font-semibold tabular-nums text-foreground">
+              {report.yearData?.yield?.toFixed(1) ?? "—"} <span className="text-base font-normal text-muted-foreground">sc/ha</span>
+            </p>
+          </div>
+          {report.riskScore != null && (
+            <div className="flex flex-col items-center gap-1">
+              <div className={`flex h-14 w-14 items-center justify-center rounded-full ${
+                report.riskScore >= 70 ? "bg-red-100" : report.riskScore >= 40 ? "bg-amber-100" : "bg-emerald-100"
+              }`}>
+                <span className={`text-lg font-bold tabular-nums ${
+                  report.riskScore >= 70 ? "text-red-700" : report.riskScore >= 40 ? "text-amber-700" : "text-emerald-700"
+                }`}>{report.riskScore}</span>
+              </div>
+              <p className="text-[10px] text-muted-foreground">risco</p>
+            </div>
+          )}
+        </div>
+        <p className="mt-3 text-sm text-foreground">{verdictLine}</p>
+      </div>
+
+      {/* ── Clima do ano (compact pills) ── */}
+      <div className="flex gap-3">
+        <div className="flex-1 rounded-[16px] border border-border bg-card px-4 py-3 text-center">
+          <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">Temperatura</p>
+          <p className="mt-1 text-lg font-semibold tabular-nums text-ember-600">{report.yearData?.temp?.toFixed(1) ?? report.avgTemp?.toFixed(1) ?? "—"}<span className="text-xs font-normal text-muted-foreground"> C</span></p>
+        </div>
+        <div className="flex-1 rounded-[16px] border border-border bg-card px-4 py-3 text-center">
+          <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">Chuva</p>
+          <p className="mt-1 text-lg font-semibold tabular-nums text-rain-600">{report.yearData?.rain?.toFixed(0) ?? report.avgRain?.toFixed(0) ?? "—"}<span className="text-xs font-normal text-muted-foreground"> mm</span></p>
+        </div>
+        <div className="flex-1 rounded-[16px] border border-border bg-card px-4 py-3 text-center">
+          <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">Produtividade</p>
+          <p className="mt-1 text-lg font-semibold tabular-nums text-leaf-600">{report.yearData?.yield?.toFixed(1) ?? "—"}<span className="text-xs font-normal text-muted-foreground"> sc/ha</span></p>
+        </div>
+      </div>
+
+      {/* ── ENSO indicator ── */}
+      {report.yearData?.enso && (() => {
+        const enso = report.yearData!.enso!;
+        const isElNino = enso.includes("el_nino");
+        const isLaNina = enso.includes("la_nina");
+        const intensity = enso.includes("forte") ? "Forte" : enso.includes("fraco") ? "Fraco" : enso.includes("moderado") ? "Moderado" : "";
+        const label = isElNino ? "El Nino" : isLaNina ? "La Nina" : "Ano Neutro";
+        const fullLabel = intensity ? `${label} (${intensity})` : label;
+        const phase = isElNino ? report.ensoImpact?.el_nino
+          : isLaNina ? report.ensoImpact?.la_nina
+          : report.ensoImpact?.neutro;
+        return (
+          <div className="rounded-[16px] border border-border bg-card px-5 py-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">Fenomeno climatico {report.selectedYear}/{report.selectedYear + 1}</p>
+                <p className={`mt-1 text-lg font-semibold ${isElNino ? "text-red-600" : isLaNina ? "text-blue-600" : "text-stone-500"}`}>
+                  {fullLabel}
+                </p>
+              </div>
+              {phase && (
+                <div className="text-right">
+                  <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">Media historica nesse fenomeno</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums text-foreground">{phase.avg_yield_sc_ha?.toFixed(1) ?? "—"} <span className="text-xs font-normal text-muted-foreground">sc/ha em {phase.n_safras} safras</span></p>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* ── Projecao proxima safra ── */}
+      {analogLoading && (
+        <div className="rounded-[24px] border border-border bg-card p-6 text-center">
+          <div className="mx-auto h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <p className="mt-2 text-sm text-muted-foreground">Calculando tendencia climatica...</p>
+        </div>
+      )}
+      {analogData?.projection && !analogLoading && (() => {
+        const proj = analogData.projection;
+        const outlookColors = {
+          favoravel: "border-emerald-200 bg-emerald-50/50",
+          neutro: "border-border bg-card",
+          atencao: "border-amber-200 bg-amber-50/50",
+          risco: "border-red-200 bg-red-50/50",
+        };
+        const outlookTextColors = {
+          favoravel: "text-emerald-700",
+          neutro: "text-foreground",
+          atencao: "text-amber-700",
+          risco: "text-red-700",
+        };
+        const outlookBadgeColors = {
+          favoravel: "bg-emerald-100 text-emerald-700",
+          neutro: "bg-stone-100 text-stone-600",
+          atencao: "bg-amber-100 text-amber-700",
+          risco: "bg-red-100 text-red-700",
+        };
+        const nextSafra = `${(latestAvailableYear ?? report.selectedYear) + 1}/${(latestAvailableYear ?? report.selectedYear) + 2}`;
+        return (
+          <div className={`rounded-[24px] border p-5 space-y-4 ${outlookColors[proj.outlook]}`}>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">Tendencia para {nextSafra}</p>
+                <p className={`mt-1 text-xl font-semibold ${outlookTextColors[proj.outlook]}`}>{proj.outlook_label}</p>
+              </div>
+              <div className="text-right shrink-0">
+                <p className="text-2xl font-semibold tabular-nums text-foreground">{proj.weighted_yield.toFixed(0)}</p>
+                <p className="text-[10px] text-muted-foreground">sc/ha estimado</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <span className={`rounded-full px-3 py-1 text-xs font-semibold ${outlookBadgeColors[proj.outlook]}`}>
+                {proj.pct_vs_avg > 0 ? "+" : ""}{proj.pct_vs_avg}% vs media
+              </span>
+              <span className="text-xs text-muted-foreground">
+                Faixa provavel: {proj.expected_yield_range[0].toFixed(0)}-{proj.expected_yield_range[1].toFixed(0)} sc/ha
+              </span>
+            </div>
+
+            <p className="text-sm text-foreground">{proj.action}</p>
+
+            {(proj.risk_factors.length > 0 || proj.positive_factors.length > 0) && (
+              <div className="flex flex-wrap gap-x-6 gap-y-1 border-t border-border/50 pt-3">
+                {proj.positive_factors.map((f, i) => (
+                  <p key={`p${i}`} className="text-xs text-emerald-600">+ {f}</p>
+                ))}
+                {proj.risk_factors.map((f, i) => (
+                  <p key={`r${i}`} className="text-xs text-red-600">- {f}</p>
+                ))}
+              </div>
+            )}
+
+            <details className="group">
+              <summary className="cursor-pointer text-xs text-muted-foreground hover:text-foreground transition-colors">
+                Anos com clima similar (base do calculo)
+              </summary>
+              <div className="mt-2 divide-y divide-border/50">
+                {analogData.analog_years.slice(0, 5).map((ay) => (
+                  <div key={ay.year} className="flex items-center justify-between py-2 first:pt-0 last:pb-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-semibold tabular-nums text-foreground">{ay.year}</span>
+                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                        ay.similarity_pct >= 70 ? "bg-emerald-100 text-emerald-700"
+                          : ay.similarity_pct >= 50 ? "bg-amber-100 text-amber-700"
+                          : "bg-stone-100 text-stone-500"
+                      }`}>
+                        {ay.similarity_pct.toFixed(0)}%
+                      </span>
+                    </div>
+                    <span className="text-sm tabular-nums text-foreground">
+                      {ay.outcome.yield_sc_ha?.toFixed(1) ?? "—"} <span className="text-xs font-normal text-muted-foreground">sc/ha</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-2 text-[10px] text-muted-foreground">
+                Tendencia baseada nos ultimos 3 anos ({(latestAvailableYear ?? report.selectedYear) - 2}-{latestAvailableYear ?? report.selectedYear}) comparados com 44 anos de dados NASA
+              </p>
+            </details>
+          </div>
+        );
+      })()}
+
+      </>)}
+
+      {activeTab === "rotacao" && (<>
+      {/* ── Estrategias de rotacao ── */}
+      <div>
+        <div className="mb-3 text-center">
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Sua estrategia</p>
+          <h3 className="mt-1 text-lg font-semibold text-foreground">Rotacao para {report.municipality}</h3>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            {aiStrategies
+              ? "Recomendacao por IA agronoma baseada em pesquisas da Embrapa"
+              : "Baseado em 44 anos de dados climaticos"}
+          </p>
+        </div>
+
+        {aiStrategiesLoading && (
+          <div className="rounded-[24px] border border-border bg-card p-6 text-center">
+            <div className="mx-auto h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+            <p className="mt-2 text-sm text-muted-foreground">Super inteligencia analisando melhores rotacoes...</p>
           </div>
         )}
-      </div>
 
-      {report.summary && (
-        <div className="rounded-[24px] border border-border bg-card p-6">
-          <p className="text-sm leading-relaxed text-foreground">{report.summary}</p>
-        </div>
-      )}
+        {!aiStrategiesLoading && (aiStrategies || report.strategies.length > 0) && (
+          <div className="space-y-4">
+            {(aiStrategies || report.strategies).slice(0, 3).map((s: any, i: number) => {
+              const isExpanded = expandedStrategy === i;
+              const hasYears = s.years && s.years.length > 0;
+              const allSequences = hasYears
+                ? s.years.flatMap((y: any) => y.sequence || [])
+                : s.sequence || [];
+              const uniqueCrops: string[] = Array.from(new Set(allSequences.map((seq: any) => String(formatCrop(seq.crop)))));
+              return (
+                <div key={i} className={`relative rounded-[24px] border bg-card transition-shadow ${i === 0 ? "border-primary shadow-sm" : "border-border"} ${isExpanded ? "shadow-md" : "hover:shadow-md"}`}>
+                  {i === 0 && (
+                    <span className="absolute -top-3 left-5 rounded-full bg-primary px-3 py-0.5 text-[10px] font-bold tracking-wide text-primary-foreground uppercase">Recomendada</span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setExpandedStrategy(isExpanded ? null : i)}
+                    className="w-full p-5 text-left"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">{s.name}</p>
+                        <p className="mt-0.5 text-xs text-muted-foreground">{s.subtitle}</p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="text-right">
+                          <span className="text-xl font-semibold tabular-nums text-primary">{s.score ?? s.totalScore}</span>
+                          <span className="block text-[10px] text-muted-foreground">/ 100</span>
+                        </div>
+                        <svg className={`h-4 w-4 text-muted-foreground transition-transform ${isExpanded ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {hasYears ? (
+                        <>
+                          <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">{s.years.length} anos</span>
+                          {uniqueCrops.slice(0, 6).map((crop: string, j: number) => (
+                            <span key={j} className="rounded-full bg-forest-50 px-2.5 py-0.5 text-xs font-medium text-primary">{crop}</span>
+                          ))}
+                        </>
+                      ) : (
+                        allSequences.map((seq: any, j: number) => (
+                          <span key={j} className="rounded-full bg-forest-50 px-2.5 py-0.5 text-xs font-medium text-primary">
+                            {formatCrop(seq.crop)} <span className="text-stone-400">({seq.month_range || SEASON_LABEL[seq.season] || seq.season})</span>
+                          </span>
+                        ))
+                      )}
+                    </div>
+                  </button>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <div className="rounded-[24px] border border-border bg-card p-5 text-center">
-          <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">Risco</p>
-          <p className="mt-2 text-[36px] font-light tabular-nums text-primary">{report.riskScore ?? "—"}</p>
-          <p className="text-xs text-muted-foreground">{report.riskLabel ? formatCrop(report.riskLabel) : "de 100"}</p>
-        </div>
-        <div className="rounded-[24px] border border-border bg-card p-5 text-center">
-          <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">Temperatura</p>
-          <p className="mt-2 text-[36px] font-light tabular-nums text-ember-600">{report.yearData?.temp?.toFixed(1) ?? report.avgTemp?.toFixed(1) ?? "—"}</p>
-          <p className="text-xs text-muted-foreground">graus C</p>
-        </div>
-        <div className="rounded-[24px] border border-border bg-card p-5 text-center">
-          <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">Chuva</p>
-          <p className="mt-2 text-[36px] font-light tabular-nums text-rain-600">{report.yearData?.rain?.toFixed(0) ?? report.avgRain?.toFixed(0) ?? "—"}</p>
-          <p className="text-xs text-muted-foreground">mm/ano</p>
-        </div>
-        <div className="rounded-[24px] border border-border bg-card p-5 text-center">
-          <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">Produtividade</p>
-          <p className="mt-2 text-[36px] font-light tabular-nums text-leaf-600">{report.yearData?.yield?.toFixed(1) ?? "—"}</p>
-          <p className="text-xs text-muted-foreground">sc/ha</p>
-        </div>
-      </div>
+                  {isExpanded && (
+                    <div className="border-t border-border px-5 pb-5 pt-4 space-y-5">
+                      {hasYears ? (
+                        s.years.map((year: any, yi: number) => (
+                          <div key={yi}>
+                            <p className="text-[10px] font-semibold tracking-wide text-primary uppercase mb-2">{year.year_label}</p>
+                            <MonthTimeline sequence={year.sequence || []} />
+                            {(year.sequence || []).some((seq: any) => seq.reason) && (
+                              <div className="mt-2 space-y-1">
+                                {(year.sequence || []).map((seq: any, j: number) => (
+                                  seq.reason && (
+                                    <div key={j} className="flex gap-2">
+                                      <span className="shrink-0 text-[11px] font-semibold text-primary">{formatCrop(seq.crop)}</span>
+                                      <span className="text-[11px] text-muted-foreground">{seq.reason}</span>
+                                    </div>
+                                  )
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))
+                      ) : (
+                        <>
+                          <MonthTimeline sequence={allSequences} />
+                          {allSequences.some((seq: any) => seq.reason) && (
+                            <div className="space-y-2">
+                              <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">Por que cada cultura</p>
+                              {allSequences.map((seq: any, j: number) => (
+                                seq.reason && (
+                                  <div key={j} className="flex gap-2">
+                                    <span className="shrink-0 text-xs font-semibold text-primary">{formatCrop(seq.crop)}</span>
+                                    <span className="text-xs text-muted-foreground">{seq.reason}</span>
+                                  </div>
+                                )
+                              ))}
+                            </div>
+                          )}
+                        </>
+                      )}
 
-      {/* ── Calendario de riscos ── */}
-      {report.riskCalendar?.length === 12 && (
-        <div className="rounded-[24px] border border-border bg-card p-6">
-          <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Calendário de riscos</p>
-          <p className="mt-1 text-sm text-muted-foreground">De cada 10 anos, quantas vezes cada problema aconteceu em cada mês.</p>
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr>
-                  <th className="py-2 px-2 text-left text-xs text-muted-foreground font-medium">Risco</th>
-                  {MONTH_NAMES_SHORT.map((m) => (
-                    <th key={m} className="py-2 px-1 text-center text-xs text-muted-foreground font-medium min-w-[44px]">{m}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {RISK_KEYS.map((key) => (
-                  <tr key={key} className="border-t border-border">
-                    <td className="py-2.5 px-2 text-xs text-muted-foreground font-medium whitespace-nowrap">{RISK_LABELS[key]}</td>
-                    {report.riskCalendar.map((month, i) => (
-                      <td key={i} className="py-2.5 px-1 text-center">
-                        <span className={`inline-block w-full rounded py-0.5 px-0.5 text-[10px] font-semibold ${riskColor(month[key])}`}>
-                          {riskText(month[key])}
-                        </span>
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="flex flex-wrap gap-3 mt-3 text-[10px] text-stone-400">
-            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-emerald-100" /> Raro</span>
-            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-amber-100" /> Às vezes</span>
-            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-orange-100" /> Frequente</span>
-            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-red-100" /> Quase todo ano</span>
-          </div>
-        </div>
-      )}
-
-      <div>
-        <div className="mb-4 text-center">
-          <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Escolha sua estrategia</p>
-          <h3 className="mt-1 text-lg font-semibold text-foreground">3 planos de rotacao para {report.municipality}</h3>
-          <p className="mt-1 text-sm text-muted-foreground">Baseado em 44 anos de dados climaticos e regras agronomicas</p>
-        </div>
-
-        {report.strategies.length > 0 ? (
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-            {report.strategies.slice(0, 3).map((s, i) => (
-              <div key={i} className={`relative rounded-[24px] border bg-card p-6 transition-shadow hover:shadow-md ${i === 0 ? "border-primary shadow-sm" : "border-border"}`}>
-                {i === 0 && (
-                  <span className="absolute -top-3 left-6 rounded-full bg-primary px-3 py-0.5 text-[10px] font-bold tracking-wide text-primary-foreground uppercase">Recomendada</span>
-                )}
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-base font-semibold text-foreground">{s.name}</p>
-                    <p className="mt-0.5 text-sm text-muted-foreground">{s.subtitle}</p>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-2xl font-light tabular-nums text-primary">{s.totalScore}</span>
-                    <span className="block text-[10px] text-muted-foreground">/ 100</span>
-                  </div>
+                      {s.justificativa && (
+                        <div>
+                          <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">Justificativa</p>
+                          <p className="mt-1 text-xs leading-relaxed text-foreground">{s.justificativa}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-                <div className="mt-4 flex flex-wrap gap-1.5">
-                  {s.sequence.map((seq, j) => (
-                    <span key={j} className="rounded-full bg-forest-50 px-3 py-1 text-xs font-medium text-primary">
-                      {formatCrop(seq.crop)} <span className="text-stone-400">({SEASON_LABEL[seq.season] ?? seq.season})</span>
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
-        ) : report.rotation ? (
-          <div className="rounded-[24px] border border-primary bg-card p-6 shadow-sm">
-            <p className="text-base font-semibold text-foreground">{report.rotation.name}</p>
-            <p className="mt-0.5 text-sm text-muted-foreground">{report.rotation.subtitle}</p>
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {report.rotation.sequence.map((s, i) => (
-                <span key={i} className="rounded-full bg-forest-50 px-3 py-1 text-xs font-medium text-primary">
-                  {formatCrop(s.crop)} <span className="text-stone-400">({SEASON_LABEL[s.season] ?? s.season})</span>
-                </span>
-              ))}
-            </div>
-            <div className="mt-3 text-right">
-              <span className="text-2xl font-light tabular-nums text-primary">{report.rotation.totalScore}</span>
-              <span className="ml-1 text-xs text-muted-foreground">/ 100</span>
-            </div>
-          </div>
-        ) : (
-          <div className="rounded-[24px] border border-border bg-card p-6">
+        )}
+
+        {!aiStrategiesLoading && !aiStrategies && report.strategies.length === 0 && !report.rotation && (
+          <div className="rounded-[24px] border border-border bg-card p-5">
             <p className="text-sm text-muted-foreground">Culturas indicadas para a regiao:</p>
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="mt-2 flex flex-wrap gap-2">
               {report.topCrops.map((c) => (
                 <span key={c} className="rounded-full bg-forest-50 px-3 py-1 text-sm font-medium text-primary">{c}</span>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="rounded-[24px] border border-border bg-card p-6">
-        <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Mix de cobertura recomendados</p>
-        <p className="mt-2 text-sm text-muted-foreground">Combinacoes de plantas que equilibram palhada, nitrogenio e descompactacao:</p>
-        <div className="mt-4 space-y-3">
-          <div className="rounded-xl border border-border bg-muted/50 p-4">
-            <p className="text-sm font-semibold text-foreground">Aveia-preta + Ervilhaca</p>
-            <p className="mt-1 text-xs text-muted-foreground">Graminea (palhada duradoura, C:N alta) + leguminosa (fixa 80-120 kg N/ha). O mix mais usado no Sul.</p>
-          </div>
-          <div className="rounded-xl border border-border bg-muted/50 p-4">
-            <p className="text-sm font-semibold text-foreground">Centeio + Nabo forrageiro</p>
-            <p className="mt-1 text-xs text-muted-foreground">Centeio resiste a geada forte (-8C) e gera palha. Nabo descompacta 20-40 cm e cicla nutrientes.</p>
-          </div>
-          <div className="rounded-xl border border-border bg-muted/50 p-4">
-            <p className="text-sm font-semibold text-foreground">Aveia-preta + Ervilhaca + Nabo</p>
-            <p className="mt-1 text-xs text-muted-foreground">Triplo mix: palhada + nitrogenio + descompactacao. Ideal para solos degradados ou compactados.</p>
-          </div>
-        </div>
-        {report.coverCrops.length > 0 && (
-          <div className="mt-4 border-t border-border pt-3">
-            <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">Plantas disponiveis na regiao</p>
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {report.coverCrops.map((c) => (
-                <span key={c} className="rounded-full bg-status-success-bg px-2.5 py-0.5 text-xs font-medium text-status-success">{c}</span>
               ))}
             </div>
           </div>
@@ -539,16 +853,106 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
           </div>
         )}
       </div>
+      </>)}
 
-      <div className="flex justify-center gap-3">
-        <Link href="/painel" className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover">
-          Ver painel completo
-        </Link>
+      {activeTab === "riscos" && report.riskCalendar?.length === 12 && (
+        <div className="rounded-[24px] border border-border bg-card p-6">
+          <p className="text-sm font-semibold text-foreground">Calendario de riscos detalhado</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">Frequencia de cada risco por mes nos ultimos 44 anos</p>
+          <div className="mt-4 overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr>
+                  <th className="py-2 px-2 text-left text-xs text-muted-foreground font-medium">Risco</th>
+                  {MONTH_NAMES_SHORT.map((m) => (
+                    <th key={m} className="py-2 px-1 text-center text-xs text-muted-foreground font-medium min-w-[44px]">{m}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {RISK_KEYS.map((key) => (
+                  <tr key={key} className="border-t border-border">
+                    <td className="py-2.5 px-2 text-xs text-muted-foreground font-medium whitespace-nowrap">{RISK_LABELS[key]}</td>
+                    {report.riskCalendar.map((month, i) => (
+                      <td key={i} className="py-2.5 px-1 text-center">
+                        <span className={`inline-block w-full rounded py-0.5 px-0.5 text-[10px] font-semibold ${riskColor(month[key])}`}>
+                          {riskText(month[key])}
+                        </span>
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="flex flex-wrap gap-3 mt-3 text-[10px] text-stone-400">
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-emerald-100" /> Raro</span>
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-amber-100" /> As vezes</span>
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-orange-100" /> Frequente</span>
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-red-100" /> Quase todo ano</span>
+          </div>
+        </div>
+      )}
+
+      <div className="flex justify-center">
         <Link href="/mapa" className="rounded-full border border-border bg-card px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted">
           Abrir mapa
         </Link>
       </div>
     </section>
+  );
+}
+
+/* ── Month Timeline Bar ── */
+const MONTHS_SHORT = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+const MONTH_MAP: Record<string, number> = { jan:0, fev:1, mar:2, abr:3, mai:4, jun:5, jul:6, ago:7, set:8, out:9, nov:10, dez:11 };
+const SEQ_COLORS = [
+  "bg-emerald-600 text-white",
+  "bg-amber-500 text-white",
+  "bg-sky-600 text-white",
+  "bg-violet-600 text-white",
+];
+
+function parseMonthRange(range: string): [number, number] | null {
+  const parts = range.toLowerCase().split("-").map(s => s.trim());
+  if (parts.length !== 2) return null;
+  const start = MONTH_MAP[parts[0]];
+  const end = MONTH_MAP[parts[1]];
+  if (start === undefined || end === undefined) return null;
+  return [start, end];
+}
+
+function MonthTimeline({ sequence }: { sequence: { crop: string; month_range?: string; season?: string }[] }) {
+  const cells: { color: string; label: string }[] = Array.from({ length: 12 }, () => ({ color: "bg-stone-100", label: "" }));
+
+  sequence.forEach((seq, idx) => {
+    const range = seq.month_range ? parseMonthRange(seq.month_range) : null;
+    if (!range) return;
+    const [start, end] = range;
+    const color = SEQ_COLORS[idx % SEQ_COLORS.length];
+    const shortCrop = formatCrop(seq.crop).split(" ")[0];
+    if (end >= start) {
+      for (let m = start; m <= end; m++) cells[m] = { color, label: shortCrop };
+    } else {
+      for (let m = start; m < 12; m++) cells[m] = { color, label: shortCrop };
+      for (let m = 0; m <= end; m++) cells[m] = { color, label: shortCrop };
+    }
+  });
+
+  return (
+    <div>
+      <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase mb-2">Ocupacao do solo — 12 meses</p>
+      <div className="flex gap-0.5">
+        {cells.map((cell, i) => (
+          <div key={i} className="flex-1 min-w-0">
+            <div className={`h-6 rounded-sm flex items-center justify-center ${cell.color}`}>
+              <span className="text-[8px] font-semibold truncate px-0.5">{cell.label}</span>
+            </div>
+            <p className="mt-0.5 text-center text-[8px] text-muted-foreground">{MONTHS_SHORT[i]}</p>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -638,6 +1042,7 @@ export default function HomeClient() {
         avgTemp: data.avgTemp,
         avgRain: data.avgRain,
         yearData: data.yearData,
+        ensoImpact: data.ensoImpact ?? null,
         topCrops: data.topCrops ?? [],
         coverCrops: data.coverCrops ?? [],
         rotation: data.rotation,
@@ -657,6 +1062,7 @@ export default function HomeClient() {
         avgTemp: null,
         avgRain: null,
         yearData: null,
+        ensoImpact: null,
         topCrops: ["Soja", "Milho", "Trigo", "Aveia"],
         coverCrops: [],
         rotation: null,
@@ -752,6 +1158,7 @@ export default function HomeClient() {
       avgTemp: null,
       avgRain: null,
       yearData: null,
+      ensoImpact: null,
       topCrops: [],
       coverCrops: [],
       rotation: null,

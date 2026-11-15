@@ -656,10 +656,15 @@ export type AnalogYear = {
 
 export type PatternProjection = {
   expected_yield_range: [number, number];
+  weighted_yield: number;
   confidence: "alta" | "media" | "baixa";
+  outlook: "favoravel" | "neutro" | "atencao" | "risco";
+  outlook_label: string;
+  action: string;
   risk_factors: string[];
   positive_factors: string[];
   recommendation: string;
+  pct_vs_avg: number;
 };
 
 export type PatternAnalysis = {

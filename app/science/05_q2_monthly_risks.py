@@ -1,6 +1,6 @@
 # SI-assisted — Q2: Monthly climate risk fractions from NASA POWER daily 1981-2025
 # For each calendar month, fraction of years with:
-#   dry_spell:  >= 10 consecutive days with precip < 1 mm
+#   dry_spell:  monthly precip < 50% of climatological normal OR 8+ consecutive days < 2mm
 #   heat:       >= 5 days with Tmax >= 32 C
 #   heavy_rain: >= 1 day with precip >= 50 mm
 #   frost:      >= 1 day with Tmin <= 2 C
@@ -26,6 +26,35 @@ def days_in_month(y, m):
         return (date(y + 1, 1, 1) - date(y, m, 1)).days
     return (date(y, m + 1, 1) - date(y, m, 1)).days
 
+# Phase 1: compute monthly precipitation normals (climatological average)
+monthly_totals = defaultdict(list)
+for year in range(1981, 2026):
+    for month in range(1, 13):
+        try:
+            n_days = days_in_month(year, month)
+        except ValueError:
+            continue
+        total = 0.0
+        valid = 0
+        for day in range(1, n_days + 1):
+            key = f"{year}{month:02d}{day:02d}"
+            p = precip.get(key)
+            if p is not None and p != FILL:
+                total += p
+                valid += 1
+        if valid >= n_days * 0.7:
+            monthly_totals[month].append(total)
+
+monthly_normals = {}
+for month in range(1, 13):
+    vals = monthly_totals[month]
+    monthly_normals[month] = sum(vals) / len(vals) if vals else 100.0
+
+print("Monthly precip normals (mm):")
+for m in range(1, 13):
+    print(f"  {date(2000, m, 1).strftime('%b')}: {monthly_normals[m]:.1f} mm")
+
+# Phase 2: compute risk fractions
 results = []
 
 for month in range(1, 13):
@@ -73,16 +102,21 @@ for month in range(1, 13):
 
         years_with_data.append(year)
 
-        # dry_spell: 10+ consecutive days with precip < 1mm
+        # dry_spell: deficit hidrico — precip < 50% da normal OU 8+ dias consecutivos < 2mm
+        month_total = sum(p for p in daily_precip if p is not None)
+        deficit = month_total < (monthly_normals[month] * 0.5)
+
         max_streak = 0
         streak = 0
         for p in daily_precip:
-            if p is not None and p < 1.0:
+            if p is not None and p < 2.0:
                 streak += 1
                 max_streak = max(max_streak, streak)
             else:
                 streak = 0
-        if max_streak >= 10:
+        veranico = max_streak >= 8
+
+        if deficit or veranico:
             dry_count += 1
 
         # heat: 5+ days with Tmax >= 32
@@ -114,18 +148,26 @@ for month in range(1, 13):
     month_name = date(2000, month, 1).strftime("%b")
     print(f"{month_name}: dry={results[-1]['dry_spell']:.3f} heat={results[-1]['heat']:.3f} heavy={results[-1]['heavy_rain']:.3f} frost={results[-1]['frost']:.3f}  (n={n})")
 
-# Update site.json
-site_path = os.path.join(DIR, "..", "web", "data", "site.json")
-with open(site_path) as f:
-    site = json.load(f)
-
-site["q2"] = {
+# Output as JSON for Supabase update
+q2_data = {
     "status": "real",
     "source": "NASA POWER daily 1981-2025",
     "months": results,
 }
 
-with open(site_path, "w") as f:
-    json.dump(site, f, indent=2, ensure_ascii=False)
+output_path = os.path.join(DIR, "q2_risks_output.json")
+with open(output_path, "w") as f:
+    json.dump(q2_data, indent=2, ensure_ascii=False, fp=f)
 
-print(f"\nUpdated q2 in {site_path}")
+# Also try to update site.json if it exists
+site_path = os.path.join(DIR, "..", "web", "data", "site.json")
+if os.path.exists(site_path):
+    with open(site_path) as f:
+        site = json.load(f)
+    site["q2"] = q2_data
+    with open(site_path, "w") as f:
+        json.dump(site, f, indent=2, ensure_ascii=False)
+    print(f"\nUpdated q2 in {site_path}")
+else:
+    print(f"\nsite.json not found — output saved to {output_path}")
+    print("Update Supabase climate_yearly.values.q2_risks with the new data")

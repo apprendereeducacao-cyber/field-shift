@@ -1,0 +1,78 @@
+{
+  "status": "real",
+  "source": "NASA POWER daily 1981-2025",
+  "months": [
+    {
+      "dry_spell": 0.444,
+      "heat": 0.711,
+      "heavy_rain": 0.2,
+      "frost": 0.0
+    },
+    {
+      "dry_spell": 0.4,
+      "heat": 0.422,
+      "heavy_rain": 0.067,
+      "frost": 0.0
+    },
+    {
+      "dry_spell": 0.644,
+      "heat": 0.356,
+      "heavy_rain": 0.222,
+      "frost": 0.0
+    },
+    {
+      "dry_spell": 0.622,
+      "heat": 0.022,
+      "heavy_rain": 0.2,
+      "frost": 0.0
+    },
+    {
+      "dry_spell": 0.778,
+      "heat": 0.0,
+      "heavy_rain": 0.444,
+      "frost": 0.244
+    },
+    {
+      "dry_spell": 0.733,
+      "heat": 0.0,
+      "heavy_rain": 0.244,
+      "frost": 0.8
+    },
+    {
+      "dry_spell": 0.778,
+      "heat": 0.0,
+      "heavy_rain": 0.289,
+      "frost": 0.756
+    },
+    {
+      "dry_spell": 0.8,
+      "heat": 0.0,
+      "heavy_rain": 0.2,
+      "frost": 0.578
+    },
+    {
+      "dry_spell": 0.6,
+      "heat": 0.0,
+      "heavy_rain": 0.4,
+      "frost": 0.267
+    },
+    {
+      "dry_spell": 0.4,
+      "heat": 0.044,
+      "heavy_rain": 0.4,
+      "frost": 0.0
+    },
+    {
+      "dry_spell": 0.622,
+      "heat": 0.2,
+      "heavy_rain": 0.222,
+      "frost": 0.0
+    },
+    {
+      "dry_spell": 0.467,
+      "heat": 0.556,
+      "heavy_rain": 0.156,
+      "frost": 0.0
+    }
+  ]
+}

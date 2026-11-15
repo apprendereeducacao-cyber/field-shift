@@ -116,15 +116,45 @@ function findMatchingDimensions(
   return { matching, diverging };
 }
 
+function buildTrendVector(
+  vectors: ClimateVector[],
+  targetYear: number,
+  windowSize: number = 3
+): Record<string, number> | null {
+  const keys = Object.keys(WEIGHTS);
+  const recent = vectors
+    .filter((v) => v.year <= targetYear && v.year > targetYear - windowSize)
+    .sort((a, b) => b.year - a.year);
+  if (recent.length === 0) return null;
+  const recencyWeights = recent.map((_, i) => 1 / (i + 1));
+  const totalW = recencyWeights.reduce((a, b) => a + b, 0);
+  const trend: Record<string, number> = {};
+  for (const k of keys) {
+    trend[k] = recent.reduce((s, v, i) => s + (v as any)[k] * recencyWeights[i], 0) / totalW;
+  }
+  return trend;
+}
+
 export function findAnalogYears(
   vectors: ClimateVector[],
   targetYear: number,
   classifications: YearClassification[],
-  topN: number = 5
+  topN: number = 8
 ): AnalogYear[] {
-  const { normalized } = zNormalize(vectors);
-  const targetNorm = normalized[targetYear];
-  if (!targetNorm) return [];
+  const { normalized, means, stds } = zNormalize(vectors);
+  const keys = Object.keys(WEIGHTS);
+
+  const trend = buildTrendVector(vectors, targetYear);
+  if (!trend) return [];
+
+  const trendNorm: Record<string, number> = {};
+  for (const k of keys) {
+    trendNorm[k] = (trend[k] - means[k]) / stds[k];
+  }
+
+  const recentYears = new Set(
+    vectors.filter((v) => v.year <= targetYear && v.year > targetYear - 3).map((v) => v.year)
+  );
 
   const classMap = new Map(classifications.map((c) => [c.year, c]));
   const rawVectorMap = new Map(vectors.map((v) => [v.year, v]));
@@ -132,11 +162,11 @@ export function findAnalogYears(
   const results: AnalogYear[] = [];
 
   for (const v of vectors) {
-    if (v.year === targetYear) continue;
+    if (recentYears.has(v.year)) continue;
     const otherNorm = normalized[v.year];
-    const distance = weightedEuclidean(targetNorm, otherNorm);
+    const distance = weightedEuclidean(trendNorm, otherNorm);
     const similarity = 1 / (1 + distance) * 100;
-    const { matching, diverging } = findMatchingDimensions(targetNorm, otherNorm);
+    const { matching, diverging } = findMatchingDimensions(trendNorm, otherNorm);
 
     const cls = classMap.get(v.year);
     const raw = rawVectorMap.get(v.year)!;
@@ -170,10 +200,15 @@ export function projectOutcome(
   if (withYield.length === 0) {
     return {
       expected_yield_range: [historicalAvg * 0.85, historicalAvg * 1.15],
+      weighted_yield: historicalAvg,
       confidence: "baixa",
-      risk_factors: ["Dados insuficientes para projecao precisa"],
+      outlook: "neutro",
+      outlook_label: "Dados insuficientes",
+      action: "Use a media historica como referencia e monitore o clima ao longo da safra.",
+      risk_factors: [],
       positive_factors: [],
-      recommendation: "Historico limitado impede projecao confiavel. Use a media historica como referencia.",
+      recommendation: "",
+      pct_vs_avg: 0,
     };
   }
 
@@ -184,97 +219,95 @@ export function projectOutcome(
   );
 
   const yields = withYield.map((a) => a.outcome.yield_sc_ha!);
-  const minY = Math.min(...yields);
-  const maxY = Math.max(...yields);
+  const p25 = percentile(yields, 25);
+  const p75 = percentile(yields, 75);
 
-  const spread = maxY - minY;
+  const spread = p75 - p25;
   const confidence: "alta" | "media" | "baixa" =
-    withYield.length >= 4 && spread < historicalAvg * 0.3
+    withYield.length >= 6 && spread < historicalAvg * 0.25
       ? "alta"
-      : withYield.length >= 2 && spread < historicalAvg * 0.5
+      : withYield.length >= 4 && spread < historicalAvg * 0.4
         ? "media"
         : "baixa";
+
+  const pctVsAvg = ((weightedYield - historicalAvg) / historicalAvg) * 100;
 
   const riskFactors: string[] = [];
   const positiveFactors: string[] = [];
 
   const badYears = withYield.filter((a) => a.outcome.class === "safra_ruim");
-  if (badYears.length > withYield.length / 2) {
-    riskFactors.push(
-      `${badYears.length} dos ${withYield.length} anos analogos tiveram safra ruim`
-    );
-  }
+  const goodYears = withYield.filter((a) => a.outcome.class === "safra_boa");
 
-  const ninoYears = withYield.filter(
-    (a) => a.outcome.enso.toLowerCase().includes("nino") || a.outcome.enso.toLowerCase().includes("niño")
-  );
-  if (ninoYears.length > withYield.length / 2) {
-    riskFactors.push("Maioria dos anos analogos foram El Nino — risco de excesso de chuva no trigo");
+  if (badYears.length > 0) {
+    const pct = Math.round((badYears.length / withYield.length) * 100);
+    riskFactors.push(`${pct}% dos anos similares tiveram safra abaixo da media`);
   }
 
   const ninaYears = withYield.filter(
     (a) => a.outcome.enso.toLowerCase().includes("nina") || a.outcome.enso.toLowerCase().includes("niña")
   );
   if (ninaYears.length > withYield.length / 2) {
-    riskFactors.push("Maioria dos anos analogos foram La Nina — risco de deficit hidrico na soja");
+    riskFactors.push("Padrao La Nina predominante — risco de deficit hidrico na soja");
   }
 
-  const lowRainYears = withYield.filter((a) => a.outcome.season_rain_mm < 600);
-  if (lowRainYears.length > 0) {
-    riskFactors.push("Alguns anos analogos tiveram chuva abaixo de 600mm na safra");
+  const ninoYears = withYield.filter(
+    (a) => a.outcome.enso.toLowerCase().includes("nino") || a.outcome.enso.toLowerCase().includes("niño")
+  );
+  if (ninoYears.length > withYield.length / 2) {
+    riskFactors.push("Padrao El Nino predominante — risco de excesso de chuva no trigo");
   }
 
-  const goodYears = withYield.filter((a) => a.outcome.class === "safra_boa");
-  if (goodYears.length > withYield.length / 2) {
-    positiveFactors.push(
-      `${goodYears.length} dos ${withYield.length} anos analogos tiveram safra boa`
-    );
+  if (goodYears.length > 0) {
+    const pct = Math.round((goodYears.length / withYield.length) * 100);
+    positiveFactors.push(`${pct}% dos anos similares tiveram safra acima da media`);
   }
 
-  if (weightedYield > historicalAvg) {
-    positiveFactors.push("Projecao ponderada acima da media historica");
-  }
+  let outlook: "favoravel" | "neutro" | "atencao" | "risco";
+  let outlookLabel: string;
+  let action: string;
 
-  const margin = spread * 0.3;
-  const recommendation = buildRecommendation(weightedYield, historicalAvg, riskFactors, confidence);
+  if (pctVsAvg >= 10) {
+    outlook = "favoravel";
+    outlookLabel = "Tendencia favoravel";
+    action = "Clima historicamente bom para produtividade. Invista em insumos de qualidade e considere ampliar area.";
+  } else if (pctVsAvg >= -5) {
+    outlook = "neutro";
+    outlookLabel = "Dentro da normalidade";
+    action = "Clima sem desvios significativos. Mantenha o planejamento padrao e acompanhe previsoes mensais.";
+  } else if (pctVsAvg >= -20) {
+    outlook = "atencao";
+    outlookLabel = "Atencao redobrada";
+    action = "Tendencia de queda na produtividade. Priorize cultivares tolerantes a seca e reduza custo fixo.";
+  } else {
+    outlook = "risco";
+    outlookLabel = "Risco elevado";
+    action = "Padrao climatico desfavoravel. Considere seguro agricola, reduza investimento em insumos caros e diversifique culturas.";
+  }
 
   return {
     expected_yield_range: [
-      Math.round((weightedYield - margin) * 10) / 10,
-      Math.round((weightedYield + margin) * 10) / 10,
+      Math.round(p25 * 10) / 10,
+      Math.round(p75 * 10) / 10,
     ],
+    weighted_yield: Math.round(weightedYield * 10) / 10,
     confidence,
+    outlook,
+    outlook_label: outlookLabel,
+    action,
     risk_factors: riskFactors,
     positive_factors: positiveFactors,
-    recommendation,
+    recommendation: "",
+    pct_vs_avg: Math.round(pctVsAvg),
   };
 }
 
-function buildRecommendation(
-  projected: number,
-  avg: number,
-  risks: string[],
-  confidence: string
-): string {
-  const parts: string[] = [];
-
-  if (projected > avg * 1.1) {
-    parts.push("Padrao climatico favoravel comparado a media historica.");
-  } else if (projected < avg * 0.9) {
-    parts.push("Padrao climatico abaixo da media. Considere estrategia conservadora.");
-  } else {
-    parts.push("Padrao climatico dentro da normalidade.");
-  }
-
-  if (risks.length > 0) {
-    parts.push(`Atencao: ${risks[0].toLowerCase()}.`);
-  }
-
-  if (confidence === "baixa") {
-    parts.push("Confianca baixa — monitore com frequencia.");
-  }
-
-  return parts.join(" ");
+function percentile(sorted: number[], p: number): number {
+  const arr = [...sorted].sort((a, b) => a - b);
+  const idx = (p / 100) * (arr.length - 1);
+  const lo = Math.floor(idx);
+  const hi = Math.ceil(idx);
+  if (lo === hi) return arr[lo];
+  return arr[lo] + (arr[hi] - arr[lo]) * (idx - lo);
 }
 
 export async function analyzePatterns(

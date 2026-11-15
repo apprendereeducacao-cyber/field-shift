@@ -1,40 +1,45 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 
 const SUMMER_CROPS = [
+  { value: "", label: "Selecione" },
   { value: "soja", label: "Soja" },
   { value: "milho", label: "Milho" },
+  { value: "milheto", label: "Milheto" },
   { value: "outro", label: "Outro" },
-  { value: "nenhum", label: "Nenhum" },
 ];
 
 const WINTER_CROPS = [
-  { value: "trigo", label: "Trigo" },
-  { value: "aveia_preta", label: "Aveia Preta" },
+  { value: "", label: "Selecione" },
+  { value: "pousio", label: "Pousio (nao plantou nada)" },
+  { value: "aveia_preta", label: "Aveia preta" },
   { value: "ervilhaca", label: "Ervilhaca" },
-  { value: "nabo_forrageiro", label: "Nabo Forrageiro" },
+  { value: "nabo_forrageiro", label: "Nabo forrageiro" },
+  { value: "trigo", label: "Trigo" },
   { value: "azevem", label: "Azevem" },
   { value: "canola", label: "Canola" },
-  { value: "pousio", label: "Pousio (não plantou nada)" },
   { value: "outro", label: "Outro" },
 ];
 
 const YIELD_RESULTS = [
-  { value: "boa", label: "Boa (acima da média)" },
+  { value: "", label: "Selecione" },
+  { value: "bom", label: "Boa (acima da media)" },
   { value: "normal", label: "Normal" },
-  { value: "ruim", label: "Ruim (abaixo da média)" },
+  { value: "ruim", label: "Ruim (abaixo da media)" },
   { value: "perda_total", label: "Perda total" },
 ];
 
 const PROBLEMS = [
+  { value: "", label: "Selecione" },
   { value: "nenhum", label: "Nenhum problema grave" },
   { value: "seca", label: "Seca" },
   { value: "chuva_demais", label: "Chuva demais" },
+  { value: "geada", label: "Geada" },
   { value: "praga_doenca", label: "Praga ou doenca" },
   { value: "solo_compactado", label: "Solo compactado" },
-  { value: "geada", label: "Geada" },
+  { value: "erosao", label: "Erosao" },
 ];
 
 type YearData = {
@@ -57,10 +62,10 @@ const YEAR_LABELS = ["Ano 1 (mais recente)", "Ano 2"];
 
 const DEFAULT_YEAR: YearData = {
   label: "",
-  summer_crop: "soja",
-  winter_crop: "pousio",
-  yield_result: "normal",
-  main_problem: "nenhum",
+  summer_crop: "",
+  winter_crop: "",
+  yield_result: "",
+  main_problem: "",
 };
 
 function SelectField({
@@ -69,30 +74,83 @@ function SelectField({
   value,
   onChange,
   options,
+  error,
 }: {
   id: string;
   label: string;
   value: string;
   onChange: (v: string) => void;
   options: { value: string; label: string }[];
+  error?: boolean;
 }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const selected = options.find((o) => o.value === value);
+
+  useEffect(() => {
+    function close(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, []);
+
   return (
-    <div>
-      <label htmlFor={id} className="mb-1 block text-sm text-muted-foreground">
+    <div ref={ref} className="relative">
+      <label htmlFor={id} className="mb-1 block text-xs text-muted-foreground">
         {label}
       </label>
-      <select
+      <button
         id={id}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-full border border-border bg-muted px-4 py-2 text-sm text-foreground outline-none transition-colors focus:border-primary"
+        type="button"
+        onClick={() => setOpen(!open)}
+        className={`flex w-full items-center justify-between rounded-[12px] border px-3 py-2 text-sm outline-none transition-colors ${
+          error && !value
+            ? "border-destructive bg-destructive/5"
+            : open
+              ? "border-primary bg-muted"
+              : "border-border bg-muted"
+        }`}
       >
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+        <span className={value ? "text-foreground" : "text-stone-400"}>
+          {selected?.label || "Selecione"}
+        </span>
+        <svg
+          className={`h-4 w-4 text-stone-400 transition-transform ${open ? "rotate-180" : ""}`}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      {open && (
+        <div className="absolute left-0 right-0 z-20 mt-1 max-h-48 overflow-y-auto rounded-[12px] border border-border bg-card shadow-lg">
+          {options
+            .filter((o) => o.value !== "")
+            .map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => {
+                  onChange(opt.value);
+                  setOpen(false);
+                }}
+                className={`flex w-full items-center px-3 py-2 text-left text-sm transition-colors hover:bg-muted ${
+                  opt.value === value
+                    ? "font-medium text-primary"
+                    : "text-foreground"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+        </div>
+      )}
+      {error && !value && (
+        <p className="mt-1 text-xs text-destructive">Obrigatorio</p>
+      )}
     </div>
   );
 }
@@ -150,6 +208,7 @@ export default function ProdutorPage() {
   const [usedGreenManure, setUsedGreenManure] = useState(false);
   const [saved, setSaved] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [showErrors, setShowErrors] = useState(false);
 
   useEffect(() => {
     try {
@@ -178,7 +237,15 @@ export default function ProdutorPage() {
     setSaved(false);
   }
 
+  const isFormComplete = yearsData.every(
+    (y) => y.summer_crop && y.winter_crop && y.yield_result && y.main_problem
+  );
+
   function handleSave() {
+    if (!isFormComplete) {
+      setShowErrors(true);
+      return;
+    }
     const data: ProducerData = {
       years: yearsData,
       has_cattle: hasCattle,
@@ -189,6 +256,7 @@ export default function ProdutorPage() {
     try {
       localStorage.setItem("fieldshift_produtor", JSON.stringify(data));
       setSaved(true);
+      setShowErrors(false);
     } catch {
       // ignore
     }
@@ -224,10 +292,11 @@ export default function ProdutorPage() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <SelectField
                   id={`summer-${i}`}
-                  label="O que plantou no verão?"
+                  label="O que plantou no verao?"
                   value={year.summer_crop}
                   onChange={(v) => updateYear(i, "summer_crop", v)}
                   options={SUMMER_CROPS}
+                  error={showErrors}
                 />
                 <SelectField
                   id={`winter-${i}`}
@@ -235,13 +304,15 @@ export default function ProdutorPage() {
                   value={year.winter_crop}
                   onChange={(v) => updateYear(i, "winter_crop", v)}
                   options={WINTER_CROPS}
+                  error={showErrors}
                 />
                 <SelectField
                   id={`yield-${i}`}
-                  label="Como foi a safra de verão?"
+                  label="Como foi a safra de verao?"
                   value={year.yield_result}
                   onChange={(v) => updateYear(i, "yield_result", v)}
                   options={YIELD_RESULTS}
+                  error={showErrors}
                 />
                 <SelectField
                   id={`problem-${i}`}
@@ -249,6 +320,7 @@ export default function ProdutorPage() {
                   value={year.main_problem}
                   onChange={(v) => updateYear(i, "main_problem", v)}
                   options={PROBLEMS}
+                  error={showErrors}
                 />
               </div>
             </section>
@@ -291,17 +363,25 @@ export default function ProdutorPage() {
           </section>
 
           <div className="flex flex-col items-center gap-4 pt-4">
+            {showErrors && !isFormComplete && (
+              <div className="w-full rounded-[16px] border border-destructive/30 bg-destructive/5 p-4 text-center">
+                <p className="text-sm text-destructive">
+                  Preencha todos os campos antes de salvar.
+                </p>
+              </div>
+            )}
+
             <button
               onClick={handleSave}
               className="h-11 w-full rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover sm:w-auto sm:px-12"
             >
-              Salvar meu histórico
+              Salvar meu historico
             </button>
 
             {saved && (
               <div className="w-full rounded-[24px] border border-status-success/30 bg-status-success-bg p-5 text-center">
                 <p className="text-sm font-medium text-status-success">
-                  Histórico salvo com sucesso
+                  Historico salvo com sucesso
                 </p>
                 <p className="mt-2 text-sm text-muted-foreground">
                   Agora a gente pode cruzar seus dados com 44 anos de clima e
@@ -311,7 +391,7 @@ export default function ProdutorPage() {
                   href="/recomendacao"
                   className="mt-4 inline-block h-11 rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-hover"
                 >
-                  Ver minha recomendação
+                  Ver minha recomendacao
                 </Link>
               </div>
             )}

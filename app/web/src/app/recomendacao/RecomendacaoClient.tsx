@@ -37,30 +37,33 @@ type ScoredStrategy = {
 const CROP_LABELS: Record<string, string> = {
   soja: "Soja",
   milho: "Milho",
+  milheto: "Milheto",
   trigo: "Trigo",
   pousio: "Pousio (terra parada)",
-  aveia_preta: "Aveia Preta",
+  aveia_preta: "Aveia preta",
   ervilhaca: "Ervilhaca",
-  nabo_forrageiro: "Nabo Forrageiro",
+  nabo_forrageiro: "Nabo forrageiro",
   canola: "Canola",
   azevem: "Azevem",
-  milheto: "Milheto",
   crotalaria: "Crotalaria",
+  outro: "Outro",
 };
 
 const YIELD_LABELS: Record<string, string> = {
   bom: "Boa",
   normal: "Normal",
   ruim: "Ruim",
+  perda_total: "Perda total",
 };
 
 const PROBLEM_LABELS: Record<string, string> = {
-  seca: "Seca",
-  geada: "Geada",
-  praga: "Pragas/doenças",
-  solo_compactado: "Solo compactado",
-  erosão: "Erosão",
   nenhum: "Nenhum problema grave",
+  seca: "Seca",
+  chuva_demais: "Chuva demais",
+  geada: "Geada",
+  praga_doenca: "Praga ou doenca",
+  solo_compactado: "Solo compactado",
+  erosao: "Erosao",
 };
 
 const STRATEGY_COLORS: Record<string, string> = {
@@ -139,7 +142,9 @@ function scoreStrategies(
     const hadCompaction =
       producer.soil_compacted ||
       producer.years.some((y) => y.main_problem === "solo_compactado");
-    const hadBadYield = producer.years.some((y) => y.yield_result === "ruim");
+    const hadBadYield = producer.years.some(
+      (y) => y.yield_result === "ruim" || y.yield_result === "perda_total"
+    );
 
     if (strategy.id === "conservative") {
       if (allPousio) {

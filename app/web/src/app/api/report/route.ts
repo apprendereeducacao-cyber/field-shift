@@ -92,8 +92,10 @@ export async function GET(request: Request) {
             rain: yearData.annual_rain_mm,
             temp: yearData.avg_temp_c,
             spiDjf: yearData.season_rain_mm,
+            enso: (yearData as any).enso ?? null,
           }
         : null,
+      ensoImpact: timeline.enso_impact ?? null,
       topCrops: topStrategy
         ? topStrategy.sequence.map((s) => s.crop)
         : ["Soja", "Milho", "Trigo", "Aveia"],

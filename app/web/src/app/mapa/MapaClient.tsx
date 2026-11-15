@@ -309,7 +309,7 @@ export default function MapaClient({
         attributionControl: false,
       });
 
-      L.control.zoom({ position: "topright" }).addTo(map);
+      // zoom controls handled by custom buttons
       L.control.scale({ position: "bottomright", metric: true, imperial: false }).addTo(map);
       L.control
         .attribution({ position: "bottomright", prefix: false })
@@ -385,45 +385,6 @@ export default function MapaClient({
         })
         .catch(() => {});
 
-      // Site marker
-      const siteIcon = L.divIcon({
-        className: "",
-        html: `<div style="
-          width:28px;height:28px;border-radius:50%;
-          background:#165337;border:3px solid #fff;
-          box-shadow:0 2px 8px rgba(0,0,0,0.4);
-          display:flex;align-items:center;justify-content:center;
-          color:#fff;font-size:12px;font-weight:700;
-        ">SR</div>`,
-        iconSize: [28, 28],
-        iconAnchor: [14, 14],
-      });
-
-      siteMarkerRef.current = L.marker(
-        [site.point.lat, site.point.lon],
-        { icon: siteIcon, zIndexOffset: 1000 },
-      ).addTo(map);
-
-      const popupContent = `
-        <div style="font-family:system-ui;font-size:13px;line-height:1.5;min-width:180px;background:#FFFFFF;color:#151A17;padding:8px;border-radius:12px">
-          <div style="font-weight:700;font-size:14px;margin-bottom:4px">${site.point.name}</div>
-          <div style="color:#4B5C50;font-size:11px;margin-bottom:8px">${site.point.state} | ${site.point.lat.toFixed(4)}, ${site.point.lon.toFixed(4)}</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-size:12px">
-            <span style="color:#4B5C50">Elevacao media</span>
-            <span style="font-weight:600">${meanElev}m</span>
-            <span style="color:#4B5C50">Tmax media</span>
-            <span style="font-weight:600">${avgTmax.toFixed(1)}°C</span>
-            <span style="color:#4B5C50">Desnivel</span>
-            <span style="font-weight:600">${topography.summary.range_m}m</span>
-            <span style="color:#4B5C50">Pts topografia</span>
-            <span style="font-weight:600">${topography.points.length}</span>
-          </div>
-        </div>
-      `;
-      siteMarkerRef.current.bindPopup(popupContent, {
-        maxWidth: 280,
-        className: "fs-popup",
-      });
 
       // Click handler — show point data
       map.on("click", (e: any) => {
@@ -888,13 +849,13 @@ export default function MapaClient({
     <div
       ref={containerRef}
       className="relative flex flex-col"
-      style={{ height: isFullscreen ? "100vh" : "calc(100vh - 72px)", minHeight: "500px" }}
+      style={{ height: isFullscreen ? "100vh" : "calc(100vh - 72px)", maxHeight: isFullscreen ? "100vh" : "700px", minHeight: "500px" }}
     >
       {/* ── Map container ── */}
       <div ref={mapRef} className="absolute inset-0 z-0 bg-muted" />
 
       {/* ── Top bar ── */}
-      <div className="pointer-events-none absolute left-0 right-0 top-0 z-[500] flex items-start justify-between p-3 pr-4">
+      <div className="pointer-events-none absolute left-0 right-0 top-0 z-[500] flex items-start justify-between p-4 pr-6">
         <button
           onClick={() => setPanelOpen(!panelOpen)}
           className="pointer-events-auto flex items-center gap-2 rounded-full bg-card/95 px-4 py-2 text-sm font-semibold text-foreground shadow-lg backdrop-blur-sm transition-colors hover:bg-card"
@@ -910,7 +871,7 @@ export default function MapaClient({
           )}
         </button>
 
-        <div className="pointer-events-auto flex items-center gap-2">
+        <div className="pointer-events-auto flex flex-col gap-1.5">
           <button
             onClick={() => {
               if (mapInstance.current && boundaryRef.current) {
@@ -920,7 +881,7 @@ export default function MapaClient({
                 mapInstance.current.setView([site.point.lat, site.point.lon], ndviTiles.zoom);
               }
             }}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-card/95 text-muted-foreground shadow-lg backdrop-blur-sm hover:text-foreground"
+            className="flex h-9 w-9 items-center justify-center rounded-xl bg-card/95 text-muted-foreground shadow-lg backdrop-blur-sm transition-colors hover:text-foreground"
             title="Resetar vista"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -930,7 +891,7 @@ export default function MapaClient({
           </button>
           <button
             onClick={toggleFullscreen}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-card/95 text-muted-foreground shadow-lg backdrop-blur-sm hover:text-foreground"
+            className="flex h-9 w-9 items-center justify-center rounded-xl bg-card/95 text-muted-foreground shadow-lg backdrop-blur-sm transition-colors hover:text-foreground"
             title={isFullscreen ? "Sair do fullscreen" : "Fullscreen"}
           >
             {isFullscreen ? (
@@ -942,6 +903,25 @@ export default function MapaClient({
                 <path d="M2 6V2h4M14 6V2h-4M2 10v4h4M14 10v4h-4" />
               </svg>
             )}
+          </button>
+          <div className="h-px bg-border/50" />
+          <button
+            onClick={() => mapInstance.current?.zoomIn()}
+            className="flex h-9 w-9 items-center justify-center rounded-xl bg-card/95 text-muted-foreground shadow-lg backdrop-blur-sm transition-colors hover:text-foreground"
+            title="Zoom in"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+              <path d="M8 4v8M4 8h8" />
+            </svg>
+          </button>
+          <button
+            onClick={() => mapInstance.current?.zoomOut()}
+            className="flex h-9 w-9 items-center justify-center rounded-xl bg-card/95 text-muted-foreground shadow-lg backdrop-blur-sm transition-colors hover:text-foreground"
+            title="Zoom out"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+              <path d="M4 8h8" />
+            </svg>
           </button>
         </div>
       </div>

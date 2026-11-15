@@ -116,13 +116,13 @@ function BarChart({
   return (
     <div>
       <div className="mb-2 flex items-baseline justify-between">
-        <h3 className="text-sm font-semibold text-text-primary">{label}</h3>
-        <span className="text-xs text-text-muted">
+        <h3 className="text-sm font-semibold text-foreground">{label}</h3>
+        <span className="text-xs text-muted-foreground">
           Média: {avg.toFixed(1)}
           {unit}
         </span>
       </div>
-      <div className="relative overflow-x-auto rounded-lg border border-border bg-bg-surface p-4">
+      <div className="relative overflow-x-auto rounded-lg border border-border bg-card p-4">
         <div className="relative" style={{ minWidth: data.length * 14 }}>
           <div
             className="absolute left-0 right-0 border-t border-dashed border-text-dim/30"
@@ -151,11 +151,11 @@ function BarChart({
                     }}
                   />
                   {hovered === i && (
-                    <div className="pointer-events-none absolute -top-16 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-md border border-border bg-bg-base px-2 py-1 text-xs shadow-lg">
-                      <p className="font-semibold text-text-primary">
+                    <div className="pointer-events-none absolute -top-16 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-md border border-border bg-card px-2 py-1 text-xs shadow-lg">
+                      <p className="font-semibold text-foreground">
                         {d.year}
                       </p>
-                      <p className="text-text-secondary">
+                      <p className="text-muted-foreground">
                         {val.toFixed(1)}
                         {unit}
                       </p>
@@ -170,7 +170,7 @@ function BarChart({
               i % 5 === 0 ? (
                 <span
                   key={d.year}
-                  className="text-[9px] text-text-dim"
+                  className="text-[9px] text-stone-400"
                   style={{ width: `${(5 / data.length) * 100}%` }}
                 >
                   {d.year}
@@ -203,8 +203,8 @@ function MonthlyChart({
 
   return (
     <div>
-      <h3 className="mb-2 text-sm font-semibold text-text-primary">{label}</h3>
-      <div className="rounded-lg border border-border bg-bg-surface p-4">
+      <h3 className="mb-2 text-sm font-semibold text-foreground">{label}</h3>
+      <div className="rounded-lg border border-border bg-card p-4">
         <div className="flex items-end gap-2" style={{ height: 160 }}>
           {data.map((d, i) => {
             const val = getValue(d);
@@ -227,15 +227,15 @@ function MonthlyChart({
                     }}
                   />
                   {hovered === i && (
-                    <div className="pointer-events-none absolute -top-10 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-md border border-border bg-bg-base px-2 py-1 text-xs shadow-lg">
-                      <p className="text-text-primary">
+                    <div className="pointer-events-none absolute -top-10 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-md border border-border bg-card px-2 py-1 text-xs shadow-lg">
+                      <p className="text-foreground">
                         {val.toFixed(1)}
                         {unit}
                       </p>
                     </div>
                   )}
                 </div>
-                <span className="mt-1 text-[10px] text-text-dim">
+                <span className="mt-1 text-[10px] text-stone-400">
                   {MONTH_NAMES[i]}
                 </span>
               </div>
@@ -257,10 +257,10 @@ function StatCard({
   sub?: string;
 }) {
   return (
-    <div className="rounded-xl border border-border bg-bg-surface p-4">
-      <p className="text-2xl font-bold text-text-primary">{value}</p>
-      <p className="mt-1 text-sm text-text-secondary">{label}</p>
-      {sub && <p className="mt-0.5 text-xs text-text-dim">{sub}</p>}
+    <div className="rounded-[16px] border border-border bg-card p-4">
+      <p className="text-2xl font-bold text-foreground">{value}</p>
+      <p className="mt-1 text-sm text-muted-foreground">{label}</p>
+      {sub && <p className="mt-0.5 text-xs text-stone-400">{sub}</p>}
     </div>
   );
 }
@@ -274,7 +274,7 @@ function EnsoLegend() {
             className="h-3 w-3 rounded-sm"
             style={{ backgroundColor: ENSO_COLORS[key] }}
           />
-          <span className="text-xs text-text-muted">{label}</span>
+          <span className="text-xs text-muted-foreground">{label}</span>
         </div>
       ))}
     </div>
@@ -300,10 +300,10 @@ function riskText(value: number): string {
 }
 
 function riskColor(value: number): string {
-  if (value <= 0.2) return "bg-emerald-500/10 text-emerald-400";
-  if (value <= 0.5) return "bg-yellow-500/10 text-yellow-400";
-  if (value <= 0.75) return "bg-orange-500/10 text-orange-400";
-  return "bg-red-500/10 text-red-400";
+  if (value <= 0.2) return "bg-status-success-bg text-status-success";
+  if (value <= 0.5) return "bg-status-warning-bg text-status-warning";
+  if (value <= 0.75) return "bg-status-serious-bg text-status-serious";
+  return "bg-status-critical-bg text-destructive";
 }
 
 function ClimaTab() {
@@ -311,23 +311,23 @@ function ClimaTab() {
   return (
     <div className="space-y-10">
       <div>
-        <h2 className="text-xl font-semibold text-text-primary mb-2">
+        <h2 className="text-xl font-semibold text-foreground mb-2">
           Calendário de riscos — mês a mês
         </h2>
-        <p className="text-text-muted text-sm mb-6">
+        <p className="text-muted-foreground text-sm mb-6">
           De cada 10 anos, quantas vezes cada problema aconteceu em cada mês.
         </p>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr>
-                <th className="text-left py-2 px-3 text-text-muted font-medium">
+                <th className="text-left py-2 px-3 text-muted-foreground font-medium">
                   Risco
                 </th>
                 {MONTH_NAMES.map((m) => (
                   <th
                     key={m}
-                    className="py-2 px-2 text-center text-text-muted font-medium min-w-[52px]"
+                    className="py-2 px-2 text-center text-muted-foreground font-medium min-w-[52px]"
                   >
                     {m}
                   </th>
@@ -337,7 +337,7 @@ function ClimaTab() {
             <tbody>
               {RISK_KEYS.map((key) => (
                 <tr key={key} className="border-t border-border">
-                  <td className="py-3 px-3 text-text-secondary font-medium whitespace-nowrap">
+                  <td className="py-3 px-3 text-muted-foreground font-medium whitespace-nowrap">
                     {RISK_LABELS[key]}
                   </td>
                   {months.map((month, i) => {
@@ -357,51 +357,51 @@ function ClimaTab() {
             </tbody>
           </table>
         </div>
-        <div className="flex flex-wrap gap-4 mt-4 text-xs text-text-dim">
+        <div className="flex flex-wrap gap-4 mt-4 text-xs text-stone-400">
           <span className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded bg-emerald-500/10 border border-emerald-500/30" /> Raro (até 2
+            <span className="w-3 h-3 rounded bg-status-success-bg border border-status-success/20" /> Raro (até 2
             em 10)
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded bg-yellow-500/10 border border-yellow-500/30" /> Às vezes (3 a
+            <span className="w-3 h-3 rounded bg-status-warning-bg border border-status-warning/20" /> Às vezes (3 a
             5 em 10)
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded bg-orange-500/10 border border-orange-500/30" /> Frequente (6
+            <span className="w-3 h-3 rounded bg-status-serious-bg border border-status-serious/20" /> Frequente (6
             a 7 em 10)
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded bg-red-500/10 border border-red-500/30" /> Quase todo ano
+            <span className="w-3 h-3 rounded bg-status-critical-bg border border-destructive/20" /> Quase todo ano
             (8+ em 10)
           </span>
         </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-lg bg-bg-surface-alt p-5">
+        <div className="rounded-lg bg-muted p-5">
           <h3 className="text-warning font-semibold mb-2">
             Verão (Dez a Fev) — Hora da soja
           </h3>
-          <p className="text-text-secondary text-sm">
+          <p className="text-muted-foreground text-sm">
             É quando a soja mais precisa de chuva. O calor forte aparece em até
             7 de cada 10 janeiros.
           </p>
         </div>
-        <div className="rounded-lg bg-bg-surface-alt p-5">
+        <div className="rounded-lg bg-muted p-5">
           <h3 className="text-accent-light font-semibold mb-2">
             Inverno (Jun a Ago) — Terra parada?
           </h3>
-          <p className="text-text-secondary text-sm">
+          <p className="text-muted-foreground text-sm">
             Geada em {KEY_FINDINGS.frost_jul_pct} a{" "}
             {KEY_FINDINGS.frost_aug_pct}% dos anos. Quem planta aveia ou trigo
             aproveita esses meses.
           </p>
         </div>
-        <div className="rounded-lg bg-bg-surface-alt p-5">
-          <h3 className="text-primary-light font-semibold mb-2">
+        <div className="rounded-lg bg-muted p-5">
+          <h3 className="text-primary font-semibold mb-2">
             Transições (Mar-Mai / Set-Nov)
           </h3>
-          <p className="text-text-secondary text-sm">
+          <p className="text-muted-foreground text-sm">
             Chuvaradas fortes (50mm/dia) em até 4 de cada 10 anos. Se o solo
             está sem cobertura, a enxurrada leva a camada mais rica.
           </p>
@@ -432,7 +432,7 @@ function HistoricoTab() {
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-text-secondary">
+      <p className="text-sm text-muted-foreground">
         Dados de satélite da NASA de 1981 até 2025, cruzados com a
         produtividade de soja do IBGE e a classificação El Niño/La Niña da NOAA.
       </p>
@@ -443,8 +443,8 @@ function HistoricoTab() {
             onClick={() => setSubTab(t.key)}
             className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
               subTab === t.key
-                ? "bg-primary/20 text-primary-light"
-                : "bg-bg-surface text-text-muted hover:bg-bg-surface-alt"
+                ? "bg-forest-100 text-primary"
+                : "bg-card text-muted-foreground hover:bg-muted"
             }`}
           >
             {t.label}
@@ -470,7 +470,7 @@ function HistoricoTab() {
               label={`Neutro (${ensoImpact.neutro.n_safras} safras)`}
             />
           </div>
-          <div className="rounded-lg border border-border bg-bg-surface p-4">
+          <div className="rounded-lg border border-border bg-card p-4">
             <div className="flex flex-wrap gap-1">
               {years.map((y) => (
                 <div key={y.year} className="flex flex-col items-center">
@@ -480,7 +480,7 @@ function HistoricoTab() {
                     title={`${y.year}: ${ENSO_LABELS[y.enso]}`}
                   />
                   {y.year % 5 === 0 && (
-                    <span className="mt-0.5 text-[8px] text-text-dim">
+                    <span className="mt-0.5 text-[8px] text-stone-400">
                       {y.year}
                     </span>
                   )}
@@ -580,8 +580,8 @@ function HistoricoTab() {
             unit="%"
             label="Umidade média do solo (raiz) por ano"
           />
-          <div className="rounded-xl border border-border bg-bg-surface p-5">
-            <p className="mb-4 text-xs text-text-dim">
+          <div className="rounded-[16px] border border-border bg-card p-5">
+            <p className="mb-4 text-xs text-stone-400">
               Umidade mensal — 0% = seco, 100% = saturado
             </p>
             <div className="flex items-end gap-1.5">
@@ -598,7 +598,7 @@ function HistoricoTab() {
                       style={{ height: 200 }}
                     >
                       <div
-                        className="w-3 rounded-t bg-emerald-500/70"
+                        className="w-3 rounded-t bg-leaf-600/70"
                         style={{ height: rootH }}
                         title={`Raiz: ${(m.root_zone * 100).toFixed(0)}%`}
                       />
@@ -608,14 +608,14 @@ function HistoricoTab() {
                         title={`Perfil: ${(m.profile * 100).toFixed(0)}%`}
                       />
                     </div>
-                    <span className="text-[10px] text-text-dim">{m.name}</span>
+                    <span className="text-[10px] text-stone-400">{m.name}</span>
                   </div>
                 );
               })}
             </div>
-            <div className="mt-3 flex items-center gap-4 text-xs text-text-muted">
+            <div className="mt-3 flex items-center gap-4 text-xs text-muted-foreground">
               <span className="flex items-center gap-1">
-                <span className="inline-block h-2.5 w-2.5 rounded-sm bg-emerald-500/70" />
+                <span className="inline-block h-2.5 w-2.5 rounded-sm bg-leaf-600/70" />
                 Raiz (0-100cm)
               </span>
               <span className="flex items-center gap-1">
@@ -660,9 +660,9 @@ function HistoricoTab() {
 
 function elevationColor(elev: number, min: number, max: number): string {
   const pct = (elev - min) / (max - min);
-  if (pct > 0.75) return "bg-emerald-700";
-  if (pct > 0.5) return "bg-emerald-600";
-  if (pct > 0.25) return "bg-yellow-700";
+  if (pct > 0.75) return "bg-leaf-700";
+  if (pct > 0.5) return "bg-leaf-600";
+  if (pct > 0.25) return "bg-sun-700";
   return "bg-orange-700";
 }
 
@@ -673,32 +673,32 @@ function SoloTab() {
 
   return (
     <div className="space-y-10">
-      <div className="rounded-lg bg-bg-surface-alt p-6">
-        <h3 className="text-lg font-semibold text-text-primary mb-4">
+      <div className="rounded-lg bg-muted p-6">
+        <h3 className="text-lg font-semibold text-foreground mb-4">
           Relevo da região
         </h3>
         <div className="grid gap-4 sm:grid-cols-4 mb-6">
-          <div className="rounded-lg bg-bg-surface p-4">
-            <p className="text-2xl font-bold text-text-primary">
+          <div className="rounded-lg bg-card p-4">
+            <p className="text-2xl font-bold text-foreground">
               {topo.mean_elevation_m.toFixed(0)}m
             </p>
-            <p className="text-xs text-text-muted">Altitude média</p>
+            <p className="text-xs text-muted-foreground">Altitude média</p>
           </div>
-          <div className="rounded-lg bg-bg-surface p-4">
-            <p className="text-2xl font-bold text-text-primary">
+          <div className="rounded-lg bg-card p-4">
+            <p className="text-2xl font-bold text-foreground">
               {topo.min_elevation_m}m - {topo.max_elevation_m}m
             </p>
-            <p className="text-xs text-text-muted">Variação de altitude</p>
+            <p className="text-xs text-muted-foreground">Variação de altitude</p>
           </div>
-          <div className="rounded-lg bg-bg-surface p-4">
-            <p className="text-2xl font-bold text-text-primary">
+          <div className="rounded-lg bg-card p-4">
+            <p className="text-2xl font-bold text-foreground">
               {topo.range_m}m
             </p>
-            <p className="text-xs text-text-muted">Desnível total</p>
+            <p className="text-xs text-muted-foreground">Desnível total</p>
           </div>
-          <div className="rounded-lg bg-bg-surface p-4">
-            <p className="text-2xl font-bold text-text-primary">Planalto</p>
-            <p className="text-xs text-text-muted">Planalto Médio Gaúcho</p>
+          <div className="rounded-lg bg-card p-4">
+            <p className="text-2xl font-bold text-foreground">Planalto</p>
+            <p className="text-xs text-muted-foreground">Planalto Médio Gaúcho</p>
           </div>
         </div>
         <div className="grid grid-cols-5 gap-1 max-w-sm">
@@ -714,20 +714,20 @@ function SoloTab() {
             </div>
           ))}
         </div>
-        <div className="mt-2 flex items-center gap-2 text-[10px] text-text-dim">
+        <div className="mt-2 flex items-center gap-2 text-[10px] text-stone-400">
           <div className="flex items-center gap-1">
             <div className="h-3 w-3 rounded-sm bg-orange-700" />
             <span>Baixo ({topo.min_elevation_m}m)</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="h-3 w-3 rounded-sm bg-emerald-700" />
+            <div className="h-3 w-3 rounded-sm bg-leaf-700" />
             <span>Alto ({topo.max_elevation_m}m)</span>
           </div>
         </div>
       </div>
 
-      <div className="rounded-lg bg-bg-surface-alt p-6">
-        <h3 className="text-lg font-semibold text-text-primary mb-4">
+      <div className="rounded-lg bg-muted p-6">
+        <h3 className="text-lg font-semibold text-foreground mb-4">
           Textura: {soil.texture_class}
         </h3>
         <div className="space-y-3">
@@ -750,12 +750,12 @@ function SoloTab() {
           ].map((item) => (
             <div key={item.label}>
               <div className="flex justify-between text-sm mb-1">
-                <span className="text-text-secondary">{item.label}</span>
+                <span className="text-muted-foreground">{item.label}</span>
                 <span className="font-semibold" style={{ color: item.color }}>
                   {item.value}%
                 </span>
               </div>
-              <div className="h-3 bg-bg-surface-alt rounded-full overflow-hidden">
+              <div className="h-3 bg-muted rounded-full overflow-hidden">
                 <div
                   className="h-full rounded-full"
                   style={{
@@ -769,22 +769,22 @@ function SoloTab() {
         </div>
       </div>
 
-      <div className="rounded-lg bg-bg-surface-alt p-6">
-        <h3 className="text-lg font-semibold text-text-primary mb-4">
+      <div className="rounded-lg bg-muted p-6">
+        <h3 className="text-lg font-semibold text-foreground mb-4">
           O que fazer pra melhorar esse solo
         </h3>
         <div className="space-y-3">
           <div className="flex gap-3">
             <div className="mt-1 h-2 w-2 shrink-0 rounded-full bg-warning" />
-            <p className="text-sm text-text-secondary">
-              <strong className="text-text-primary">Corrigir acidez:</strong>{" "}
+            <p className="text-sm text-muted-foreground">
+              <strong className="text-foreground">Corrigir acidez:</strong>{" "}
               pH {topLayer.ph} — aplicar calcário pra subir pra pelo menos 5.5.
             </p>
           </div>
           <div className="flex gap-3">
             <div className="mt-1 h-2 w-2 shrink-0 rounded-full bg-primary-light" />
-            <p className="text-sm text-text-secondary">
-              <strong className="text-text-primary">
+            <p className="text-sm text-muted-foreground">
+              <strong className="text-foreground">
                 Plantar leguminosa no inverno:
               </strong>{" "}
               Ervilhaca fixa nitrogênio de graça — economia de R$200-400/ha em
@@ -793,8 +793,8 @@ function SoloTab() {
           </div>
           <div className="flex gap-3">
             <div className="mt-1 h-2 w-2 shrink-0 rounded-full bg-accent-light" />
-            <p className="text-sm text-text-secondary">
-              <strong className="text-text-primary">
+            <p className="text-sm text-muted-foreground">
+              <strong className="text-foreground">
                 Manter cobertura o ano todo:
               </strong>{" "}
               Aveia preta repõe 4-8 t/ha de palha no solo.
@@ -802,8 +802,8 @@ function SoloTab() {
           </div>
           <div className="flex gap-3">
             <div className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#8B5E3C]" />
-            <p className="text-sm text-text-secondary">
-              <strong className="text-text-primary">
+            <p className="text-sm text-muted-foreground">
+              <strong className="text-foreground">
                 Quebrar compactação:
               </strong>{" "}
               Nabo forrageiro — raiz que vai a 2 metros de profundidade.
@@ -823,7 +823,7 @@ function NdviBar({ value, max }: { value: number; max: number }) {
   const red = Math.round((1 - value) * 180);
   return (
     <div className="flex items-center gap-2">
-      <div className="h-5 flex-1 overflow-hidden rounded-full bg-bg-surface-alt">
+      <div className="h-5 flex-1 overflow-hidden rounded-full bg-muted">
         <div
           className="h-full rounded-full transition-all"
           style={{
@@ -832,7 +832,7 @@ function NdviBar({ value, max }: { value: number; max: number }) {
           }}
         />
       </div>
-      <span className="w-12 text-right text-xs font-mono text-text-secondary">
+      <span className="w-12 text-right text-xs font-mono text-muted-foreground">
         {value.toFixed(2)}
       </span>
     </div>
@@ -856,33 +856,33 @@ function VegetacaoTab() {
   return (
     <div className="space-y-8">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-border bg-bg-surface p-4">
-          <p className="text-xs text-text-dim uppercase">NDVI medio</p>
-          <p className="mt-1 text-2xl font-bold text-primary-light">
+        <div className="rounded-[16px] border border-border bg-card p-4">
+          <p className="text-xs text-stone-400 uppercase">NDVI medio</p>
+          <p className="mt-1 text-2xl font-bold text-primary">
             {s.overall_mean.toFixed(2)}
           </p>
-          <p className="text-xs text-text-muted">2000-2025</p>
+          <p className="text-xs text-muted-foreground">2000-2025</p>
         </div>
-        <div className="rounded-xl border border-border bg-bg-surface p-4">
-          <p className="text-xs text-text-dim uppercase">NDVI safra</p>
+        <div className="rounded-[16px] border border-border bg-card p-4">
+          <p className="text-xs text-stone-400 uppercase">NDVI safra</p>
           <p className="mt-1 text-2xl font-bold text-accent-light">
             {s.growing_season_mean?.toFixed(2) ?? "—"}
           </p>
-          <p className="text-xs text-text-muted">Out-Mar</p>
+          <p className="text-xs text-muted-foreground">Out-Mar</p>
         </div>
-        <div className="rounded-xl border border-border bg-bg-surface p-4">
-          <p className="text-xs text-text-dim uppercase">EVI medio mensal</p>
-          <p className="mt-1 text-2xl font-bold text-emerald-400">
+        <div className="rounded-[16px] border border-border bg-card p-4">
+          <p className="text-xs text-stone-400 uppercase">EVI medio mensal</p>
+          <p className="mt-1 text-2xl font-bold text-leaf-600">
             {(ndvi.monthly_averages.reduce((s, m) => s + m.avg_evi, 0) / 12).toFixed(2)}
           </p>
-          <p className="text-xs text-text-muted">Enhanced Vegetation Index</p>
+          <p className="text-xs text-muted-foreground">Enhanced Vegetation Index</p>
         </div>
-        <div className="rounded-xl border border-border bg-bg-surface p-4">
-          <p className="text-xs text-text-dim uppercase">Observacoes</p>
-          <p className="mt-1 text-2xl font-bold text-text-secondary">
+        <div className="rounded-[16px] border border-border bg-card p-4">
+          <p className="text-xs text-stone-400 uppercase">Observacoes</p>
+          <p className="mt-1 text-2xl font-bold text-muted-foreground">
             {s.n_good_quality.toLocaleString("pt-BR")}
           </p>
-          <p className="text-xs text-text-muted">Com qualidade boa</p>
+          <p className="text-xs text-muted-foreground">Com qualidade boa</p>
         </div>
       </div>
 
@@ -897,8 +897,8 @@ function VegetacaoTab() {
             onClick={() => setSubTab(t.key)}
             className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
               subTab === t.key
-                ? "bg-primary/20 text-primary-light"
-                : "bg-bg-surface text-text-muted hover:bg-bg-surface-alt"
+                ? "bg-forest-100 text-primary"
+                : "bg-card text-muted-foreground hover:bg-muted"
             }`}
           >
             {t.label}
@@ -909,7 +909,7 @@ function VegetacaoTab() {
       {subTab === "ndvi" && (
         <div className="space-y-8">
           <div>
-            <h3 className="text-sm font-semibold text-text-primary mb-3">
+            <h3 className="text-sm font-semibold text-foreground mb-3">
               NDVI medio por mes
             </h3>
             <div className="space-y-2">
@@ -918,7 +918,7 @@ function VegetacaoTab() {
                   key={m.month}
                   className="grid grid-cols-[3rem_1fr] items-center gap-3"
                 >
-                  <span className="text-xs font-medium text-text-secondary">
+                  <span className="text-xs font-medium text-muted-foreground">
                     {m.name}
                   </span>
                   <NdviBar value={m.avg_ndvi} max={maxNdvi * 1.05} />
@@ -928,7 +928,7 @@ function VegetacaoTab() {
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold text-text-primary mb-3">
+            <h3 className="text-sm font-semibold text-foreground mb-3">
               Evolucao anual do NDVI
             </h3>
             <div className="overflow-x-auto">
@@ -946,7 +946,7 @@ function VegetacaoTab() {
                       className="group relative flex flex-1 flex-col items-center justify-end"
                       style={{ height: "200px" }}
                     >
-                      <div className="absolute -top-6 hidden rounded bg-bg-surface-alt px-2 py-1 text-[10px] text-text-secondary shadow-lg group-hover:block">
+                      <div className="absolute -top-6 hidden rounded bg-muted px-2 py-1 text-[10px] text-muted-foreground shadow-lg group-hover:block">
                         {a.year}: {a.avg_ndvi.toFixed(3)}
                       </div>
                       <div
@@ -954,7 +954,7 @@ function VegetacaoTab() {
                         style={{ height: `${h}px` }}
                       />
                       {a.year % 5 === 0 && (
-                        <span className="mt-1 text-[9px] text-text-dim">
+                        <span className="mt-1 text-[9px] text-stone-400">
                           {a.year}
                         </span>
                       )}
@@ -969,11 +969,11 @@ function VegetacaoTab() {
 
       {subTab === "evi" && (
         <div className="space-y-8">
-          <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-5">
-            <p className="text-xs font-medium tracking-wider text-emerald-400 uppercase">
+          <div className="rounded-[16px] border border-leaf-600/20 bg-status-success-bg p-5">
+            <p className="text-xs font-medium tracking-wider text-leaf-600 uppercase">
               O que e o EVI
             </p>
-            <p className="mt-2 text-sm text-text-secondary">
+            <p className="mt-2 text-sm text-muted-foreground">
               O EVI (Enhanced Vegetation Index) e uma versao melhorada do NDVI. Corrige
               distorcoes causadas pela atmosfera e pelo brilho do solo exposto. Em regioes
               com vegetacao densa, o EVI continua subindo enquanto o NDVI ja satura (para de
@@ -982,7 +982,7 @@ function VegetacaoTab() {
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold text-text-primary mb-3">
+            <h3 className="text-sm font-semibold text-foreground mb-3">
               EVI medio por mes
             </h3>
             <div className="space-y-2">
@@ -991,17 +991,17 @@ function VegetacaoTab() {
                   key={m.month}
                   className="grid grid-cols-[3rem_1fr] items-center gap-3"
                 >
-                  <span className="text-xs font-medium text-text-secondary">
+                  <span className="text-xs font-medium text-muted-foreground">
                     {m.name}
                   </span>
                   <div className="flex items-center gap-2">
-                    <div className="h-5 flex-1 overflow-hidden rounded-full bg-bg-surface-alt">
+                    <div className="h-5 flex-1 overflow-hidden rounded-full bg-muted">
                       <div
-                        className="h-full rounded-full transition-all bg-emerald-500"
+                        className="h-full rounded-full transition-all bg-leaf-500"
                         style={{ width: `${(m.avg_evi / (maxEvi * 1.05)) * 100}%` }}
                       />
                     </div>
-                    <span className="w-12 text-right text-xs font-mono text-text-secondary">
+                    <span className="w-12 text-right text-xs font-mono text-muted-foreground">
                       {m.avg_evi.toFixed(3)}
                     </span>
                   </div>
@@ -1011,10 +1011,10 @@ function VegetacaoTab() {
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold text-text-primary mb-3">
+            <h3 className="text-sm font-semibold text-foreground mb-3">
               NDVI vs EVI — comparacao mensal
             </h3>
-            <div className="rounded-lg border border-border bg-bg-surface p-4">
+            <div className="rounded-lg border border-border bg-card p-4">
               <div className="flex items-end gap-2" style={{ height: 160 }}>
                 {ndvi.monthly_averages.map((m, i) => {
                   const ndviPct = (m.avg_ndvi / (maxNdvi * 1.05)) * 100;
@@ -1028,26 +1028,26 @@ function VegetacaoTab() {
                             style={{ height: `${ndviPct}%` }}
                           />
                           <div
-                            className="flex-1 rounded-t-sm bg-emerald-500 transition-opacity group-hover:opacity-80"
+                            className="flex-1 rounded-t-sm bg-leaf-500 transition-opacity group-hover:opacity-80"
                             style={{ height: `${eviPct}%` }}
                           />
                         </div>
-                        <div className="absolute -top-14 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-bg-base px-2 py-1 text-xs shadow-lg">
+                        <div className="absolute -top-14 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-card px-2 py-1 text-xs shadow-lg">
                           <p>NDVI: {m.avg_ndvi.toFixed(3)}</p>
                           <p>EVI: {m.avg_evi.toFixed(3)}</p>
                         </div>
                       </div>
-                      <span className="mt-1 text-[10px] text-text-dim">{MONTH_NAMES[i]}</span>
+                      <span className="mt-1 text-[10px] text-stone-400">{MONTH_NAMES[i]}</span>
                     </div>
                   );
                 })}
               </div>
-              <div className="mt-2 flex items-center gap-4 text-xs text-text-muted">
+              <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1">
                   <span className="inline-block h-2.5 w-2.5 rounded-sm bg-primary" /> NDVI
                 </span>
                 <span className="flex items-center gap-1">
-                  <span className="inline-block h-2.5 w-2.5 rounded-sm bg-emerald-500" /> EVI
+                  <span className="inline-block h-2.5 w-2.5 rounded-sm bg-leaf-500" /> EVI
                 </span>
               </div>
             </div>
@@ -1057,11 +1057,11 @@ function VegetacaoTab() {
 
       {subTab === "safra" && (
         <div className="space-y-8">
-          <div className="rounded-xl border border-accent/30 bg-accent/5 p-5">
+          <div className="rounded-[16px] border border-forest-200 bg-forest-50 p-5">
             <p className="text-xs font-medium tracking-wider text-accent uppercase">
               NDVI da safra (Out-Mar)
             </p>
-            <p className="mt-2 text-sm text-text-secondary">
+            <p className="mt-2 text-sm text-muted-foreground">
               O NDVI medio durante os meses da safra (outubro a marco) mostra como a
               vegetacao se comportou no periodo critico. Valores altos indicam boa
               cobertura e condicoes favoraveis; valores baixos apontam estresse hidrico
@@ -1070,7 +1070,7 @@ function VegetacaoTab() {
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold text-text-primary mb-3">
+            <h3 className="text-sm font-semibold text-foreground mb-3">
               NDVI da safra por ano (Out-Mar)
             </h3>
             <div className="overflow-x-auto">
@@ -1088,7 +1088,7 @@ function VegetacaoTab() {
                       className="group relative flex flex-1 flex-col items-center justify-end"
                       style={{ height: "200px" }}
                     >
-                      <div className="absolute -top-6 hidden rounded bg-bg-surface-alt px-2 py-1 text-[10px] text-text-secondary shadow-lg group-hover:block">
+                      <div className="absolute -top-6 hidden rounded bg-muted px-2 py-1 text-[10px] text-muted-foreground shadow-lg group-hover:block">
                         {a.year}: {val.toFixed(3)}
                       </div>
                       <div
@@ -1096,7 +1096,7 @@ function VegetacaoTab() {
                         style={{ height: `${h}px`, backgroundColor: color }}
                       />
                       {a.year % 5 === 0 && (
-                        <span className="mt-1 text-[9px] text-text-dim">
+                        <span className="mt-1 text-[9px] text-stone-400">
                           {a.year}
                         </span>
                       )}
@@ -1105,7 +1105,7 @@ function VegetacaoTab() {
                 })}
               </div>
             </div>
-            <div className="mt-2 flex items-center gap-4 text-xs text-text-muted">
+            <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
               <span className="flex items-center gap-1">
                 <span className="inline-block h-2.5 w-2.5 rounded-sm bg-[#2D6A4F]" /> Acima de 0.62
               </span>
@@ -1169,7 +1169,7 @@ function UsoDoSoloTab() {
   return (
     <div className="space-y-8">
       <div>
-        <h3 className="text-lg font-semibold text-text-primary mb-4">
+        <h3 className="text-lg font-semibold text-foreground mb-4">
           O que tem hoje ({last?.year || 2023})
         </h3>
         <div className="space-y-2">
@@ -1182,11 +1182,11 @@ function UsoDoSoloTab() {
                     className="h-4 w-4 shrink-0 rounded"
                     style={{ backgroundColor: GROUP_COLORS[g] }}
                   />
-                  <span className="w-28 text-sm text-text-secondary">
+                  <span className="w-28 text-sm text-muted-foreground">
                     {GROUP_LABELS[g]}
                   </span>
                   <div className="flex-1">
-                    <div className="h-6 overflow-hidden rounded-full bg-bg-surface-alt">
+                    <div className="h-6 overflow-hidden rounded-full bg-muted">
                       <div
                         className="h-full rounded-full"
                         style={{
@@ -1197,10 +1197,10 @@ function UsoDoSoloTab() {
                       />
                     </div>
                   </div>
-                  <span className="w-20 text-right text-xs font-mono text-text-secondary">
+                  <span className="w-20 text-right text-xs font-mono text-muted-foreground">
                     {state.area_ha.toLocaleString("pt-BR")} ha
                   </span>
-                  <span className="w-12 text-right text-xs text-text-dim">
+                  <span className="w-12 text-right text-xs text-stone-400">
                     {state.pct}%
                   </span>
                 </div>
@@ -1210,32 +1210,32 @@ function UsoDoSoloTab() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-warning/30 bg-warning/5 p-6">
+      <div className="rounded-[16px] border border-status-warning/20 bg-status-warning-bg p-6">
         <h3 className="text-lg font-semibold text-warning-light mb-3">
           A explosão da soja
         </h3>
         <div className="grid gap-4 sm:grid-cols-3">
-          <div className="rounded-lg border border-border bg-bg-surface p-4 text-center">
-            <p className="text-2xl font-bold text-text-secondary">
+          <div className="rounded-lg border border-border bg-card p-4 text-center">
+            <p className="text-2xl font-bold text-muted-foreground">
               {first?.area_ha.toLocaleString("pt-BR")} ha
             </p>
-            <p className="text-xs text-text-dim">
+            <p className="text-xs text-stone-400">
               Soja em {first?.year || 1985}
             </p>
           </div>
           <div className="flex items-center justify-center text-3xl text-warning-light">
             →
           </div>
-          <div className="rounded-lg border border-border bg-bg-surface p-4 text-center">
+          <div className="rounded-lg border border-border bg-card p-4 text-center">
             <p className="text-2xl font-bold text-warning-light">
               {last?.area_ha.toLocaleString("pt-BR")} ha
             </p>
-            <p className="text-xs text-text-dim">
+            <p className="text-xs text-stone-400">
               Soja em {last?.year || 2023}
             </p>
           </div>
         </div>
-        <p className="mt-4 text-sm text-text-muted">
+        <p className="mt-4 text-sm text-muted-foreground">
           A soja saiu de {tr.soja?.from_ha.toLocaleString("pt-BR")} ha pra{" "}
           {tr.soja?.to_ha.toLocaleString("pt-BR")} ha — aumento de{" "}
           {tr.soja?.change_pct > 0 ? "+" : ""}
@@ -1244,7 +1244,7 @@ function UsoDoSoloTab() {
       </div>
 
       <div className="overflow-x-auto">
-        <h3 className="text-sm font-semibold text-text-primary mb-3">
+        <h3 className="text-sm font-semibold text-foreground mb-3">
           Evolução da soja (1985 → 2023)
         </h3>
         <div
@@ -1260,7 +1260,7 @@ function UsoDoSoloTab() {
                 className="group relative flex flex-1 flex-col items-center justify-end"
                 style={{ height: "180px" }}
               >
-                <div className="absolute -top-6 hidden rounded bg-bg-surface-alt px-2 py-1 text-[10px] text-text-secondary shadow-lg group-hover:block">
+                <div className="absolute -top-6 hidden rounded bg-muted px-2 py-1 text-[10px] text-muted-foreground shadow-lg group-hover:block">
                   {entry.year}: {entry.area_ha.toLocaleString("pt-BR")} ha
                 </div>
                 <div
@@ -1271,7 +1271,7 @@ function UsoDoSoloTab() {
                   }}
                 />
                 {entry.year % 5 === 0 && (
-                  <span className="mt-1 text-[9px] text-text-dim">
+                  <span className="mt-1 text-[9px] text-stone-400">
                     {entry.year}
                   </span>
                 )}
@@ -1302,7 +1302,7 @@ function SateliteTab() {
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-text-secondary">
+      <p className="text-sm text-muted-foreground">
         Dados de {lst ? 6 : 5} satelites NASA processados para Cruz Alta — agua subterranea,
         umidade do solo por microondas, chuva por radar, evapotranspiracao{lst ? ", temperatura de superficie" : ""} e
         variaveis climaticas estendidas.
@@ -1314,8 +1314,8 @@ function SateliteTab() {
             onClick={() => setSubTab(t.key)}
             className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
               subTab === t.key
-                ? "bg-primary/20 text-primary-light"
-                : "bg-bg-surface text-text-muted hover:bg-bg-surface-alt"
+                ? "bg-forest-100 text-primary"
+                : "bg-card text-muted-foreground hover:bg-muted"
             }`}
           >
             {t.label}
@@ -1372,12 +1372,12 @@ function GraceSection() {
         />
       </div>
 
-      <div className="rounded-xl border-2 border-primary bg-primary/5 p-5">
-        <p className="text-xs font-medium tracking-wider text-primary-light uppercase">
+      <div className="rounded-[16px] border-2 border-primary bg-forest-50 p-5">
+        <p className="text-xs font-medium tracking-wider text-primary uppercase">
           O que isso significa pro produtor
         </p>
-        <p className="mt-2 text-sm text-text-secondary">
-          A regiao de Cruz Alta esta <strong className="text-primary-light">ganhando agua subterranea</strong> — +{trend.change_cm.toFixed(1)} cm
+        <p className="mt-2 text-sm text-muted-foreground">
+          A regiao de Cruz Alta esta <strong className="text-primary">ganhando agua subterranea</strong> — +{trend.change_cm.toFixed(1)} cm
           em 22 anos de medicao por satelite. Isso indica que o lencol freatico esta se recarregando,
           o que e bom sinal para periodos de seca. Setembro e o mes com maior reserva, e fevereiro
           o menor — coincide com o pico de consumo da soja.
@@ -1385,10 +1385,10 @@ function GraceSection() {
       </div>
 
       <div>
-        <h3 className="text-sm font-semibold text-text-primary mb-3">
+        <h3 className="text-sm font-semibold text-foreground mb-3">
           Sazonalidade da agua subterranea (media mensal)
         </h3>
-        <div className="rounded-lg border border-border bg-bg-surface p-4">
+        <div className="rounded-lg border border-border bg-card p-4">
           <div className="flex items-end gap-2" style={{ height: 180 }}>
             {clim.map((m, i) => {
               const val = m.avg_tws_anomaly_cm;
@@ -1421,12 +1421,12 @@ function GraceSection() {
                       )}
                     </div>
                   </div>
-                  <span className="mt-1 text-[10px] text-text-dim">{MONTH_NAMES[i]}</span>
+                  <span className="mt-1 text-[10px] text-stone-400">{MONTH_NAMES[i]}</span>
                 </div>
               );
             })}
           </div>
-          <div className="mt-2 flex items-center gap-4 text-xs text-text-muted">
+          <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
               <span className="inline-block h-2.5 w-2.5 rounded-sm bg-sky-500" /> Acima da media
             </span>
@@ -1438,10 +1438,10 @@ function GraceSection() {
       </div>
 
       <div>
-        <h3 className="text-sm font-semibold text-text-primary mb-3">
+        <h3 className="text-sm font-semibold text-foreground mb-3">
           Tendencia anual (2002-2024)
         </h3>
-        <div className="rounded-lg border border-border bg-bg-surface p-4">
+        <div className="rounded-lg border border-border bg-card p-4">
           <div className="flex items-end gap-[3px]" style={{ height: 160, minWidth: annualAvg.length * 20 }}>
             {annualAvg.map((a) => {
               const pct = ((a.avg - minY) / rangeY) * 100;
@@ -1456,11 +1456,11 @@ function GraceSection() {
                     className="absolute bottom-0 w-full rounded-t-sm transition-opacity group-hover:opacity-80"
                     style={{ height: `${Math.max(pct, 2)}%`, backgroundColor: color }}
                   />
-                  <div className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-bg-base px-2 py-1 text-xs shadow-lg">
+                  <div className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-card px-2 py-1 text-xs shadow-lg">
                     {a.year}: {a.avg.toFixed(1)} cm
                   </div>
                   {a.year % 4 === 0 && (
-                    <span className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[9px] text-text-dim">{a.year}</span>
+                    <span className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[9px] text-stone-400">{a.year}</span>
                   )}
                 </div>
               );
@@ -1469,7 +1469,7 @@ function GraceSection() {
         </div>
       </div>
 
-      <p className="text-[10px] text-text-dim border-t border-border pt-3">
+      <p className="text-[10px] text-stone-400 border-t border-border pt-3">
         Fonte: {grace.source} | {grace.period} | Unidade: {grace.unit}
       </p>
     </div>
@@ -1507,11 +1507,11 @@ function SmapSection() {
         />
       </div>
 
-      <div className="rounded-xl border border-accent/30 bg-accent/5 p-5">
+      <div className="rounded-[16px] border border-forest-200 bg-forest-50 p-5">
         <p className="text-xs font-medium tracking-wider text-accent uppercase">
           Interpretacao
         </p>
-        <p className="mt-2 text-sm text-text-secondary">
+        <p className="mt-2 text-sm text-muted-foreground">
           O SMAP mede a umidade real do solo por microondas (9km de resolucao). Em Cruz Alta,
           o solo fica mais seco em <strong>dezembro-janeiro</strong> — justamente quando a soja
           mais precisa de agua. O inverno (junho-julho) e o periodo mais umido. Manter cobertura
@@ -1520,10 +1520,10 @@ function SmapSection() {
       </div>
 
       <div>
-        <h3 className="text-sm font-semibold text-text-primary mb-3">
+        <h3 className="text-sm font-semibold text-foreground mb-3">
           Umidade do solo por mes (SMAP, media 2015-2025)
         </h3>
-        <div className="rounded-lg border border-border bg-bg-surface p-4">
+        <div className="rounded-lg border border-border bg-card p-4">
           <div className="flex items-end gap-2" style={{ height: 160 }}>
             {clim.map((m, i) => {
               const pct = (m.avg_soil_moisture / maxMoist) * 100;
@@ -1535,16 +1535,16 @@ function SmapSection() {
                       className="w-full max-w-8 rounded-t-sm transition-opacity group-hover:opacity-80"
                       style={{ height: `${pct}%`, backgroundColor: color }}
                     />
-                    <div className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-bg-base px-2 py-1 text-xs shadow-lg">
+                    <div className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-card px-2 py-1 text-xs shadow-lg">
                       {(m.avg_soil_moisture * 100).toFixed(1)}%
                     </div>
                   </div>
-                  <span className="mt-1 text-[10px] text-text-dim">{MONTH_NAMES[i]}</span>
+                  <span className="mt-1 text-[10px] text-stone-400">{MONTH_NAMES[i]}</span>
                 </div>
               );
             })}
           </div>
-          <div className="mt-2 flex items-center gap-4 text-xs text-text-muted">
+          <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
               <span className="inline-block h-2.5 w-2.5 rounded-sm bg-sky-500" /> Umido ({">"}28%)
             </span>
@@ -1552,17 +1552,17 @@ function SmapSection() {
               <span className="inline-block h-2.5 w-2.5 rounded-sm bg-amber-500" /> Medio (22-28%)
             </span>
             <span className="flex items-center gap-1">
-              <span className="inline-block h-2.5 w-2.5 rounded-sm bg-red-500" /> Seco ({"<"}22%)
+              <span className="inline-block h-2.5 w-2.5 rounded-sm bg-destructive" /> Seco ({"<"}22%)
             </span>
           </div>
         </div>
       </div>
 
       <div>
-        <h3 className="text-sm font-semibold text-text-primary mb-3">
+        <h3 className="text-sm font-semibold text-foreground mb-3">
           Tendencia anual (SMAP 2015-2025)
         </h3>
-        <div className="rounded-lg border border-border bg-bg-surface p-4">
+        <div className="rounded-lg border border-border bg-card p-4">
           <div className="flex items-end gap-2" style={{ height: 140 }}>
             {trend.map((t) => {
               const pct = ((t.avg - minTrend) / rangeTrend) * 80 + 10;
@@ -1573,11 +1573,11 @@ function SmapSection() {
                       className="w-full max-w-10 rounded-t-sm bg-sky-500 transition-opacity group-hover:opacity-80"
                       style={{ height: `${pct}%` }}
                     />
-                    <div className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-bg-base px-2 py-1 text-xs shadow-lg">
+                    <div className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-card px-2 py-1 text-xs shadow-lg">
                       {t.year}: {(t.avg * 100).toFixed(1)}%
                     </div>
                   </div>
-                  <span className="mt-1 text-[10px] text-text-dim">{t.year}</span>
+                  <span className="mt-1 text-[10px] text-stone-400">{t.year}</span>
                 </div>
               );
             })}
@@ -1586,10 +1586,10 @@ function SmapSection() {
       </div>
 
       <div>
-        <h3 className="text-sm font-semibold text-text-primary mb-3">
+        <h3 className="text-sm font-semibold text-foreground mb-3">
           Serie temporal completa ({smap.timeseries.length} meses, 2015-2025)
         </h3>
-        <div className="rounded-lg border border-border bg-bg-surface p-4 overflow-x-auto">
+        <div className="rounded-lg border border-border bg-card p-4 overflow-x-auto">
           <div className="flex items-end gap-[1px]" style={{ height: 180, minWidth: smap.timeseries.length * 4 }}>
             {(() => {
               const ts = smap.timeseries;
@@ -1606,25 +1606,25 @@ function SmapSection() {
                       className="absolute bottom-0 w-full rounded-t-sm transition-opacity group-hover:opacity-80"
                       style={{ height: `${pct}%`, backgroundColor: color }}
                     />
-                    <div className="absolute -top-14 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-bg-base px-2 py-1 text-xs shadow-lg">
+                    <div className="absolute -top-14 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-card px-2 py-1 text-xs shadow-lg">
                       <p className="font-semibold">{t.date}</p>
                       <p>{(t.soil_moisture * 100).toFixed(1)}% ({t.n_images} imgs)</p>
                     </div>
                     {isJan && (
-                      <span className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[8px] text-text-dim">{t.year}</span>
+                      <span className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[8px] text-stone-400">{t.year}</span>
                     )}
                   </div>
                 );
               });
             })()}
           </div>
-          <p className="mt-5 text-xs text-text-muted">
+          <p className="mt-5 text-xs text-muted-foreground">
             Cada barra = 1 mes. Passe o mouse para ver data e valor exato.
           </p>
         </div>
       </div>
 
-      <p className="text-[10px] text-text-dim border-t border-border pt-3">
+      <p className="text-[10px] text-stone-400 border-t border-border pt-3">
         Fonte: {smap.source} | {smap.period} | Unidade: {smap.unit}
       </p>
     </div>
@@ -1663,10 +1663,10 @@ function GpmSection() {
       </div>
 
       <div>
-        <h3 className="text-sm font-semibold text-text-primary mb-3">
+        <h3 className="text-sm font-semibold text-foreground mb-3">
           Chuva media mensal (GPM satelite, 1998-2025)
         </h3>
-        <div className="rounded-lg border border-border bg-bg-surface p-4">
+        <div className="rounded-lg border border-border bg-card p-4">
           <div className="flex items-end gap-2" style={{ height: 160 }}>
             {clim.map((m, i) => {
               const pct = (m.avg_precip_mm / maxMonth) * 100;
@@ -1678,11 +1678,11 @@ function GpmSection() {
                       className="w-full max-w-8 rounded-t-sm transition-opacity group-hover:opacity-80"
                       style={{ height: `${pct}%`, backgroundColor: color }}
                     />
-                    <div className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-bg-base px-2 py-1 text-xs shadow-lg">
+                    <div className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-card px-2 py-1 text-xs shadow-lg">
                       {m.avg_precip_mm.toFixed(0)} mm
                     </div>
                   </div>
-                  <span className="mt-1 text-[10px] text-text-dim">{MONTH_NAMES[i]}</span>
+                  <span className="mt-1 text-[10px] text-stone-400">{MONTH_NAMES[i]}</span>
                 </div>
               );
             })}
@@ -1691,10 +1691,10 @@ function GpmSection() {
       </div>
 
       <div>
-        <h3 className="text-sm font-semibold text-text-primary mb-3">
+        <h3 className="text-sm font-semibold text-foreground mb-3">
           Chuva total por ano (GPM satelite)
         </h3>
-        <div className="rounded-lg border border-border bg-bg-surface p-4 overflow-x-auto">
+        <div className="rounded-lg border border-border bg-card p-4 overflow-x-auto">
           <div className="flex items-end gap-[2px]" style={{ height: 160, minWidth: annuals.length * 14 }}>
             {annuals.map((a) => {
               const pct = ((a.total_mm - minAnn) / rangeAnn) * 85 + 10;
@@ -1705,11 +1705,11 @@ function GpmSection() {
                     className="absolute bottom-0 w-full rounded-t-sm transition-opacity group-hover:opacity-80"
                     style={{ height: `${pct}%`, backgroundColor: color }}
                   />
-                  <div className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-bg-base px-2 py-1 text-xs shadow-lg">
+                  <div className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-card px-2 py-1 text-xs shadow-lg">
                     {a.year}: {a.total_mm.toFixed(0)} mm
                   </div>
                   {a.year % 5 === 0 && (
-                    <span className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[9px] text-text-dim">{a.year}</span>
+                    <span className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[9px] text-stone-400">{a.year}</span>
                   )}
                 </div>
               );
@@ -1718,31 +1718,31 @@ function GpmSection() {
         </div>
       </div>
 
-      <div className="rounded-xl border-2 border-sky-500/30 bg-sky-500/5 p-5">
+      <div className="rounded-[16px] border-2 border-status-info/20 bg-status-info-bg p-5">
         <p className="text-xs font-medium tracking-wider text-sky-600 uppercase">
           Tendencia de longo prazo
         </p>
         <div className="mt-3 grid gap-4 sm:grid-cols-3">
-          <div className="rounded-lg border border-border bg-bg-surface p-4 text-center">
-            <p className="text-2xl font-bold text-text-secondary">
+          <div className="rounded-lg border border-border bg-card p-4 text-center">
+            <p className="text-2xl font-bold text-muted-foreground">
               {gpm.trend.first_half_avg_mm.toFixed(0)} mm
             </p>
-            <p className="text-xs text-text-dim">Media 1a metade (1998-2011)</p>
+            <p className="text-xs text-stone-400">Media 1a metade (1998-2011)</p>
           </div>
           <div className="flex items-center justify-center">
-            <div className="rounded-lg border border-sky-500/30 bg-sky-500/10 px-4 py-2">
+            <div className="rounded-lg border border-status-info/20 bg-status-info-bg px-4 py-2">
               <p className="text-2xl font-bold text-sky-600">+{gpm.trend.change_pct}%</p>
-              <p className="text-xs text-text-dim">Aumento</p>
+              <p className="text-xs text-stone-400">Aumento</p>
             </div>
           </div>
-          <div className="rounded-lg border border-border bg-bg-surface p-4 text-center">
+          <div className="rounded-lg border border-border bg-card p-4 text-center">
             <p className="text-2xl font-bold text-sky-600">
               {gpm.trend.second_half_avg_mm.toFixed(0)} mm
             </p>
-            <p className="text-xs text-text-dim">Media 2a metade (2012-2025)</p>
+            <p className="text-xs text-stone-400">Media 2a metade (2012-2025)</p>
           </div>
         </div>
-        <p className="mt-3 text-sm text-text-secondary">
+        <p className="mt-3 text-sm text-muted-foreground">
           A chuva media anual aumentou {gpm.trend.change_pct}% entre a primeira e a segunda metade
           do periodo medido pelo GPM. Mais chuva e bom para a soja, mas chuvas mais concentradas
           aumentam o risco de enxurrada e erosao.
@@ -1750,10 +1750,10 @@ function GpmSection() {
       </div>
 
       <div>
-        <h3 className="text-sm font-semibold text-text-primary mb-3">
+        <h3 className="text-sm font-semibold text-foreground mb-3">
           Serie temporal completa ({gpm.timeseries.length} meses, 1998-2025)
         </h3>
-        <div className="rounded-lg border border-border bg-bg-surface p-4 overflow-x-auto">
+        <div className="rounded-lg border border-border bg-card p-4 overflow-x-auto">
           <div className="flex items-end gap-[1px]" style={{ height: 180, minWidth: gpm.timeseries.length * 3 }}>
             {(() => {
               const ts = gpm.timeseries;
@@ -1768,25 +1768,25 @@ function GpmSection() {
                       className="absolute bottom-0 w-full rounded-t-sm transition-opacity group-hover:opacity-80"
                       style={{ height: `${Math.max(pct, 1)}%`, backgroundColor: color }}
                     />
-                    <div className="absolute -top-14 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-bg-base px-2 py-1 text-xs shadow-lg">
+                    <div className="absolute -top-14 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-card px-2 py-1 text-xs shadow-lg">
                       <p className="font-semibold">{t.date}</p>
                       <p>{t.precip_mm_month.toFixed(0)} mm</p>
                     </div>
                     {isJan && t.year % 3 === 0 && (
-                      <span className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[8px] text-text-dim">{t.year}</span>
+                      <span className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[8px] text-stone-400">{t.year}</span>
                     )}
                   </div>
                 );
               });
             })()}
           </div>
-          <p className="mt-5 text-xs text-text-muted">
+          <p className="mt-5 text-xs text-muted-foreground">
             Cada barra = 1 mes. Padrao sazonal visivel: picos no verao, vales no inverno. Passe o mouse para detalhes.
           </p>
         </div>
       </div>
 
-      <p className="text-[10px] text-text-dim border-t border-border pt-3">
+      <p className="text-[10px] text-stone-400 border-t border-border pt-3">
         Fonte: {gpm.source} | {gpm.period} | Unidade: {gpm.unit_monthly}
       </p>
     </div>
@@ -1826,11 +1826,11 @@ function ETSection() {
         />
       </div>
 
-      <div className="rounded-xl border border-accent/30 bg-accent/5 p-5">
+      <div className="rounded-[16px] border border-forest-200 bg-forest-50 p-5">
         <p className="text-xs font-medium tracking-wider text-accent uppercase">
           Por que isso importa
         </p>
-        <p className="mt-2 text-sm text-text-secondary">
+        <p className="mt-2 text-sm text-muted-foreground">
           A evapotranspiracao mostra quanta agua a planta e o solo perdem por dia.
           No verao, Cruz Alta perde <strong>{summerAvg.toFixed(1)} mm/dia</strong> — se nao chover
           por 10 dias, sao {(summerAvg * 10).toFixed(0)} mm de deficit. Cobertura morta (palha) reduz
@@ -1839,10 +1839,10 @@ function ETSection() {
       </div>
 
       <div>
-        <h3 className="text-sm font-semibold text-text-primary mb-3">
+        <h3 className="text-sm font-semibold text-foreground mb-3">
           Evapotranspiracao mensal (media 1981-2025)
         </h3>
-        <div className="rounded-lg border border-border bg-bg-surface p-4">
+        <div className="rounded-lg border border-border bg-card p-4">
           <div className="flex items-end gap-2" style={{ height: 160 }}>
             {et.map((m, i) => {
               const pct = (m.value / maxET) * 100;
@@ -1851,56 +1851,56 @@ function ETSection() {
                   <div className="relative flex-1 w-full flex items-end justify-center">
                     <div className="flex gap-0.5 items-end w-full max-w-8">
                       <div
-                        className="flex-1 rounded-t-sm bg-orange-500 transition-opacity group-hover:opacity-80"
+                        className="flex-1 rounded-t-sm bg-ember-500 transition-opacity group-hover:opacity-80"
                         style={{ height: `${pct}%` }}
                         title={`ET: ${m.value.toFixed(1)} mm/dia`}
                       />
                       <div
-                        className="flex-1 rounded-t-sm bg-emerald-500 transition-opacity group-hover:opacity-80"
+                        className="flex-1 rounded-t-sm bg-leaf-500 transition-opacity group-hover:opacity-80"
                         style={{ height: `${(land[i].value / maxET) * 100}%` }}
                         title={`Solo: ${land[i].value.toFixed(1)} mm/dia`}
                       />
                     </div>
-                    <div className="absolute -top-14 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-bg-base px-2 py-1 text-xs shadow-lg">
+                    <div className="absolute -top-14 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-card px-2 py-1 text-xs shadow-lg">
                       <p>ET total: {m.value.toFixed(2)} mm/dia</p>
                       <p>Solo: {land[i].value.toFixed(2)} mm/dia</p>
                     </div>
                   </div>
-                  <span className="mt-1 text-[10px] text-text-dim">{MONTH_NAMES[i]}</span>
+                  <span className="mt-1 text-[10px] text-stone-400">{MONTH_NAMES[i]}</span>
                 </div>
               );
             })}
           </div>
-          <div className="mt-2 flex items-center gap-4 text-xs text-text-muted">
+          <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
-              <span className="inline-block h-2.5 w-2.5 rounded-sm bg-orange-500" /> Evapotranspiracao total
+              <span className="inline-block h-2.5 w-2.5 rounded-sm bg-ember-500" /> Evapotranspiracao total
             </span>
             <span className="flex items-center gap-1">
-              <span className="inline-block h-2.5 w-2.5 rounded-sm bg-emerald-500" /> Evaporacao do solo
+              <span className="inline-block h-2.5 w-2.5 rounded-sm bg-leaf-500" /> Evaporacao do solo
             </span>
           </div>
         </div>
       </div>
 
       <div>
-        <h3 className="text-sm font-semibold text-text-primary mb-3">
+        <h3 className="text-sm font-semibold text-foreground mb-3">
           Tendencia anual da ET
         </h3>
-        <div className="rounded-lg border border-border bg-bg-surface p-4 overflow-x-auto">
+        <div className="rounded-lg border border-border bg-card p-4 overflow-x-auto">
           <div className="flex items-end gap-[2px]" style={{ height: 140, minWidth: trend.length * 12 }}>
             {trend.map((t) => {
               const pct = ((t.avg - minTrend) / rangeTrend) * 80 + 10;
               return (
                 <div key={t.year} className="group relative flex-1" style={{ height: "100%" }}>
                   <div
-                    className="absolute bottom-0 w-full rounded-t-sm bg-orange-500 transition-opacity group-hover:opacity-80"
+                    className="absolute bottom-0 w-full rounded-t-sm bg-ember-500 transition-opacity group-hover:opacity-80"
                     style={{ height: `${pct}%` }}
                   />
-                  <div className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-bg-base px-2 py-1 text-xs shadow-lg">
+                  <div className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-card px-2 py-1 text-xs shadow-lg">
                     {t.year}: {t.avg.toFixed(2)} mm/dia
                   </div>
                   {t.year % 5 === 0 && (
-                    <span className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[9px] text-text-dim">{t.year}</span>
+                    <span className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[9px] text-stone-400">{t.year}</span>
                   )}
                 </div>
               );
@@ -1909,7 +1909,7 @@ function ETSection() {
         </div>
       </div>
 
-      <p className="text-[10px] text-text-dim border-t border-border pt-3">
+      <p className="text-[10px] text-stone-400 border-t border-border pt-3">
         Fonte: {evapotranspiration.source} | {evapotranspiration.period} | Unidade: {evapotranspiration.unit}
       </p>
     </div>
@@ -1943,11 +1943,11 @@ function LstSection() {
         />
       </div>
 
-      <div className="rounded-xl border-2 border-orange-500/30 bg-orange-500/5 p-5">
-        <p className="text-xs font-medium tracking-wider text-orange-600 uppercase">
+      <div className="rounded-[16px] border-2 border-ember-500/20 bg-status-serious-bg p-5">
+        <p className="text-xs font-medium tracking-wider text-ember-600 uppercase">
           Por que a temperatura do solo importa
         </p>
-        <p className="mt-2 text-sm text-text-secondary">
+        <p className="mt-2 text-sm text-muted-foreground">
           A temperatura da superficie (LST) e diferente da temperatura do ar. Solo exposto no verao
           pode atingir <strong>50-60 C</strong> enquanto o ar esta a 35 C. Cobertura vegetal (palha ou
           cultura de cobertura) reduz a LST em 10-20 C, protegendo a biologia do solo e reduzindo a
@@ -1956,10 +1956,10 @@ function LstSection() {
       </div>
 
       <div>
-        <h3 className="text-sm font-semibold text-text-primary mb-3">
+        <h3 className="text-sm font-semibold text-foreground mb-3">
           Temperatura da superficie por mes (dia vs noite)
         </h3>
-        <div className="rounded-lg border border-border bg-bg-surface p-4">
+        <div className="rounded-lg border border-border bg-card p-4">
           <div className="flex items-end gap-2" style={{ height: 180 }}>
             {clim.map((m, i) => {
               const dayVal = m.avg_lst_day_c;
@@ -1972,7 +1972,7 @@ function LstSection() {
                   <div className="relative flex-1 w-full flex items-end justify-center">
                     <div className="flex gap-0.5 items-end w-full max-w-8">
                       <div
-                        className="flex-1 rounded-t-sm bg-orange-500 transition-opacity group-hover:opacity-80"
+                        className="flex-1 rounded-t-sm bg-ember-500 transition-opacity group-hover:opacity-80"
                         style={{ height: `${dayPct}%` }}
                       />
                       <div
@@ -1980,19 +1980,19 @@ function LstSection() {
                         style={{ height: `${Math.max(nightPct, 2)}%` }}
                       />
                     </div>
-                    <div className="absolute -top-14 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-bg-base px-2 py-1 text-xs shadow-lg">
+                    <div className="absolute -top-14 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-card px-2 py-1 text-xs shadow-lg">
                       <p>Dia: {dayVal.toFixed(1)} C</p>
                       <p>Noite: {nightVal?.toFixed(1) ?? "—"} C</p>
                     </div>
                   </div>
-                  <span className="mt-1 text-[10px] text-text-dim">{MONTH_NAMES[i]}</span>
+                  <span className="mt-1 text-[10px] text-stone-400">{MONTH_NAMES[i]}</span>
                 </div>
               );
             })}
           </div>
-          <div className="mt-2 flex items-center gap-4 text-xs text-text-muted">
+          <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
-              <span className="inline-block h-2.5 w-2.5 rounded-sm bg-orange-500" /> Dia (superficie)
+              <span className="inline-block h-2.5 w-2.5 rounded-sm bg-ember-500" /> Dia (superficie)
             </span>
             <span className="flex items-center gap-1">
               <span className="inline-block h-2.5 w-2.5 rounded-sm bg-indigo-500" /> Noite (superficie)
@@ -2002,21 +2002,21 @@ function LstSection() {
       </div>
 
       {lst.trend && (
-        <div className="rounded-xl border border-orange-500/20 bg-orange-500/5 p-5">
+        <div className="rounded-[16px] border border-ember-500/20 bg-status-serious-bg p-5">
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="text-center">
-              <p className="text-2xl font-bold text-text-secondary">{lst.trend.first_half_avg_c} C</p>
-              <p className="text-xs text-text-dim">1a metade</p>
+              <p className="text-2xl font-bold text-muted-foreground">{lst.trend.first_half_avg_c} C</p>
+              <p className="text-xs text-stone-400">1a metade</p>
             </div>
             <div className="flex items-center justify-center">
-              <div className="rounded-lg border border-orange-500/30 bg-orange-500/10 px-4 py-2">
-                <p className="text-2xl font-bold text-orange-600">{lst.trend.change_c > 0 ? "+" : ""}{lst.trend.change_c} C</p>
-                <p className="text-xs text-text-dim">{lst.trend.direction}</p>
+              <div className="rounded-lg border border-ember-500/20 bg-status-serious-bg px-4 py-2">
+                <p className="text-2xl font-bold text-ember-600">{lst.trend.change_c > 0 ? "+" : ""}{lst.trend.change_c} C</p>
+                <p className="text-xs text-stone-400">{lst.trend.direction}</p>
               </div>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-orange-600">{lst.trend.second_half_avg_c} C</p>
-              <p className="text-xs text-text-dim">2a metade</p>
+              <p className="text-2xl font-bold text-ember-600">{lst.trend.second_half_avg_c} C</p>
+              <p className="text-xs text-stone-400">2a metade</p>
             </div>
           </div>
         </div>
@@ -2024,10 +2024,10 @@ function LstSection() {
 
       {trend.length > 0 && (
         <div>
-          <h3 className="text-sm font-semibold text-text-primary mb-3">
+          <h3 className="text-sm font-semibold text-foreground mb-3">
             Tendencia anual da LST diurna ({trend[0].year}-{trend[trend.length - 1].year})
           </h3>
-          <div className="rounded-lg border border-border bg-bg-surface p-4 overflow-x-auto">
+          <div className="rounded-lg border border-border bg-card p-4 overflow-x-auto">
             {(() => {
               const minT = Math.min(...trend.map((t) => t.avg_lst_day_c));
               const maxT = Math.max(...trend.map((t) => t.avg_lst_day_c));
@@ -2039,14 +2039,14 @@ function LstSection() {
                     return (
                       <div key={t.year} className="group relative flex-1" style={{ height: "100%" }}>
                         <div
-                          className="absolute bottom-0 w-full rounded-t-sm bg-orange-500 transition-opacity group-hover:opacity-80"
+                          className="absolute bottom-0 w-full rounded-t-sm bg-ember-500 transition-opacity group-hover:opacity-80"
                           style={{ height: `${pct}%` }}
                         />
-                        <div className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-bg-base px-2 py-1 text-xs shadow-lg">
+                        <div className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-card px-2 py-1 text-xs shadow-lg">
                           {t.year}: {t.avg_lst_day_c} C
                         </div>
                         {t.year % 4 === 0 && (
-                          <span className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[9px] text-text-dim">{t.year}</span>
+                          <span className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[9px] text-stone-400">{t.year}</span>
                         )}
                       </div>
                     );
@@ -2058,7 +2058,7 @@ function LstSection() {
         </div>
       )}
 
-      <p className="text-[10px] text-text-dim border-t border-border pt-3">
+      <p className="text-[10px] text-stone-400 border-t border-border pt-3">
         Fonte: {lst.source} | {lst.period} | Resolucao: {lst.resolution}
       </p>
     </div>
@@ -2081,10 +2081,10 @@ function ClimaExtSection() {
           const p = params[item.key];
           const maxVal = Math.max(...p.monthly.map((m) => m.value));
           return (
-            <div key={item.key} className="rounded-lg border border-border bg-bg-surface p-4">
+            <div key={item.key} className="rounded-lg border border-border bg-card p-4">
               <div className="flex items-baseline justify-between mb-3">
-                <h3 className="text-sm font-semibold text-text-primary">{item.label}</h3>
-                <span className="text-xs text-text-dim">{p.unit}</span>
+                <h3 className="text-sm font-semibold text-foreground">{item.label}</h3>
+                <span className="text-xs text-stone-400">{p.unit}</span>
               </div>
               <div className="flex items-end gap-1.5" style={{ height: 100 }}>
                 {p.monthly.map((m, i) => {
@@ -2096,45 +2096,45 @@ function ClimaExtSection() {
                           className="w-full max-w-6 rounded-t-sm transition-opacity group-hover:opacity-80"
                           style={{ height: `${pct}%`, backgroundColor: item.color }}
                         />
-                        <div className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-bg-base px-2 py-1 text-xs shadow-lg">
+                        <div className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-card px-2 py-1 text-xs shadow-lg">
                           {m.value.toFixed(1)} {p.unit}
                         </div>
                       </div>
-                      <span className="mt-0.5 text-[8px] text-text-dim">{MONTH_NAMES[i]}</span>
+                      <span className="mt-0.5 text-[8px] text-stone-400">{MONTH_NAMES[i]}</span>
                     </div>
                   );
                 })}
               </div>
-              <p className="mt-2 text-xs text-text-muted">{p.description}</p>
+              <p className="mt-2 text-xs text-muted-foreground">{p.description}</p>
             </div>
           );
         })}
       </div>
 
-      <div className="rounded-xl border border-primary/30 bg-primary/5 p-5">
-        <p className="text-xs font-medium tracking-wider text-primary-light uppercase">
+      <div className="rounded-[16px] border border-forest-200 bg-forest-50 p-5">
+        <p className="text-xs font-medium tracking-wider text-primary uppercase">
           Resumo climatico completo
         </p>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          <p className="text-sm text-text-secondary">
-            <strong className="text-text-primary">Radiacao solar:</strong> Pico em janeiro
+          <p className="text-sm text-muted-foreground">
+            <strong className="text-foreground">Radiacao solar:</strong> Pico em janeiro
             ({params.solar_radiation.monthly[0].value.toFixed(1)} {params.solar_radiation.unit}),
             minimo em junho ({params.solar_radiation.monthly[5].value.toFixed(1)}).
             Alta radiacao no verao acelera evapotranspiracao.
           </p>
-          <p className="text-sm text-text-secondary">
-            <strong className="text-text-primary">Umidade relativa:</strong> Fica entre{" "}
+          <p className="text-sm text-muted-foreground">
+            <strong className="text-foreground">Umidade relativa:</strong> Fica entre{" "}
             {Math.min(...params.relative_humidity.monthly.map((m) => m.value)).toFixed(0)}% e{" "}
             {Math.max(...params.relative_humidity.monthly.map((m) => m.value)).toFixed(0)}%.
             Umidade baixa + vento = mais perda de agua.
           </p>
-          <p className="text-sm text-text-secondary">
-            <strong className="text-text-primary">Vento:</strong> Media de{" "}
+          <p className="text-sm text-muted-foreground">
+            <strong className="text-foreground">Vento:</strong> Media de{" "}
             {(params.wind_speed_2m.monthly.reduce((s, m) => s + m.value, 0) / 12).toFixed(1)} m/s.
             Ventos mais fortes em setembro-outubro, quando o solo pode estar exposto.
           </p>
-          <p className="text-sm text-text-secondary">
-            <strong className="text-text-primary">Temperatura:</strong> Media anual de{" "}
+          <p className="text-sm text-muted-foreground">
+            <strong className="text-foreground">Temperatura:</strong> Media anual de{" "}
             {(params.temperature.monthly.reduce((s, m) => s + m.value, 0) / 12).toFixed(1)} graus.
             Janeiro mais quente ({params.temperature.monthly[0].value.toFixed(1)} graus), julho mais frio
             ({params.temperature.monthly[6].value.toFixed(1)} graus).
@@ -2142,7 +2142,7 @@ function ClimaExtSection() {
         </div>
       </div>
 
-      <p className="text-[10px] text-text-dim border-t border-border pt-3">
+      <p className="text-[10px] text-stone-400 border-t border-border pt-3">
         Fonte: {climateExt.source} | {climateExt.period}
       </p>
     </div>
@@ -2305,7 +2305,7 @@ function GlossarioTab() {
   return (
     <div className="space-y-8">
       <div>
-        <p className="text-sm text-text-secondary">
+        <p className="text-sm text-muted-foreground">
           Termos cientificos explicados de forma simples. Clique em qualquer
           termo para ver a explicacao completa com exemplos de Cruz Alta.
         </p>
@@ -2318,7 +2318,7 @@ function GlossarioTab() {
               className="h-3 w-3 rounded-full"
               style={{ backgroundColor: section.color }}
             />
-            <h3 className="text-sm font-semibold text-text-primary">
+            <h3 className="text-sm font-semibold text-foreground">
               {section.title}
             </h3>
           </div>
@@ -2329,7 +2329,7 @@ function GlossarioTab() {
               return (
                 <div
                   key={entry.term}
-                  className="rounded-xl border border-border bg-bg-surface overflow-hidden"
+                  className="rounded-[16px] border border-border bg-card overflow-hidden"
                 >
                   <button
                     onClick={() =>
@@ -2344,34 +2344,34 @@ function GlossarioTab() {
                       {isOpen ? "-" : "+"}
                     </span>
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-text-primary">
+                      <p className="text-sm font-semibold text-foreground">
                         {entry.term}
                       </p>
-                      <p className="mt-0.5 text-sm text-text-secondary">
+                      <p className="mt-0.5 text-sm text-muted-foreground">
                         {entry.simple}
                       </p>
                     </div>
                   </button>
 
                   {isOpen && (
-                    <div className="border-t border-border bg-bg-base px-4 pb-4 pt-3 space-y-3">
+                    <div className="border-t border-border bg-card px-4 pb-4 pt-3 space-y-3">
                       <div>
-                        <p className="text-xs font-medium text-text-dim uppercase tracking-wider">
+                        <p className="text-xs font-medium text-stone-400 uppercase tracking-wider">
                           Como funciona
                         </p>
-                        <p className="mt-1 text-sm text-text-secondary leading-relaxed">
+                        <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
                           {entry.detail}
                         </p>
                       </div>
-                      <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
-                        <p className="text-xs font-medium text-primary-light uppercase tracking-wider">
+                      <div className="rounded-lg border border-forest-100 bg-forest-50 p-3">
+                        <p className="text-xs font-medium text-primary uppercase tracking-wider">
                           Exemplo em Cruz Alta
                         </p>
-                        <p className="mt-1 text-sm text-text-primary leading-relaxed">
+                        <p className="mt-1 text-sm text-foreground leading-relaxed">
                           {entry.example}
                         </p>
                       </div>
-                      <p className="text-[11px] text-text-dim">
+                      <p className="text-[11px] text-stone-400">
                         Veja os dados: {entry.where}
                       </p>
                     </div>
@@ -2387,13 +2387,13 @@ function GlossarioTab() {
       <div className="space-y-4">
         <div className="flex items-center gap-2">
           <div className="h-3 w-3 rounded-full bg-text-primary" />
-          <h3 className="text-sm font-semibold text-text-primary">
+          <h3 className="text-sm font-semibold text-foreground">
             Satelite vs Medicao no Chao — qual e melhor?
           </h3>
         </div>
 
-        <div className="rounded-xl border border-border bg-bg-surface p-5 space-y-4">
-          <p className="text-sm text-text-secondary leading-relaxed">
+        <div className="rounded-[16px] border border-border bg-card p-5 space-y-4">
+          <p className="text-sm text-muted-foreground leading-relaxed">
             Nenhum dos dois e perfeito sozinho. A estacao meteorologica (INMET)
             mede com precisao, mas so enxerga o ponto onde esta instalada. O
             satelite enxerga a regiao inteira, mas de longe — como olhar a
@@ -2405,18 +2405,18 @@ function GlossarioTab() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border">
-                  <th className="py-2 px-3 text-left text-xs font-medium text-text-dim" />
-                  <th className="py-2 px-3 text-left text-xs font-medium text-text-dim">
+                  <th className="py-2 px-3 text-left text-xs font-medium text-stone-400" />
+                  <th className="py-2 px-3 text-left text-xs font-medium text-stone-400">
                     Estacao no chao
                   </th>
-                  <th className="py-2 px-3 text-left text-xs font-medium text-text-dim">
+                  <th className="py-2 px-3 text-left text-xs font-medium text-stone-400">
                     Satelite
                   </th>
                 </tr>
               </thead>
-              <tbody className="text-text-secondary">
+              <tbody className="text-muted-foreground">
                 <tr className="border-b border-border/50">
-                  <td className="py-2 px-3 font-medium text-text-primary">
+                  <td className="py-2 px-3 font-medium text-foreground">
                     Area coberta
                   </td>
                   <td className="py-2 px-3">
@@ -2427,7 +2427,7 @@ function GlossarioTab() {
                   </td>
                 </tr>
                 <tr className="border-b border-border/50">
-                  <td className="py-2 px-3 font-medium text-text-primary">
+                  <td className="py-2 px-3 font-medium text-foreground">
                     Precisao local
                   </td>
                   <td className="py-2 px-3">
@@ -2438,7 +2438,7 @@ function GlossarioTab() {
                   </td>
                 </tr>
                 <tr className="border-b border-border/50">
-                  <td className="py-2 px-3 font-medium text-text-primary">
+                  <td className="py-2 px-3 font-medium text-foreground">
                     Historico
                   </td>
                   <td className="py-2 px-3">
@@ -2449,7 +2449,7 @@ function GlossarioTab() {
                   </td>
                 </tr>
                 <tr className="border-b border-border/50">
-                  <td className="py-2 px-3 font-medium text-text-primary">
+                  <td className="py-2 px-3 font-medium text-foreground">
                     Falhas
                   </td>
                   <td className="py-2 px-3">
@@ -2460,7 +2460,7 @@ function GlossarioTab() {
                   </td>
                 </tr>
                 <tr>
-                  <td className="py-2 px-3 font-medium text-text-primary">
+                  <td className="py-2 px-3 font-medium text-foreground">
                     O que mede
                   </td>
                   <td className="py-2 px-3">
@@ -2476,56 +2476,56 @@ function GlossarioTab() {
         </div>
 
         {/* Validacao cruzada real */}
-        <div className="rounded-xl border border-border bg-bg-surface p-5 space-y-4">
-          <p className="text-xs font-medium text-text-dim uppercase tracking-wider">
+        <div className="rounded-[16px] border border-border bg-card p-5 space-y-4">
+          <p className="text-xs font-medium text-stone-400 uppercase tracking-wider">
             Como conferimos — validacao cruzada em Cruz Alta
           </p>
-          <p className="text-sm text-text-secondary leading-relaxed">
+          <p className="text-sm text-muted-foreground leading-relaxed">
             Comparamos os dados do satelite com os da estacao do INMET em Cruz
             Alta para verificar se batem. Quanto mais proximo de 1.0 a
             correlacao, mais os dois concordam.
           </p>
 
           <div className="grid gap-3 sm:grid-cols-3">
-            <div className="rounded-lg border border-border bg-bg-base p-3 text-center">
-              <p className="text-xs text-text-dim">
+            <div className="rounded-lg border border-border bg-card p-3 text-center">
+              <p className="text-xs text-stone-400">
                 POWER vs INMET (chuva safra)
               </p>
-              <p className="text-2xl font-bold text-emerald-600">0.886</p>
-              <p className="text-xs text-text-muted">
+              <p className="text-2xl font-bold text-leaf-600">0.886</p>
+              <p className="text-xs text-muted-foreground">
                 Correlacao alta — confiavel
               </p>
-              <div className="mt-2 h-1.5 rounded-full bg-bg-surface-alt overflow-hidden">
+              <div className="mt-2 h-1.5 rounded-full bg-muted overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-emerald-500"
+                  className="h-full rounded-full bg-leaf-500"
                   style={{ width: "88.6%" }}
                 />
               </div>
             </div>
-            <div className="rounded-lg border border-border bg-bg-base p-3 text-center">
-              <p className="text-xs text-text-dim">
+            <div className="rounded-lg border border-border bg-card p-3 text-center">
+              <p className="text-xs text-stone-400">
                 Vies do modelo POWER
               </p>
-              <p className="text-2xl font-bold text-emerald-600">+1.8%</p>
-              <p className="text-xs text-text-muted">
+              <p className="text-2xl font-bold text-leaf-600">+1.8%</p>
+              <p className="text-xs text-muted-foreground">
                 Quase igual a estacao
               </p>
-              <div className="mt-2 h-1.5 rounded-full bg-bg-surface-alt overflow-hidden">
+              <div className="mt-2 h-1.5 rounded-full bg-muted overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-emerald-500"
+                  className="h-full rounded-full bg-leaf-500"
                   style={{ width: "98.2%" }}
                 />
               </div>
             </div>
-            <div className="rounded-lg border border-border bg-bg-base p-3 text-center">
-              <p className="text-xs text-text-dim">
+            <div className="rounded-lg border border-border bg-card p-3 text-center">
+              <p className="text-xs text-stone-400">
                 GPM vs POWER (chuva anual)
               </p>
               <p className="text-2xl font-bold text-amber-600">+13.6%</p>
-              <p className="text-xs text-text-muted">
+              <p className="text-xs text-muted-foreground">
                 GPM mede um pouco mais — normal
               </p>
-              <div className="mt-2 h-1.5 rounded-full bg-bg-surface-alt overflow-hidden">
+              <div className="mt-2 h-1.5 rounded-full bg-muted overflow-hidden">
                 <div
                   className="h-full rounded-full bg-amber-500"
                   style={{ width: "86.4%" }}
@@ -2534,7 +2534,7 @@ function GlossarioTab() {
             </div>
           </div>
 
-          <p className="text-sm text-text-secondary leading-relaxed">
+          <p className="text-sm text-muted-foreground leading-relaxed">
             O modelo NASA POWER e a estacao do INMET concordam em 88.6% nas
             chuvas da safra, com apenas 1.8% de diferenca. Ja o satelite GPM
             registra 13.6% a mais de chuva que o POWER — isso acontece porque o
@@ -2545,11 +2545,11 @@ function GlossarioTab() {
         </div>
 
         {/* Resolucao dos satelites */}
-        <div className="rounded-xl border border-border bg-bg-surface p-5 space-y-3">
-          <p className="text-xs font-medium text-text-dim uppercase tracking-wider">
+        <div className="rounded-[16px] border border-border bg-card p-5 space-y-3">
+          <p className="text-xs font-medium text-stone-400 uppercase tracking-wider">
             Resolucao — o tamanho do pixel de cada satelite
           </p>
-          <p className="text-sm text-text-secondary leading-relaxed">
+          <p className="text-sm text-muted-foreground leading-relaxed">
             Cada satelite tem um &quot;tamanho de quadradinho&quot; diferente.
             Quanto menor o quadrado, mais detalhe ele enxerga. Para comparar:
             uma propriedade pequena em Cruz Alta tem cerca de 50 hectares (700m
@@ -2596,10 +2596,10 @@ function GlossarioTab() {
             ].map((sat) => (
               <div
                 key={sat.name}
-                className="flex items-center gap-3 rounded-lg border border-border/50 bg-bg-base p-2.5"
+                className="flex items-center gap-3 rounded-lg border border-border/50 bg-card p-2.5"
               >
                 <div className="w-28 shrink-0">
-                  <p className="text-xs font-semibold text-text-primary">
+                  <p className="text-xs font-semibold text-foreground">
                     {sat.name}
                   </p>
                   <p className="text-[11px] font-bold" style={{ color: sat.color }}>
@@ -2607,7 +2607,7 @@ function GlossarioTab() {
                   </p>
                 </div>
                 <div className="flex-1">
-                  <div className="h-2 rounded-full bg-bg-surface-alt overflow-hidden">
+                  <div className="h-2 rounded-full bg-muted overflow-hidden">
                     <div
                       className="h-full rounded-full"
                       style={{
@@ -2616,25 +2616,25 @@ function GlossarioTab() {
                       }}
                     />
                   </div>
-                  <p className="mt-0.5 text-[11px] text-text-muted">
+                  <p className="mt-0.5 text-[11px] text-muted-foreground">
                     {sat.note}
                   </p>
                 </div>
               </div>
             ))}
           </div>
-          <p className="text-[11px] text-text-dim">
+          <p className="text-[11px] text-stone-400">
             Barra maior = mais detalhe espacial. Satelites com pixel grande
             compensam com historico longo e cobertura continua.
           </p>
         </div>
 
         {/* Por que combinar */}
-        <div className="rounded-xl border-2 border-primary bg-primary/5 p-5 space-y-3">
-          <p className="text-xs font-medium text-primary-light uppercase tracking-wider">
+        <div className="rounded-[16px] border-2 border-primary bg-forest-50 p-5 space-y-3">
+          <p className="text-xs font-medium text-primary uppercase tracking-wider">
             Por que o Field Shift combina os dois
           </p>
-          <div className="space-y-2 text-sm text-text-secondary leading-relaxed">
+          <div className="space-y-2 text-sm text-muted-foreground leading-relaxed">
             <p>
               A estacao do INMET em Cruz Alta so existe desde 2007. Para
               entender padroes de clima que levam decadas para aparecer (como o
@@ -2656,11 +2656,11 @@ function GlossarioTab() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-bg-surface p-4">
-        <p className="text-xs font-medium text-text-dim uppercase tracking-wider">
+      <div className="rounded-[16px] border border-border bg-card p-4">
+        <p className="text-xs font-medium text-stone-400 uppercase tracking-wider">
           Dica
         </p>
-        <p className="mt-1 text-sm text-text-secondary">
+        <p className="mt-1 text-sm text-muted-foreground">
           Estes termos aparecem nos graficos e tabelas das outras abas. Quando
           tiver duvida sobre algum numero, volte aqui para relembrar o que ele
           significa na pratica para a sua lavoura.
@@ -2680,10 +2680,10 @@ function GlossarioTab() {
           <p className="text-sm font-medium tracking-wider text-accent-light uppercase">
             Base de Dados
           </p>
-          <h1 className="mt-2 text-3xl font-bold text-text-primary">
+          <h1 className="mt-2 text-3xl font-bold text-foreground">
             Todos os dados de {site.point.name}-{site.point.state}
           </h1>
-          <p className="mt-3 max-w-2xl text-sm text-text-secondary">
+          <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
             {KEY_FINDINGS.data_years} anos de clima, solo, vegetação e uso da
             terra — tudo em um lugar.
           </p>
@@ -2696,8 +2696,8 @@ function GlossarioTab() {
               onClick={() => setActiveTab(tab.key)}
               className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
                 activeTab === tab.key
-                  ? "bg-primary/20 text-primary-light"
-                  : "bg-bg-surface text-text-muted hover:bg-bg-surface-alt hover:text-text-primary"
+                  ? "bg-forest-100 text-primary"
+                  : "bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
               {tab.label}

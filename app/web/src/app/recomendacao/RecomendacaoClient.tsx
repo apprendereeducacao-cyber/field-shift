@@ -277,19 +277,19 @@ const CALENDAR = [
 function HistorySummary({ producer }: { producer: ProducerData }) {
   return (
     <section className="mb-10">
-      <h2 className="mb-4 text-lg font-bold text-text-primary">
+      <h2 className="mb-4 text-lg font-bold text-foreground">
         O que vimos na sua historia
       </h2>
       <div className="grid gap-3 sm:grid-cols-2">
         {producer.years.map((year, i) => (
           <div
             key={i}
-            className="rounded-xl border border-border bg-bg-surface p-4"
+            className="rounded-[24px] border border-border bg-card p-4"
           >
-            <p className="text-sm font-semibold text-text-primary">
+            <p className="text-sm font-semibold text-foreground">
               {i === 0 ? "Ano passado" : "2 anos atrás"}
             </p>
-            <div className="mt-2 space-y-1 text-sm text-text-secondary">
+            <div className="mt-2 space-y-1 text-sm text-muted-foreground">
               <p>
                 Verão: {CROP_LABELS[year.summer_crop] ?? year.summer_crop} /
                 Inverno: {CROP_LABELS[year.winter_crop] ?? year.winter_crop}
@@ -304,21 +304,21 @@ function HistorySummary({ producer }: { producer: ProducerData }) {
         ))}
       </div>
       <div className="mt-3 grid gap-3 sm:grid-cols-3">
-        <div className="rounded-lg border border-border bg-bg-surface-alt p-3">
-          <p className="text-xs text-text-muted">Gado na propriedade</p>
-          <p className="text-sm font-semibold text-text-primary">
+        <div className="rounded-[16px] border border-border bg-muted p-3">
+          <p className="text-xs text-muted-foreground">Gado na propriedade</p>
+          <p className="text-sm font-semibold text-foreground">
             {producer.has_cattle ? "Sim" : "Não"}
           </p>
         </div>
-        <div className="rounded-lg border border-border bg-bg-surface-alt p-3">
-          <p className="text-xs text-text-muted">Solo compactado</p>
-          <p className="text-sm font-semibold text-text-primary">
+        <div className="rounded-[16px] border border-border bg-muted p-3">
+          <p className="text-xs text-muted-foreground">Solo compactado</p>
+          <p className="text-sm font-semibold text-foreground">
             {producer.soil_compacted ? "Sim" : "Não"}
           </p>
         </div>
-        <div className="rounded-lg border border-border bg-bg-surface-alt p-3">
-          <p className="text-xs text-text-muted">Já usou adubo verde</p>
-          <p className="text-sm font-semibold text-text-primary">
+        <div className="rounded-[16px] border border-border bg-muted p-3">
+          <p className="text-xs text-muted-foreground">Já usou adubo verde</p>
+          <p className="text-sm font-semibold text-foreground">
             {producer.used_green_manure ? "Sim" : "Não"}
           </p>
         </div>
@@ -341,54 +341,54 @@ function ClimateSummarySection({
 
   return (
     <section className="mb-10">
-      <h2 className="mb-4 text-lg font-bold text-text-primary">
+      <h2 className="mb-4 text-lg font-bold text-foreground">
         O que o clima está mostrando
       </h2>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-border bg-bg-surface p-4">
-          <p className="text-xs text-text-muted">ENSO atual (2025)</p>
-          <p className="text-xl font-bold text-text-primary">
+        <div className="rounded-[24px] border border-border bg-card p-5">
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">ENSO atual (2025)</p>
+          <p className="mt-1 text-xl font-bold tabular-nums text-foreground">
             El Niño Fraco
           </p>
-          <p className="mt-1 text-xs text-text-secondary">
+          <p className="mt-1 text-xs text-muted-foreground">
             Histórico: El Niño traz mais chuva ({timeline.enso_impact.el_nino.avg_season_rain_mm} mm na safra)
           </p>
         </div>
-        <div className="rounded-xl border border-border bg-bg-surface p-4">
-          <p className="text-xs text-text-muted">Umidade do solo (5 anos)</p>
-          <p className="text-xl font-bold text-text-primary">
+        <div className="rounded-[24px] border border-border bg-card p-5">
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">Umidade do solo (5 anos)</p>
+          <p className="mt-1 text-xl font-bold tabular-nums text-foreground">
             {(climate.avgMoisture5 * 100).toFixed(0)}%
           </p>
-          <p className="mt-1 text-xs text-warning-light">
+          <p className="mt-1 text-xs text-status-warning">
             {climate.moistureTrend.toFixed(1)}% vs média histórica — solo secando
           </p>
         </div>
-        <div className="rounded-xl border border-border bg-bg-surface p-4">
-          <p className="text-xs text-text-muted">Dias quentes (5 anos)</p>
-          <p className="text-xl font-bold text-text-primary">
+        <div className="rounded-[24px] border border-border bg-card p-5">
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">Dias quentes (5 anos)</p>
+          <p className="mt-1 text-xl font-bold tabular-nums text-foreground">
             {climate.avgHotDays5.toFixed(0)} dias/ano
           </p>
-          <p className="mt-1 text-xs text-text-secondary">
+          <p className="mt-1 text-xs text-muted-foreground">
             Média histórica: {climate.avgHotDaysAll.toFixed(0)} dias/ano
           </p>
         </div>
-        <div className="rounded-xl border border-border bg-bg-surface p-4">
-          <p className="text-xs text-text-muted">Chuva média (3 anos)</p>
-          <p className="text-xl font-bold text-text-primary">
+        <div className="rounded-[24px] border border-border bg-card p-5">
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">Chuva media (3 anos)</p>
+          <p className="mt-1 text-xl font-bold tabular-nums text-foreground">
             {Math.round(climate.avgRain3)} mm
           </p>
-          <p className="mt-1 text-xs text-text-secondary">
+          <p className="mt-1 text-xs text-muted-foreground">
             Média histórica: {q1 ? Math.round(q1.annual_rainfall_mm.mean) : "—"} mm
           </p>
         </div>
       </div>
-      <div className="mt-3 rounded-lg border border-border bg-bg-surface-alt p-4">
-        <p className="text-sm text-text-secondary">
+      <div className="mt-3 rounded-[16px] border border-border bg-muted p-4">
+        <p className="text-sm text-muted-foreground">
           Últimos 3 anos:{" "}
           {climate.last3.map((y) => (
             <span key={y.year} className="mr-2">
-              <span className="font-semibold text-text-primary">{y.year}</span>{" "}
-              <span className="text-text-muted">
+              <span className="font-semibold text-foreground">{y.year}</span>{" "}
+              <span className="text-muted-foreground">
                 ({y.yield_sc_ha} sc/ha, {y.annual_rain_mm} mm,{" "}
                 {y.enso.replace(/_/g, " ")})
               </span>
@@ -406,25 +406,25 @@ function SoilSummarySection({ soil }: { soil: SoilData }) {
 
   return (
     <section className="mb-10">
-      <h2 className="mb-4 text-lg font-bold text-text-primary">
+      <h2 className="mb-4 text-lg font-bold text-foreground">
         Como está o solo da região
       </h2>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-border bg-bg-surface p-4">
-          <p className="text-xs text-text-muted">Argila</p>
-          <p className="text-xl font-bold text-text-primary">
+        <div className="rounded-[24px] border border-border bg-card p-5">
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">Argila</p>
+          <p className="mt-1 text-xl font-bold tabular-nums text-foreground">
             {topLayer.clay_pct}%
           </p>
-          <p className="mt-1 text-xs text-text-secondary">
+          <p className="mt-1 text-xs text-muted-foreground">
             Solo argiloso — segura água e nutriente, mas compacta facil
           </p>
         </div>
-        <div className="rounded-xl border border-border bg-bg-surface p-4">
-          <p className="text-xs text-text-muted">pH</p>
-          <p className="text-xl font-bold text-text-primary">
+        <div className="rounded-[24px] border border-border bg-card p-5">
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">pH</p>
+          <p className="mt-1 text-xl font-bold tabular-nums text-foreground">
             {topLayer.ph}
           </p>
-          <p className="mt-1 text-xs text-text-secondary">
+          <p className="mt-1 text-xs text-muted-foreground">
             {topLayer.ph < 5.5
               ? "Acido — pode precisar de calagem"
               : topLayer.ph <= 6.5
@@ -432,27 +432,27 @@ function SoilSummarySection({ soil }: { soil: SoilData }) {
                 : "Levemente alcalino"}
           </p>
         </div>
-        <div className="rounded-xl border border-border bg-bg-surface p-4">
-          <p className="text-xs text-text-muted">Carbono orgânico</p>
-          <p className="text-xl font-bold text-text-primary">
+        <div className="rounded-[24px] border border-border bg-card p-5">
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">Carbono organico</p>
+          <p className="mt-1 text-xl font-bold tabular-nums text-foreground">
             {topLayer.organic_carbon_g_kg} g/kg
           </p>
-          <p className="mt-1 text-xs text-text-secondary">
+          <p className="mt-1 text-xs text-muted-foreground">
             {topLayer.organic_carbon_g_kg > 20
               ? "Bom nível — manter com cobertura"
               : "Pode melhorar com adubo verde"}
           </p>
         </div>
-        <div className="rounded-xl border border-border bg-bg-surface p-4">
-          <p className="text-xs text-text-muted">Retenção de água</p>
-          <p className="text-xl font-bold text-text-primary capitalize">
+        <div className="rounded-[24px] border border-border bg-card p-5">
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">Retencao de agua</p>
+          <p className="mt-1 text-xl font-bold tabular-nums text-foreground capitalize">
             {interp.water_holding === "high"
               ? "Alta"
               : interp.water_holding === "moderate"
                 ? "Moderada"
                 : "Baixa"}
           </p>
-          <p className="mt-1 text-xs text-text-secondary">
+          <p className="mt-1 text-xs text-muted-foreground">
             Com cobertura de palha, a retenção melhora ainda mais
           </p>
         </div>
@@ -474,66 +474,66 @@ function RecommendationSection({
 
   return (
     <section className="mb-10">
-      <h2 className="mb-4 text-lg font-bold text-text-primary">
+      <h2 className="mb-4 text-lg font-bold text-foreground">
         Nossa recomendação
       </h2>
 
-      <div className="mb-6 rounded-xl border-2 border-primary bg-primary/5 p-6">
+      <div className="mb-6 rounded-[24px] border-2 border-primary bg-forest-50 p-6">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-xs font-medium tracking-wider text-primary-light uppercase">
+            <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">
               Melhor opção para a sua situação
             </p>
-            <h3 className="mt-1 text-2xl font-bold text-text-primary">
+            <h3 className="mt-1 text-2xl font-bold text-foreground">
               {best.strategy.name}
             </h3>
-            <p className="mt-1 text-sm text-text-secondary">
+            <p className="mt-1 text-sm text-muted-foreground">
               {best.strategy.subtitle}
             </p>
           </div>
-          <div className="rounded-lg bg-primary/20 px-3 py-1">
-            <p className="text-2xl font-bold text-primary-light">
+          <div className="rounded-[16px] bg-forest-100 px-3 py-1">
+            <p className="text-2xl font-bold tabular-nums text-primary">
               {best.finalScore}
             </p>
-            <p className="text-[10px] text-text-muted">pontos</p>
+            <p className="text-[10px] text-muted-foreground">pontos</p>
           </div>
         </div>
 
         <div className="mt-4">
-          <p className="mb-2 text-sm font-semibold text-text-primary">
+          <p className="mb-2 text-sm font-semibold text-foreground">
             Por que essa opção é a melhor pra sua lavoura:
           </p>
           <ul className="space-y-2">
             {best.reasons.map((reason, i) => (
               <li
                 key={i}
-                className="flex items-start gap-2 text-sm text-text-secondary"
+                className="flex items-start gap-2 text-sm text-muted-foreground"
               >
-                <span className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary-light" />
+                <span className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary" />
                 {reason}
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="mt-4 rounded-lg bg-bg-surface p-4">
-          <p className="text-xs text-text-muted">Detalhamento da pontuação</p>
+        <div className="mt-4 rounded-[16px] bg-card p-4">
+          <p className="text-xs text-muted-foreground">Detalhamento da pontuação</p>
           <div className="mt-2 flex gap-4 text-sm">
             <div>
-              <span className="text-text-muted">Base: </span>
-              <span className="font-semibold text-text-primary">
+              <span className="text-muted-foreground">Base: </span>
+              <span className="font-semibold tabular-nums text-foreground">
                 {best.baseScore}
               </span>
             </div>
             <div>
-              <span className="text-text-muted">Sua situação: </span>
-              <span className="font-semibold text-primary-light">
+              <span className="text-muted-foreground">Sua situação: </span>
+              <span className="font-semibold tabular-nums text-primary">
                 +{best.contextBonus}
               </span>
             </div>
             <div>
-              <span className="text-text-muted">Clima recente: </span>
-              <span className="font-semibold text-accent-light">
+              <span className="text-muted-foreground">Clima recente: </span>
+              <span className="font-semibold tabular-nums text-lime-signal">
                 +{best.climateBonus}
               </span>
             </div>
@@ -541,7 +541,7 @@ function RecommendationSection({
         </div>
       </div>
 
-      <h3 className="mb-3 text-sm font-semibold text-text-primary">
+      <h3 className="mb-3 text-sm font-semibold text-foreground">
         Comparativo das 3 opções
       </h3>
       <div className="space-y-3">
@@ -551,35 +551,35 @@ function RecommendationSection({
           return (
             <div
               key={s.strategy.id}
-              className={`rounded-xl border p-4 ${
+              className={`rounded-[24px] border p-4 ${
                 isBest
-                  ? "border-primary bg-primary/5"
-                  : "border-border bg-bg-surface"
+                  ? "border-primary bg-forest-50"
+                  : "border-border bg-card"
               }`}
             >
               <div className="flex items-center justify-between">
                 <div>
                   <p
                     className={`font-semibold ${
-                      isBest ? "text-primary-light" : "text-text-primary"
+                      isBest ? "text-primary" : "text-foreground"
                     }`}
                   >
                     {s.strategy.name}
                     {isBest && (
-                      <span className="ml-2 rounded bg-primary/20 px-2 py-0.5 text-xs text-primary-light">
+                      <span className="ml-2 rounded-full bg-forest-100 px-2 py-0.5 text-xs text-primary">
                         Recomendado
                       </span>
                     )}
                   </p>
-                  <p className="text-xs text-text-muted">
+                  <p className="text-xs text-muted-foreground">
                     {s.strategy.subtitle}
                   </p>
                 </div>
-                <p className="text-lg font-bold text-text-primary">
+                <p className="text-lg font-bold tabular-nums text-foreground">
                   {s.finalScore}
                 </p>
               </div>
-              <div className="mt-2 h-2 overflow-hidden rounded-full bg-bg-surface-alt">
+              <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
                 <div
                   className="h-full rounded-full transition-all"
                   style={{
@@ -590,7 +590,7 @@ function RecommendationSection({
                 />
               </div>
               {!isBest && s.reasons.length > 0 && (
-                <p className="mt-2 text-xs text-text-dim">
+                <p className="mt-2 text-xs text-stone-400">
                   {s.reasons[0]}
                 </p>
               )}
@@ -617,12 +617,12 @@ function CalendarSection({ best }: { best: ScoredStrategy }) {
 
   return (
     <section className="mb-10">
-      <h2 className="mb-4 text-lg font-bold text-text-primary">
+      <h2 className="mb-4 text-lg font-bold text-foreground">
         Calendário de ação
       </h2>
-      <p className="mb-4 text-sm text-text-secondary">
+      <p className="mb-4 text-sm text-muted-foreground">
         Meses-chave para a estratégia{" "}
-        <span className="font-semibold text-text-primary">
+        <span className="font-semibold text-foreground">
           {best.strategy.name}
         </span>
       </p>
@@ -630,17 +630,17 @@ function CalendarSection({ best }: { best: ScoredStrategy }) {
         {calendarItems.map((item) => (
           <div
             key={item.month}
-            className="flex items-start gap-3 rounded-lg border border-border bg-bg-surface p-3"
+            className="flex items-start gap-3 rounded-[16px] border border-border bg-card p-3"
           >
             <div
               className="mt-0.5 h-3 w-3 flex-shrink-0 rounded-sm"
               style={{ backgroundColor: item.color }}
             />
             <div>
-              <p className="text-sm font-semibold text-text-primary">
+              <p className="text-sm font-semibold text-foreground">
                 {item.month}
               </p>
-              <p className="text-sm text-text-secondary">{item.action}</p>
+              <p className="text-sm text-muted-foreground">{item.action}</p>
             </div>
           </div>
         ))}
@@ -653,23 +653,23 @@ function NoDataState() {
   return (
     <div className="px-4 py-12">
       <div className="mx-auto max-w-3xl text-center">
-        <p className="text-sm font-medium tracking-wider text-accent-light uppercase">
-          Recomendação
+        <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">
+          Recomendacao
         </p>
-        <h1 className="mt-2 text-3xl font-bold text-text-primary">
+        <h1 className="mt-2 text-3xl font-bold text-foreground">
           Recomendação para sua lavoura
         </h1>
-        <p className="mx-auto mt-4 max-w-lg text-sm text-text-secondary">
+        <p className="mx-auto mt-4 max-w-lg text-sm text-muted-foreground">
           Para gerar uma recomendação personalizada, primeiro precisamos saber o
           que o senhor plantou nos últimos 2 anos e como foi o resultado.
         </p>
         <Link
           href="/produtor"
-          className="mt-8 inline-block rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-text-primary transition-colors hover:bg-primary-light"
+          className="mt-8 inline-block rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
         >
           Preencher meu histórico
         </Link>
-        <p className="mt-4 text-xs text-text-dim">
+        <p className="mt-4 text-xs text-stone-400">
           Leva menos de 2 minutos. Seus dados ficam salvos no seu navegador.
         </p>
       </div>
@@ -699,7 +699,7 @@ export default function RecomendacaoClient({ timeline, site, soil, rotations, cr
   if (!loaded) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <p className="text-sm text-text-muted">Carregando...</p>
+        <p className="text-sm text-muted-foreground">Carregando...</p>
       </div>
     );
   }
@@ -717,13 +717,13 @@ export default function RecomendacaoClient({ timeline, site, soil, rotations, cr
     <div className="px-4 py-12">
       <div className="mx-auto max-w-4xl">
         <header className="mb-10">
-          <p className="text-sm font-medium tracking-wider text-accent-light uppercase">
-            Recomendação Personalizada
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">
+            Recomendacao Personalizada
           </p>
-          <h1 className="mt-2 text-3xl font-bold text-text-primary">
+          <h1 className="mt-2 text-3xl font-bold text-foreground">
             Recomendação para sua lavoura
           </h1>
-          <p className="mt-3 max-w-2xl text-sm text-text-secondary">
+          <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
             Cruzamos o seu histórico com {keyFindings.data_years} anos de dados
             de satélite da NASA, produtividade do IBGE, análise de solo do
             SoilGrids é o padrão El Niño/La Niña da NOAA para gerar essa
@@ -738,11 +738,11 @@ export default function RecomendacaoClient({ timeline, site, soil, rotations, cr
         <CalendarSection best={best} />
 
         <section className="mb-8">
-          <div className="rounded-xl border border-warning/30 bg-warning/5 p-5">
-            <h3 className="text-sm font-semibold text-warning-light">
+          <div className="rounded-[24px] border border-status-warning/20 bg-status-warning-bg p-5">
+            <h3 className="text-sm font-semibold text-status-warning">
               Aviso importante
             </h3>
-            <p className="mt-2 text-sm text-text-secondary">
+            <p className="mt-2 text-sm text-muted-foreground">
               Esta recomendação foi gerada por um algoritmo que cruza dados
               publicos de satélite, solo e clima. Ela serve como ponto de
               partida para a conversa com seu agronomo — que conhece sua terra,
@@ -755,13 +755,13 @@ export default function RecomendacaoClient({ timeline, site, soil, rotations, cr
         <div className="flex gap-3">
           <Link
             href="/produtor"
-            className="rounded-lg bg-bg-surface px-4 py-2 text-sm font-medium text-text-muted transition-colors hover:bg-bg-surface-alt hover:text-text-primary"
+            className="rounded-full bg-card px-5 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
-            Atualizar meu histórico
+            Atualizar meu historico
           </Link>
           <Link
             href="/rotacoes"
-            className="rounded-lg bg-bg-surface px-4 py-2 text-sm font-medium text-text-muted transition-colors hover:bg-bg-surface-alt hover:text-text-primary"
+            className="rounded-full bg-card px-5 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
             Ver detalhes das 3 estrategias
           </Link>

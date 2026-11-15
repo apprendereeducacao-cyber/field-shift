@@ -100,7 +100,7 @@ function RadarChart({ strategies }: { strategies: Strategy[] }) {
           key={l}
           points={hexagonPoints((l / 100) * maxR)}
           fill="none"
-          stroke="#374151"
+          stroke="#D6E5D8"
           strokeWidth="0.5"
         />
       ))}
@@ -115,7 +115,7 @@ function RadarChart({ strategies }: { strategies: Strategy[] }) {
               y1={cy}
               x2={x}
               y2={y}
-              stroke="#374151"
+              stroke="#D6E5D8"
               strokeWidth="0.5"
             />
             <text
@@ -178,11 +178,11 @@ function ScoreBar({
 }) {
   return (
     <div>
-      <div className="text-xs text-text-muted mb-1">{SCORE_LABELS[label]}</div>
+      <div className="text-xs text-muted-foreground mb-1">{SCORE_LABELS[label]}</div>
       <div className="flex gap-1">
         {scores.map((s) => (
           <div key={s.id} className="flex-1">
-            <div className="h-2 rounded-full bg-bg-surface-alt overflow-hidden">
+            <div className="h-2 rounded-full bg-muted overflow-hidden">
               <div
                 className="h-full rounded-full"
                 style={{
@@ -191,7 +191,7 @@ function ScoreBar({
                 }}
               />
             </div>
-            <div className="text-[10px] text-text-dim mt-0.5 text-center">
+            <div className="text-[10px] text-stone-400 mt-0.5 text-center tabular-nums">
               {s.value}
             </div>
           </div>
@@ -211,15 +211,15 @@ function StrategyCard({ strategy, crops }: { strategy: Strategy; crops: Crop[] }
 
   return (
     <div
-      className="rounded-lg bg-bg-surface-alt p-6 border-t-2"
-      style={{ borderColor: colors.stroke }}
+      className="rounded-[24px] border border-border bg-card p-6 border-t-2"
+      style={{ borderTopColor: colors.stroke }}
     >
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-lg font-bold text-white">{displayName}</h3>
-          <p className="text-text-muted text-sm">{strategy.subtitle}</p>
+          <h3 className="text-lg font-bold text-foreground">{displayName}</h3>
+          <p className="text-muted-foreground text-sm">{strategy.subtitle}</p>
         </div>
-        <div className="text-3xl font-bold" style={{ color: colors.stroke }}>
+        <div className="text-3xl font-bold tabular-nums" style={{ color: colors.stroke }}>
           {strategy.total_score}
         </div>
       </div>
@@ -228,7 +228,7 @@ function StrategyCard({ strategy, crops }: { strategy: Strategy; crops: Crop[] }
         {cropDetails.map((s, i) => (
           <span
             key={i}
-            className="text-xs bg-bg-surface text-text-secondary px-2 py-1 rounded"
+            className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-[16px]"
           >
             {s.season === "summer" ? "Verão" : "Inverno"}: {s.name}
           </span>
@@ -237,34 +237,34 @@ function StrategyCard({ strategy, crops }: { strategy: Strategy; crops: Crop[] }
 
       <div className="space-y-4">
         <div>
-          <h4 className="text-xs font-semibold text-accent-light uppercase tracking-wider mb-1">
-            O que o satélite da NASA mostra
+          <h4 className="text-[11px] font-semibold tracking-[0.12em] uppercase text-status-info mb-1">
+            O que o satelite da NASA mostra
           </h4>
-          <p className="text-text-muted text-xs">
+          <p className="text-muted-foreground text-xs">
             {strategy.evidence.nasa_insight}
           </p>
         </div>
         <div>
-          <h4 className="text-xs font-semibold text-amber-500 uppercase tracking-wider mb-1">
+          <h4 className="text-[11px] font-semibold tracking-[0.12em] uppercase text-status-warning mb-1">
             O que faz com o solo
           </h4>
-          <p className="text-text-muted text-xs">
+          <p className="text-muted-foreground text-xs">
             {strategy.evidence.soil_impact}
           </p>
         </div>
         <div>
-          <h4 className="text-xs font-semibold text-warning uppercase tracking-wider mb-1">
+          <h4 className="text-[11px] font-semibold tracking-[0.12em] uppercase text-status-serious mb-1">
             E o risco do clima?
           </h4>
-          <p className="text-text-muted text-xs">
+          <p className="text-muted-foreground text-xs">
             {strategy.evidence.climate_risk}
           </p>
         </div>
         <div>
-          <h4 className="text-xs font-semibold text-green-500 uppercase tracking-wider mb-1">
+          <h4 className="text-[11px] font-semibold tracking-[0.12em] uppercase text-status-success mb-1">
             Quanto da de retorno
           </h4>
-          <p className="text-text-muted text-xs">
+          <p className="text-muted-foreground text-xs">
             {strategy.evidence.economic}
           </p>
         </div>
@@ -272,25 +272,25 @@ function StrategyCard({ strategy, crops }: { strategy: Strategy; crops: Crop[] }
 
       <div className="grid grid-cols-2 gap-4 mt-4">
         <div>
-          <h4 className="text-xs font-semibold text-red-400 mb-2">
+          <h4 className="text-xs font-semibold text-destructive mb-2">
             Pontos fracos
           </h4>
           <ul className="space-y-1">
             {strategy.risks.map((r, i) => (
-              <li key={i} className="text-xs text-text-muted flex gap-1">
-                <span className="text-red-500 shrink-0">-</span> {r}
+              <li key={i} className="text-xs text-muted-foreground flex gap-1">
+                <span className="text-destructive shrink-0">-</span> {r}
               </li>
             ))}
           </ul>
         </div>
         <div>
-          <h4 className="text-xs font-semibold text-emerald-400 mb-2">
+          <h4 className="text-xs font-semibold text-leaf-600 mb-2">
             Pontos fortes
           </h4>
           <ul className="space-y-1">
             {strategy.benefits.map((b, i) => (
-              <li key={i} className="text-xs text-text-muted flex gap-1">
-                <span className="text-green-500 shrink-0">+</span> {b}
+              <li key={i} className="text-xs text-muted-foreground flex gap-1">
+                <span className="text-leaf-600 shrink-0">+</span> {b}
               </li>
             ))}
           </ul>
@@ -310,12 +310,12 @@ const FUNCTION_LABELS: Record<string, string> = {
 };
 
 const FUNCTION_TAG_STYLES: Record<string, string> = {
-  palha_duradoura: "bg-amber-500/10 text-amber-400 border-amber-500/30",
-  cobertura_rapida: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
-  fixa_nitrogenio: "bg-sky-500/10 text-sky-400 border-sky-500/30",
-  descompactação: "bg-orange-500/10 text-orange-400 border-orange-500/30",
-  libera_fosforo: "bg-violet-500/10 text-violet-400 border-violet-500/30",
-  renda_grao: "bg-yellow-500/10 text-yellow-400 border-yellow-500/30",
+  palha_duradoura: "bg-status-warning-bg text-status-warning border-status-warning/20",
+  cobertura_rapida: "bg-status-success-bg text-status-success border-status-success/20",
+  fixa_nitrogenio: "bg-status-info-bg text-status-info border-status-info/20",
+  descompactação: "bg-status-serious-bg text-status-serious border-status-serious/20",
+  libera_fosforo: "bg-forest-50 text-primary border-forest-200",
+  renda_grao: "bg-status-warning-bg text-status-warning border-status-warning/20",
 };
 
 const GROUP_LABELS: Record<string, string> = {
@@ -325,9 +325,9 @@ const GROUP_LABELS: Record<string, string> = {
 };
 
 const GROUP_TAG_STYLES: Record<string, string> = {
-  graminea: "text-emerald-400",
-  leguminosa: "text-sky-400",
-  crucifera: "text-orange-400",
+  graminea: "text-leaf-600",
+  leguminosa: "text-status-info",
+  crucifera: "text-status-serious",
 };
 
 const STRATEGY_COVER_CROPS: Record<string, string[]> = {
@@ -347,7 +347,7 @@ function formatRange(arr: (number | null)[] | null, unit: string): string {
 }
 
 function SowingMiniBar({ months }: { months: number[] | null }) {
-  if (!months) return <span className="text-[10px] text-text-dim">A definir</span>;
+  if (!months) return <span className="text-[10px] text-stone-400">A definir</span>;
   return (
     <div className="flex gap-0.5">
       {Array.from({ length: 12 }, (_, i) => {
@@ -358,8 +358,8 @@ function SowingMiniBar({ months }: { months: number[] | null }) {
             key={m}
             className={`flex h-5 w-5 items-center justify-center rounded text-[8px] font-medium ${
               active
-                ? "bg-primary/30 text-primary-light"
-                : "bg-bg-surface-alt/50 text-text-dim"
+                ? "bg-forest-100 text-primary"
+                : "bg-muted text-stone-400"
             }`}
             title={MONTH_NAMES[i]}
           >
@@ -381,21 +381,21 @@ function CoverCropCard({ crop, highlight }: { crop: CoverCrop; highlight: string
 
   return (
     <div
-      className={`rounded-xl border p-5 ${
+      className={`rounded-[24px] border p-5 ${
         isHighlighted
-          ? "border-primary/40 bg-primary/5"
-          : "border-border bg-bg-surface"
+          ? "border-forest-200 bg-forest-50"
+          : "border-border bg-card"
       }`}
     >
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
-          <h3 className="text-base font-semibold text-text-primary">
+          <h3 className="text-base font-semibold text-foreground">
             {crop.name}
           </h3>
-          <p className="text-xs text-text-dim">
+          <p className="text-xs text-stone-400">
             <span className="italic">{crop.scientific}</span>
             {" — "}
-            <span className={GROUP_TAG_STYLES[crop.group] || "text-text-muted"}>
+            <span className={GROUP_TAG_STYLES[crop.group] || "text-muted-foreground"}>
               {GROUP_LABELS[crop.group] || crop.group}
             </span>
           </p>
@@ -407,54 +407,54 @@ function CoverCropCard({ crop, highlight }: { crop: CoverCrop; highlight: string
           <span
             key={fn}
             className={`inline-flex rounded-md border px-2 py-0.5 text-[10px] font-medium ${
-              FUNCTION_TAG_STYLES[fn] || "bg-bg-surface-alt border-border text-text-muted"
+              FUNCTION_TAG_STYLES[fn] || "bg-muted border-border text-muted-foreground"
             }`}
           >
             {FUNCTION_LABELS[fn] || fn}
           </span>
         ))}
         {crop.functions.length === 0 && (
-          <span className="text-[10px] text-text-dim">Funções a definir</span>
+          <span className="text-[10px] text-stone-400">Funções a definir</span>
         )}
       </div>
 
       <div className="mt-3 grid grid-cols-3 gap-3">
         <div>
-          <p className="text-[10px] font-medium text-text-dim uppercase">Matéria seca</p>
-          <p className="text-sm font-semibold text-text-primary">
+          <p className="text-[10px] font-medium text-stone-400 uppercase">Matéria seca</p>
+          <p className="text-sm font-semibold text-foreground tabular-nums">
             {formatRange(crop.dry_matter_t_ha, "t/ha")}
           </p>
         </div>
         <div>
-          <p className="text-[10px] font-medium text-text-dim uppercase">Florescimento</p>
-          <p className="text-sm font-semibold text-text-primary">
+          <p className="text-[10px] font-medium text-stone-400 uppercase">Florescimento</p>
+          <p className="text-sm font-semibold text-foreground tabular-nums">
             {formatRange(crop.days_to_flower, "dias")}
           </p>
         </div>
         <div>
-          <p className="text-[10px] font-medium text-text-dim uppercase">Semente</p>
-          <p className="text-sm font-semibold text-text-primary">
+          <p className="text-[10px] font-medium text-stone-400 uppercase">Semente</p>
+          <p className="text-sm font-semibold text-foreground tabular-nums">
             {formatRange(crop.seed_kg_ha, "kg/ha")}
           </p>
         </div>
       </div>
 
       <div className="mt-3">
-        <p className="mb-1 text-[10px] font-medium text-text-dim uppercase">Época de semeadura</p>
+        <p className="mb-1 text-[10px] font-medium text-stone-400 uppercase">Época de semeadura</p>
         <SowingMiniBar months={crop.sowing_months} />
       </div>
 
       {usedIn.length > 0 && (
-        <div className="mt-3 rounded-lg border border-primary/20 bg-primary/5 p-3">
-          <p className="text-[10px] font-medium tracking-wider text-primary-light uppercase">
+        <div className="mt-3 rounded-[16px] border border-forest-200 bg-forest-50 p-3">
+          <p className="text-[11px] font-semibold tracking-[0.12em] uppercase text-primary">
             Usada na estratégia
           </p>
-          <p className="mt-1 text-xs text-text-muted">{usedIn.join(" / ")}</p>
+          <p className="mt-1 text-xs text-muted-foreground">{usedIn.join(" / ")}</p>
         </div>
       )}
 
       {crop.notes.length > 0 && (
-        <p className="mt-3 text-xs text-text-muted">{crop.notes[0]}</p>
+        <p className="mt-3 text-xs text-muted-foreground">{crop.notes[0]}</p>
       )}
     </div>
   );
@@ -473,24 +473,24 @@ function CoverCropsSection({ rotations, coverCrops }: { rotations: Strategy[]; c
 
   return (
     <section>
-      <h2 className="text-xl font-semibold text-white mb-4">
+      <h2 className="text-xl font-semibold text-foreground mb-4">
         Plantas de cobertura — o arsenal do inverno
       </h2>
 
-      <div className="mb-6 rounded-xl border border-primary/30 bg-primary/5 p-5">
+      <div className="mb-6 rounded-[24px] border border-forest-200 bg-forest-50 p-5">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-lg font-bold text-text-primary">
+            <p className="text-lg font-bold text-foreground">
               {cropList.length} opções de cobertura para o inverno
             </p>
-            <p className="mt-1 text-sm text-text-secondary">
+            <p className="mt-1 text-sm text-muted-foreground">
               {withStraw} produzem palha duradoura para proteger o solo e {nFixers} fixam
               nitrogênio do ar — economia de adubo na soja seguinte.
             </p>
           </div>
-          <div className="shrink-0 rounded-lg bg-primary/20 px-4 py-2 text-center">
-            <p className="text-2xl font-bold text-primary-light">{cropList.length}</p>
-            <p className="text-[10px] text-text-dim">espécies</p>
+          <div className="shrink-0 rounded-[16px] bg-forest-100 px-4 py-2 text-center">
+            <p className="text-2xl font-bold text-primary tabular-nums">{cropList.length}</p>
+            <p className="text-[10px] text-stone-400">espécies</p>
           </div>
         </div>
       </div>
@@ -498,10 +498,10 @@ function CoverCropsSection({ rotations, coverCrops }: { rotations: Strategy[]; c
       <div className="flex flex-wrap gap-2 mb-6">
         <button
           onClick={() => setFilterStrategy(null)}
-          className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
+          className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
             !filterStrategy
-              ? "bg-white/10 text-white"
-              : "text-text-dim hover:text-text-secondary"
+              ? "bg-forest-50 text-foreground"
+              : "text-stone-400 hover:text-muted-foreground"
           }`}
         >
           Todas
@@ -516,10 +516,10 @@ function CoverCropsSection({ rotations, coverCrops }: { rotations: Strategy[]; c
                 onClick={() =>
                   setFilterStrategy(filterStrategy === s.id ? null : s.id)
                 }
-                className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
+                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                   filterStrategy === s.id
-                    ? "text-white"
-                    : "text-text-dim hover:text-text-secondary"
+                    ? "text-foreground"
+                    : "text-stone-400 hover:text-muted-foreground"
                 }`}
                 style={
                   filterStrategy === s.id
@@ -540,15 +540,15 @@ function CoverCropsSection({ rotations, coverCrops }: { rotations: Strategy[]; c
       </div>
 
       {filterStrategy && filteredCrops.length === 0 && (
-        <div className="rounded-lg border border-border bg-bg-surface p-6 text-center">
-          <p className="text-sm text-text-muted">
+        <div className="rounded-[24px] border border-border bg-card p-6 text-center">
+          <p className="text-sm text-muted-foreground">
             Essa estratégia não usa cobertura de inverno — é o sistema de pousio.
           </p>
         </div>
       )}
 
-      <div className="mt-4 rounded-lg border border-border bg-bg-surface-alt p-4">
-        <p className="text-xs text-text-dim">
+      <div className="mt-4 rounded-[16px] border border-border bg-muted p-4">
+        <p className="text-xs text-stone-400">
           <strong>Fontes:</strong> Artigos científicos (SciELO), Embrapa Trigo, dissertações e extensão rural (Epagri).
           Valores marcados como "—" serão completados com dados do ZARC para Cruz Alta.
         </p>
@@ -568,10 +568,10 @@ export default function RotacoesClient({ rotations, rotationsMeta, crops, coverC
   return (
     <div className="mx-auto max-w-5xl space-y-12 px-4 py-6 sm:px-6">
       <header>
-        <h1 className="text-3xl font-bold text-white">
+        <h1 className="text-3xl font-bold text-foreground">
           Qual manejo de inverno escolher
         </h1>
-        <p className="mt-2 text-text-secondary">
+        <p className="mt-2 text-muted-foreground">
           Tres opções comparadas lado a lado. Veja qual cuida melhor do solo, da
           mais retorno e protege contra o clima ruim — tudo baseado em{" "}
           {44} anos de dados reais.
@@ -582,10 +582,10 @@ export default function RotacoesClient({ rotations, rotationsMeta, crops, coverC
         <div className="flex flex-wrap gap-2 mb-6">
           <button
             onClick={() => setSelectedId(null)}
-            className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
+            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
               !selectedId
-                ? "bg-white/10 text-white"
-                : "text-text-dim hover:text-text-secondary"
+                ? "bg-forest-50 text-foreground"
+                : "text-stone-400 hover:text-muted-foreground"
             }`}
           >
             Ver todas
@@ -599,10 +599,10 @@ export default function RotacoesClient({ rotations, rotationsMeta, crops, coverC
                 onClick={() =>
                   setSelectedId(selectedId === s.id ? null : s.id)
                 }
-                className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
+                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                   selectedId === s.id
-                    ? "text-white"
-                    : "text-text-dim hover:text-text-secondary"
+                    ? "text-foreground"
+                    : "text-stone-400 hover:text-muted-foreground"
                 }`}
                 style={
                   selectedId === s.id
@@ -618,7 +618,7 @@ export default function RotacoesClient({ rotations, rotationsMeta, crops, coverC
 
         <div className="grid gap-8 lg:grid-cols-2">
           <div>
-            <h2 className="text-lg font-semibold text-white mb-4">
+            <h2 className="text-lg font-semibold text-foreground mb-4">
               Comparação visual
             </h2>
             <RadarChart strategies={displayed} />
@@ -629,7 +629,7 @@ export default function RotacoesClient({ rotations, rotationsMeta, crops, coverC
                 return (
                   <span
                     key={s.id}
-                    className="flex items-center gap-1.5 text-xs text-text-muted"
+                    className="flex items-center gap-1.5 text-xs text-muted-foreground"
                   >
                     <span
                       className="w-3 h-3 rounded-full"
@@ -640,13 +640,13 @@ export default function RotacoesClient({ rotations, rotationsMeta, crops, coverC
                 );
               })}
             </div>
-            <p className="text-center text-xs text-text-dim mt-2">
+            <p className="text-center text-xs text-stone-400 mt-2">
               Quanto mais aberto o desenho, melhor a opção
             </p>
           </div>
 
           <div>
-            <h2 className="text-lg font-semibold text-white mb-4">
+            <h2 className="text-lg font-semibold text-foreground mb-4">
               Nota em cada quesito
             </h2>
             <div className="space-y-4">
@@ -662,8 +662,8 @@ export default function RotacoesClient({ rotations, rotationsMeta, crops, coverC
               ))}
             </div>
 
-            <div className="mt-6 rounded-lg bg-bg-surface p-4">
-              <h3 className="text-sm font-semibold text-white mb-2">
+            <div className="mt-6 rounded-[24px] border border-border bg-card p-4">
+              <h3 className="text-sm font-semibold text-foreground mb-2">
                 Nota geral
               </h3>
               <div className="flex items-end gap-2 h-20">
@@ -675,7 +675,7 @@ export default function RotacoesClient({ rotations, rotationsMeta, crops, coverC
                       className="flex-1 flex flex-col items-center justify-end"
                     >
                       <span
-                        className="text-sm font-bold"
+                        className="text-sm font-bold tabular-nums"
                         style={{ color: colors.stroke }}
                       >
                         {s.total_score}
@@ -688,7 +688,7 @@ export default function RotacoesClient({ rotations, rotationsMeta, crops, coverC
                           opacity: 0.7,
                         }}
                       />
-                      <span className="text-[10px] text-text-dim mt-1 text-center">
+                      <span className="text-[10px] text-stone-400 mt-1 text-center">
                         {STRATEGY_NAMES[s.id] || s.name}
                       </span>
                     </div>
@@ -701,7 +701,7 @@ export default function RotacoesClient({ rotations, rotationsMeta, crops, coverC
       </section>
 
       <section>
-        <h2 className="text-xl font-semibold text-white mb-4">
+        <h2 className="text-xl font-semibold text-foreground mb-4">
           Detalhes de cada opção
         </h2>
         <div className="grid gap-6 lg:grid-cols-3">
@@ -715,10 +715,10 @@ export default function RotacoesClient({ rotations, rotationsMeta, crops, coverC
       </section>
 
       <section>
-        <h2 className="text-xl font-semibold text-white mb-4">
+        <h2 className="text-xl font-semibold text-foreground mb-4">
           Como avaliamos cada quesito
         </h2>
-        <div className="rounded-lg bg-bg-surface-alt p-6">
+        <div className="rounded-[24px] border border-border bg-muted p-6">
           <div className="grid gap-4 md:grid-cols-2">
             {DIMENSIONS.map((dim) => (
               <div key={dim} className="flex gap-3">
@@ -727,10 +727,10 @@ export default function RotacoesClient({ rotations, rotationsMeta, crops, coverC
                   style={{ backgroundColor: SCORE_COLORS[dim] }}
                 />
                 <div>
-                  <div className="text-sm font-semibold text-text-primary">
+                  <div className="text-sm font-semibold text-foreground">
                     {SCORE_LABELS[dim]}
                   </div>
-                  <div className="text-xs text-text-muted mt-1">
+                  <div className="text-xs text-muted-foreground mt-1">
                     {rotationsMeta[dim as keyof typeof rotationsMeta]}
                   </div>
                 </div>
@@ -742,7 +742,7 @@ export default function RotacoesClient({ rotations, rotationsMeta, crops, coverC
 
       <CoverCropsSection rotations={rotations} coverCrops={coverCrops} />
 
-      <footer className="text-xs text-text-dim border-t border-border pt-4">
+      <footer className="text-xs text-stone-400 border-t border-border pt-4">
         Notas baseadas em 44 anos de dados NASA POWER + pesquisa agronômica
         Embrapa. Consulte um agrônomo antes de mudar o manejo.
       </footer>

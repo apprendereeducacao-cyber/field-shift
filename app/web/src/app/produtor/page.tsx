@@ -78,14 +78,14 @@ function SelectField({
 }) {
   return (
     <div>
-      <label htmlFor={id} className="mb-1 block text-sm text-text-secondary">
+      <label htmlFor={id} className="mb-1 block text-sm text-muted-foreground">
         {label}
       </label>
       <select
         id={id}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-lg border border-border bg-bg-surface-alt px-3 py-2 text-sm text-text-primary outline-none transition-colors focus:border-primary-light"
+        className="w-full rounded-full border border-border bg-muted px-4 py-2 text-sm text-foreground outline-none transition-colors focus:border-primary"
       >
         {options.map((opt) => (
           <option key={opt.value} value={opt.value}>
@@ -112,12 +112,12 @@ function Toggle({
 }) {
   return (
     <div
-      className="flex cursor-pointer items-center justify-between rounded-xl border border-border bg-bg-surface p-4"
+      className="flex cursor-pointer items-center justify-between rounded-[24px] border border-border bg-card p-4"
       onClick={() => onChange(!checked)}
     >
       <div>
-        <p className="text-sm font-medium text-text-primary">{label}</p>
-        <p className="mt-0.5 text-xs text-text-muted">{description}</p>
+        <p className="text-sm font-medium text-foreground">{label}</p>
+        <p className="mt-0.5 text-xs text-muted-foreground">{description}</p>
       </div>
       <button
         id={id}
@@ -128,11 +128,11 @@ function Toggle({
           onChange(!checked);
         }}
         className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${
-          checked ? "bg-primary-light" : "bg-bg-surface-alt"
+          checked ? "bg-primary" : "bg-muted"
         }`}
       >
         <span
-          className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-text-primary transition-transform ${
+          className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow-xs transition-transform ${
             checked ? "translate-x-5" : "translate-x-0"
           }`}
         />
@@ -200,13 +200,13 @@ export default function ProdutorPage() {
     <div className="px-4 py-12">
       <div className="mx-auto max-w-3xl">
         <header className="mb-10">
-          <p className="text-sm font-medium tracking-wider text-primary-light uppercase">
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">
             Sua Lavoura
           </p>
-          <h1 className="mt-2 text-3xl font-bold text-text-primary">
+          <h1 className="mt-2 text-3xl font-bold text-foreground">
             Conte a historia da sua lavoura
           </h1>
-          <p className="mt-3 max-w-2xl text-sm text-text-secondary">
+          <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
             Responda sobre os últimos 2 anos. Isso ajuda a gente a recomendar o
             melhor manejo de inverno pra você.
           </p>
@@ -216,9 +216,9 @@ export default function ProdutorPage() {
           {yearsData.map((year, i) => (
             <section
               key={i}
-              className="rounded-xl border border-border bg-bg-surface p-6"
+              className="rounded-[24px] border border-border bg-card p-6"
             >
-              <h2 className="mb-5 text-lg font-semibold text-text-primary">
+              <h2 className="mb-5 text-lg font-semibold text-foreground">
                 {year.label}
               </h2>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -255,7 +255,7 @@ export default function ProdutorPage() {
           ))}
 
           <section className="space-y-3">
-            <h2 className="text-lg font-semibold text-text-primary">
+            <h2 className="text-lg font-semibold text-foreground">
               Sobre a sua propriedade
             </h2>
             <Toggle
@@ -293,23 +293,23 @@ export default function ProdutorPage() {
           <div className="flex flex-col items-center gap-4 pt-4">
             <button
               onClick={handleSave}
-              className="w-full rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-text-primary transition-colors hover:bg-primary-light sm:w-auto sm:px-12"
+              className="h-11 w-full rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover sm:w-auto sm:px-12"
             >
               Salvar meu histórico
             </button>
 
             {saved && (
-              <div className="w-full rounded-xl border border-primary/30 bg-primary/10 p-5 text-center">
-                <p className="text-sm font-medium text-primary-light">
+              <div className="w-full rounded-[24px] border border-status-success/30 bg-status-success-bg p-5 text-center">
+                <p className="text-sm font-medium text-status-success">
                   Histórico salvo com sucesso
                 </p>
-                <p className="mt-2 text-sm text-text-secondary">
+                <p className="mt-2 text-sm text-muted-foreground">
                   Agora a gente pode cruzar seus dados com 44 anos de clima e
                   recomendar o melhor manejo.
                 </p>
                 <Link
                   href="/recomendacao"
-                  className="mt-4 inline-block rounded-lg bg-accent px-6 py-2 text-sm font-medium text-text-primary transition-colors hover:bg-accent-light"
+                  className="mt-4 inline-block h-11 rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-hover"
                 >
                   Ver minha recomendação
                 </Link>

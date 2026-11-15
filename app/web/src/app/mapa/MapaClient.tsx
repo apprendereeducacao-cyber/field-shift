@@ -357,7 +357,7 @@ export default function MapaClient({
             [-90, -180], [-90, 180], [90, 180], [90, -180],
           ];
           const mask = L.polygon([worldBounds, latlngs], {
-            fillColor: "#0a1a0f",
+            fillColor: "#DCE8DD",
             fillOpacity: 0.55,
             stroke: false,
             interactive: false,
@@ -389,11 +389,11 @@ export default function MapaClient({
         className: "",
         html: `<div style="
           width:28px;height:28px;border-radius:50%;
-          background:#2D6A4F;border:3px solid #fff;
+          background:#165337;border:3px solid #fff;
           box-shadow:0 2px 8px rgba(0,0,0,0.4);
           display:flex;align-items:center;justify-content:center;
           color:#fff;font-size:12px;font-weight:700;
-        ">FS</div>`,
+        ">SR</div>`,
         iconSize: [28, 28],
         iconAnchor: [14, 14],
       });
@@ -404,17 +404,17 @@ export default function MapaClient({
       ).addTo(map);
 
       const popupContent = `
-        <div style="font-family:system-ui;font-size:13px;line-height:1.5;min-width:180px;background:#111827;color:#F9FAFB;padding:8px;border-radius:8px">
+        <div style="font-family:system-ui;font-size:13px;line-height:1.5;min-width:180px;background:#FFFFFF;color:#151A17;padding:8px;border-radius:12px">
           <div style="font-weight:700;font-size:14px;margin-bottom:4px">${site.point.name}</div>
-          <div style="color:#9CA3AF;font-size:11px;margin-bottom:8px">${site.point.state} | ${site.point.lat.toFixed(4)}, ${site.point.lon.toFixed(4)}</div>
+          <div style="color:#4B5C50;font-size:11px;margin-bottom:8px">${site.point.state} | ${site.point.lat.toFixed(4)}, ${site.point.lon.toFixed(4)}</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-size:12px">
-            <span style="color:#9CA3AF">Elevacao media</span>
+            <span style="color:#4B5C50">Elevacao media</span>
             <span style="font-weight:600">${meanElev}m</span>
-            <span style="color:#9CA3AF">Tmax media</span>
+            <span style="color:#4B5C50">Tmax media</span>
             <span style="font-weight:600">${avgTmax.toFixed(1)}°C</span>
-            <span style="color:#9CA3AF">Desnivel</span>
+            <span style="color:#4B5C50">Desnivel</span>
             <span style="font-weight:600">${topography.summary.range_m}m</span>
-            <span style="color:#9CA3AF">Pts topografia</span>
+            <span style="color:#4B5C50">Pts topografia</span>
             <span style="font-weight:600">${topography.points.length}</span>
           </div>
         </div>
@@ -441,16 +441,16 @@ export default function MapaClient({
         const popup = L.popup()
           .setLatLng(e.latlng)
           .setContent(
-            `<div style="font-family:system-ui;font-size:12px;line-height:1.6;min-width:160px;background:#111827;color:#F9FAFB;padding:8px;border-radius:8px">
-              <div style="font-weight:700;font-size:13px;margin-bottom:4px;border-bottom:1px solid #374151;padding-bottom:4px">Dados do ponto</div>
+            `<div style="font-family:system-ui;font-size:12px;line-height:1.6;min-width:160px;background:#FFFFFF;color:#151A17;padding:8px;border-radius:12px">
+              <div style="font-weight:700;font-size:13px;margin-bottom:4px;border-bottom:1px solid #D6E5D8;padding-bottom:4px">Dados do ponto</div>
               <div style="display:grid;grid-template-columns:auto 1fr;gap:2px 10px">
-                <span style="color:#9CA3AF">Latitude</span><span>${lat.toFixed(5)}</span>
-                <span style="color:#9CA3AF">Longitude</span><span>${lng.toFixed(5)}</span>
-                <span style="color:#9CA3AF">Elevacao</span>
+                <span style="color:#4B5C50">Latitude</span><span>${lat.toFixed(5)}</span>
+                <span style="color:#4B5C50">Longitude</span><span>${lng.toFixed(5)}</span>
+                <span style="color:#4B5C50">Elevacao</span>
                 <span style="font-weight:600">${elev.toFixed(0)}m
                   <span style="display:inline-block;width:10px;height:10px;border-radius:2px;vertical-align:middle;margin-left:4px;background:${elevationColor(elevRatio)}"></span>
                 </span>
-                <span style="color:#9CA3AF">Temp. max est.</span>
+                <span style="color:#4B5C50">Temp. max est.</span>
                 <span style="font-weight:600">${temp.toFixed(1)}°C</span>
               </div>
             </div>`,
@@ -890,20 +890,20 @@ export default function MapaClient({
       style={{ height: isFullscreen ? "100vh" : "calc(100vh - 120px)", minHeight: "500px" }}
     >
       {/* ── Map container ── */}
-      <div ref={mapRef} className="absolute inset-0 z-0 bg-bg-surface-alt" />
+      <div ref={mapRef} className="absolute inset-0 z-0 bg-muted" />
 
       {/* ── Top bar ── */}
       <div className="pointer-events-none absolute left-0 right-0 top-0 z-[500] flex items-start justify-between p-3">
         <button
           onClick={() => setPanelOpen(!panelOpen)}
-          className="pointer-events-auto flex items-center gap-2 rounded-lg bg-bg-surface/95 px-3 py-2 text-sm font-semibold text-text-primary shadow-lg backdrop-blur-sm transition-colors hover:bg-bg-surface"
+          className="pointer-events-auto flex items-center gap-2 rounded-full bg-card/95 px-4 py-2 text-sm font-semibold text-foreground shadow-lg backdrop-blur-sm transition-colors hover:bg-card"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
             <path d="M2 4h12M2 8h12M2 12h12" />
           </svg>
           Camadas
           {visibleCount > 0 && (
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
               {visibleCount}
             </span>
           )}
@@ -919,7 +919,7 @@ export default function MapaClient({
                 mapInstance.current.setView([site.point.lat, site.point.lon], ndviTiles.zoom);
               }
             }}
-            className="flex h-9 w-9 items-center justify-center rounded-lg bg-bg-surface/95 text-text-muted shadow-lg backdrop-blur-sm hover:text-text-primary"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-card/95 text-muted-foreground shadow-lg backdrop-blur-sm hover:text-foreground"
             title="Resetar vista"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -929,7 +929,7 @@ export default function MapaClient({
           </button>
           <button
             onClick={toggleFullscreen}
-            className="flex h-9 w-9 items-center justify-center rounded-lg bg-bg-surface/95 text-text-muted shadow-lg backdrop-blur-sm hover:text-text-primary"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-card/95 text-muted-foreground shadow-lg backdrop-blur-sm hover:text-foreground"
             title={isFullscreen ? "Sair do fullscreen" : "Fullscreen"}
           >
             {isFullscreen ? (
@@ -954,7 +954,7 @@ export default function MapaClient({
         }`}
         style={{ maxHeight: "calc(100% - 72px)" }}
       >
-        <div className="flex max-h-full flex-col overflow-hidden rounded-xl bg-bg-surface/95 shadow-xl backdrop-blur-sm">
+        <div className="flex max-h-full flex-col overflow-hidden rounded-[24px] border border-border bg-card/95 shadow-xl backdrop-blur-sm">
           <div className="overflow-y-auto p-3">
             {/* Layer toggles */}
             <div className="space-y-1.5">
@@ -970,17 +970,17 @@ export default function MapaClient({
                       onClick={() => !noData && toggleLayer(cfg.key)}
                       className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors ${
                         noData
-                          ? "cursor-not-allowed text-text-dim opacity-50"
+                          ? "cursor-not-allowed text-stone-400 opacity-50"
                           : state.visible
-                            ? "bg-primary/10 text-primary"
-                            : "text-text-muted hover:bg-bg-surface-alt hover:text-text-primary"
+                            ? "bg-forest-50 text-primary"
+                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
                       }`}
                     >
                       <span
                         className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-xs font-bold ${
                           state.visible && !noData
-                            ? "bg-primary text-white"
-                            : "bg-bg-surface-alt text-text-dim"
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted text-stone-400"
                         }`}
                       >
                         {cfg.icon}
@@ -989,7 +989,7 @@ export default function MapaClient({
                         <div className="text-sm font-semibold leading-tight">
                           {cfg.label}
                         </div>
-                        <div className="text-[10px] leading-tight text-text-dim">
+                        <div className="text-[10px] leading-tight text-stone-400">
                           {noData ? "Sem dados (rode o script GEE)" : cfg.description}
                         </div>
                       </div>
@@ -1019,7 +1019,7 @@ export default function MapaClient({
                           onChange={(e) => setOpacity(cfg.key, Number(e.target.value) / 100)}
                           className="h-1 flex-1 appearance-none rounded-full bg-border accent-primary [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3"
                         />
-                        <span className="w-7 text-right font-mono text-[10px] text-text-dim">
+                        <span className="w-7 text-right font-mono text-[10px] text-stone-400">
                           {Math.round(state.opacity * 100)}%
                         </span>
                       </div>
@@ -1033,11 +1033,11 @@ export default function MapaClient({
             {layers.temperatura.visible && hasLstTiles && (
               <div className="mt-3 border-t border-border pt-3">
                 <div className="mb-2 flex items-center justify-between">
-                  <span className="text-xs font-semibold text-text-primary">
+                  <span className="text-xs font-semibold text-foreground">
                     LST — {MONTH_NAMES_SHORT[lstMonth - 1]}
                   </span>
                   {currentLst && (
-                    <span className="rounded-full bg-orange-500/20 px-2 py-0.5 text-[10px] font-bold text-orange-400">
+                    <span className="rounded-full bg-status-serious-bg px-2 py-0.5 text-[10px] font-bold text-status-serious">
                       {currentLst.lst_mean.toFixed(1)}°C
                     </span>
                   )}
@@ -1050,7 +1050,7 @@ export default function MapaClient({
                   onChange={(e) => setLstMonth(Number(e.target.value))}
                   className="w-full accent-primary"
                 />
-                <div className="flex justify-between text-[9px] text-text-dim">
+                <div className="flex justify-between text-[9px] text-stone-400">
                   {MONTH_NAMES_SHORT.map((m, i) => (
                     <span key={m} className={i + 1 === lstMonth ? "font-bold text-primary" : ""}>
                       {m}
@@ -1064,11 +1064,11 @@ export default function MapaClient({
             {layers.ndvi.visible && (
               <div className="mt-3 border-t border-border pt-3">
                 <div className="mb-2 flex items-center justify-between">
-                  <span className="text-xs font-semibold text-text-primary">
+                  <span className="text-xs font-semibold text-foreground">
                     {ndviLabel}
                   </span>
                   <span
-                    className="rounded-full px-2 py-0.5 text-[10px] font-bold text-white"
+                    className="rounded-full px-2 py-0.5 text-[10px] font-bold text-primary-foreground"
                     style={{ backgroundColor: ndviColor }}
                   >
                     {ndviValue?.toFixed(2)}
@@ -1076,13 +1076,13 @@ export default function MapaClient({
                 </div>
 
                 {yearComparisons.length > 0 && (
-                  <div className="mb-2 flex rounded-md bg-bg-surface-alt p-0.5">
+                  <div className="mb-2 flex rounded-md bg-muted p-0.5">
                     <button
                       onClick={() => setNdviMode("monthly")}
                       className={`flex-1 rounded px-2 py-1 text-[10px] font-semibold transition-colors ${
                         ndviMode === "monthly"
-                          ? "bg-bg-surface text-primary shadow-sm"
-                          : "text-text-dim"
+                          ? "bg-card text-primary shadow-sm"
+                          : "text-stone-400"
                       }`}
                     >
                       Mensal
@@ -1094,8 +1094,8 @@ export default function MapaClient({
                       }}
                       className={`flex-1 rounded px-2 py-1 text-[10px] font-semibold transition-colors ${
                         ndviMode === "yearly"
-                          ? "bg-bg-surface text-primary shadow-sm"
-                          : "text-text-dim"
+                          ? "bg-card text-primary shadow-sm"
+                          : "text-stone-400"
                       }`}
                     >
                       Anual
@@ -1113,7 +1113,7 @@ export default function MapaClient({
                       onChange={(e) => setNdviMonth(Number(e.target.value))}
                       className="w-full accent-primary"
                     />
-                    <div className="flex justify-between text-[9px] text-text-dim">
+                    <div className="flex justify-between text-[9px] text-stone-400">
                       {MONTH_NAMES_SHORT.map((m, i) => (
                         <span key={m} className={i + 1 === ndviMonth ? "font-bold text-primary" : ""}>
                           {m}
@@ -1132,7 +1132,7 @@ export default function MapaClient({
                         onChange={(e) => setNdviYear(Number(e.target.value))}
                         className="w-full accent-primary"
                       />
-                      <div className="mt-1 flex justify-between text-[9px] text-text-dim">
+                      <div className="mt-1 flex justify-between text-[9px] text-stone-400">
                         <span>{yearComparisons[0]?.year}</span>
                         <span>{yearComparisons[yearComparisons.length - 1]?.year}</span>
                       </div>
@@ -1146,7 +1146,7 @@ export default function MapaClient({
                       <div key={i} className="flex-1" style={{ backgroundColor: color }} />
                     ))}
                   </div>
-                  <div className="mt-0.5 flex justify-between text-[8px] text-text-dim">
+                  <div className="mt-0.5 flex justify-between text-[8px] text-stone-400">
                     <span>0.0</span>
                     <span>0.5</span>
                     <span>1.0</span>
@@ -1159,11 +1159,11 @@ export default function MapaClient({
             {layers.precipitacao.visible && hasPrecipTiles && (
               <div className="mt-3 border-t border-border pt-3">
                 <div className="mb-2 flex items-center justify-between">
-                  <span className="text-xs font-semibold text-text-primary">
+                  <span className="text-xs font-semibold text-foreground">
                     Precipitacao — {MONTH_NAMES_SHORT[precipMonth - 1]}
                   </span>
                   {currentPrecip && (
-                    <span className="rounded-full bg-blue-500/20 px-2 py-0.5 text-[10px] font-bold text-blue-400">
+                    <span className="rounded-full bg-status-info-bg px-2 py-0.5 text-[10px] font-bold text-status-info">
                       {currentPrecip.precip_mean.toFixed(0)} mm
                     </span>
                   )}
@@ -1176,7 +1176,7 @@ export default function MapaClient({
                   onChange={(e) => setPrecipMonth(Number(e.target.value))}
                   className="w-full accent-primary"
                 />
-                <div className="flex justify-between text-[9px] text-text-dim">
+                <div className="flex justify-between text-[9px] text-stone-400">
                   {MONTH_NAMES_SHORT.map((m, i) => (
                     <span key={m} className={i + 1 === precipMonth ? "font-bold text-primary" : ""}>
                       {m}
@@ -1189,7 +1189,7 @@ export default function MapaClient({
                       <div key={c} className="flex-1" style={{ backgroundColor: c }} />
                     ))}
                   </div>
-                  <div className="mt-0.5 flex justify-between text-[8px] text-text-dim">
+                  <div className="mt-0.5 flex justify-between text-[8px] text-stone-400">
                     <span>Seco</span>
                     <span>Chuvoso</span>
                   </div>
@@ -1201,11 +1201,11 @@ export default function MapaClient({
             {layers["umidade-solo"].visible && hasSmTiles && (
               <div className="mt-3 border-t border-border pt-3">
                 <div className="mb-2 flex items-center justify-between">
-                  <span className="text-xs font-semibold text-text-primary">
+                  <span className="text-xs font-semibold text-foreground">
                     Umidade Solo — {MONTH_NAMES_SHORT[smMonth - 1]}
                   </span>
                   {currentSm && (
-                    <span className="rounded-full bg-teal-500/20 px-2 py-0.5 text-[10px] font-bold text-teal-400">
+                    <span className="rounded-full bg-forest-50 px-2 py-0.5 text-[10px] font-bold text-moisture-600">
                       {currentSm.sm_mean.toFixed(3)} m3/m3
                     </span>
                   )}
@@ -1218,7 +1218,7 @@ export default function MapaClient({
                   onChange={(e) => setSmMonth(Number(e.target.value))}
                   className="w-full accent-primary"
                 />
-                <div className="flex justify-between text-[9px] text-text-dim">
+                <div className="flex justify-between text-[9px] text-stone-400">
                   {MONTH_NAMES_SHORT.map((m, i) => (
                     <span key={m} className={i + 1 === smMonth ? "font-bold text-primary" : ""}>
                       {m}
@@ -1231,7 +1231,7 @@ export default function MapaClient({
                       <div key={c} className="flex-1" style={{ backgroundColor: c }} />
                     ))}
                   </div>
-                  <div className="mt-0.5 flex justify-between text-[8px] text-text-dim">
+                  <div className="mt-0.5 flex justify-between text-[8px] text-stone-400">
                     <span>Seco</span>
                     <span>Umido</span>
                   </div>
@@ -1243,11 +1243,11 @@ export default function MapaClient({
             {layers.ecostress.visible && hasEcoTiles && (
               <div className="mt-3 border-t border-border pt-3">
                 <div className="mb-2 flex items-center justify-between">
-                  <span className="text-xs font-semibold text-text-primary">
+                  <span className="text-xs font-semibold text-foreground">
                     ECOSTRESS — {MONTH_NAMES_SHORT[ecoMonth - 1]}
                   </span>
                   {currentEco && (
-                    <span className="rounded-full bg-red-500/20 px-2 py-0.5 text-[10px] font-bold text-red-400">
+                    <span className="rounded-full bg-status-critical-bg px-2 py-0.5 text-[10px] font-bold text-status-critical">
                       {currentEco.lst_mean.toFixed(1)}°C
                     </span>
                   )}
@@ -1260,7 +1260,7 @@ export default function MapaClient({
                   onChange={(e) => setEcoMonth(Number(e.target.value))}
                   className="w-full accent-primary"
                 />
-                <div className="flex justify-between text-[9px] text-text-dim">
+                <div className="flex justify-between text-[9px] text-stone-400">
                   {MONTH_NAMES_SHORT.map((m, i) => (
                     <span key={m} className={i + 1 === ecoMonth ? "font-bold text-primary" : ""}>
                       {m}
@@ -1273,14 +1273,14 @@ export default function MapaClient({
                       <div key={c} className="flex-1" style={{ backgroundColor: c }} />
                     ))}
                   </div>
-                  <div className="mt-0.5 flex justify-between text-[8px] text-text-dim">
+                  <div className="mt-0.5 flex justify-between text-[8px] text-stone-400">
                     <span>5°C</span>
                     <span>25°C</span>
                     <span>45°C</span>
                   </div>
                 </div>
                 {currentEco && (
-                  <p className="mt-1 text-[9px] text-text-dim">
+                  <p className="mt-1 text-[9px] text-stone-400">
                     {currentEco.n_images} imagens | 70m resolucao
                   </p>
                 )}
@@ -1290,11 +1290,11 @@ export default function MapaClient({
             {/* ── Legends ── */}
             {layers.relevo.visible && (
               <div className="mt-3 border-t border-border pt-3">
-                <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-text-dim">
+                <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-stone-400">
                   Elevacao
                 </p>
                 <div className="flex items-center gap-1">
-                  <span className="text-[10px] text-text-muted">
+                  <span className="text-[10px] text-muted-foreground">
                     {hasElevationTile
                       ? `${mapTiles.elevation.main!.min_elevation}m`
                       : `${topography.summary.min_elevation_m}m`}
@@ -1304,7 +1304,7 @@ export default function MapaClient({
                       <div key={c} className="flex-1" style={{ backgroundColor: c }} />
                     ))}
                   </div>
-                  <span className="text-[10px] text-text-muted">
+                  <span className="text-[10px] text-muted-foreground">
                     {hasElevationTile
                       ? `${mapTiles.elevation.main!.max_elevation}m`
                       : `${topography.summary.max_elevation_m}m`}
@@ -1315,17 +1315,17 @@ export default function MapaClient({
 
             {layers.temperatura.visible && (
               <div className="mt-3 border-t border-border pt-3">
-                <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-text-dim">
+                <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-stone-400">
                   {hasLstTiles ? "Temperatura de superficie (LST)" : "Temperatura max. estimada"}
                 </p>
                 <div className="flex items-center gap-1">
-                  <span className="text-[10px] text-text-muted">Frio</span>
+                  <span className="text-[10px] text-muted-foreground">Frio</span>
                   <div className="flex h-2 flex-1 overflow-hidden rounded-full">
                     {["#1E88E5", "#42A5F5", "#FDD835", "#FF9800", "#E65100"].map((c) => (
                       <div key={c} className="flex-1" style={{ backgroundColor: c }} />
                     ))}
                   </div>
-                  <span className="text-[10px] text-text-muted">Quente</span>
+                  <span className="text-[10px] text-muted-foreground">Quente</span>
                 </div>
               </div>
             )}
@@ -1333,7 +1333,7 @@ export default function MapaClient({
             {layers["uso-do-solo"].visible && (
               <div className="mt-3 border-t border-border pt-3">
                 <div className="mb-1.5 flex items-center justify-between">
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-text-dim">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-stone-400">
                     Uso do solo
                     {hasMbRaster && mbYears.length > 0
                       ? ` — ${mbYears[mbYearIdx]?.year}`
@@ -1351,7 +1351,7 @@ export default function MapaClient({
                       onChange={(e) => setMbYearIdx(Number(e.target.value))}
                       className="w-full accent-primary"
                     />
-                    <div className="mt-0.5 flex justify-between text-[9px] text-text-dim">
+                    <div className="mt-0.5 flex justify-between text-[9px] text-stone-400">
                       <span>{mbYears[mbYears.length - 1]?.year}</span>
                       <span>{mbYears[0]?.year}</span>
                     </div>
@@ -1365,10 +1365,10 @@ export default function MapaClient({
                         className="inline-block h-2.5 w-2.5 shrink-0 rounded-sm"
                         style={{ backgroundColor: LAND_USE_COLORS[key] ?? "#666" }}
                       />
-                      <span className="flex-1 text-[11px] text-text-secondary">
+                      <span className="flex-1 text-[11px] text-muted-foreground">
                         {LAND_USE_LABELS[key] ?? key}
                       </span>
-                      <span className="font-mono text-[10px] text-text-dim">
+                      <span className="font-mono text-[10px] text-stone-400">
                         {val.pct}%
                       </span>
                     </div>
@@ -1379,7 +1379,7 @@ export default function MapaClient({
 
             {/* Info footer */}
             <div className="mt-3 border-t border-border pt-2">
-              <p className="text-[9px] leading-relaxed text-text-dim">
+              <p className="text-[9px] leading-relaxed text-stone-400">
                 Clique no mapa para ver dados do ponto. SRTM (elevacao) | MODIS LST (temperatura) | Sentinel-2 (NDVI) | GPM (precipitacao) | SMAP (umidade) | MapBiomas (uso do solo) | NASA ECOSTRESS (LST 70m)
               </p>
             </div>
@@ -1389,8 +1389,8 @@ export default function MapaClient({
 
       {/* ── Bottom info bar ── */}
       <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-[500] flex items-end justify-between p-3">
-        <div className="pointer-events-auto rounded-lg bg-bg-surface/90 px-3 py-1.5 text-[11px] text-text-muted shadow-lg backdrop-blur-sm">
-          <span className="font-semibold text-text-primary">
+        <div className="pointer-events-auto rounded-full bg-card/90 px-4 py-1.5 text-[11px] text-muted-foreground shadow-lg backdrop-blur-sm">
+          <span className="font-semibold text-foreground">
             Municipio de {site.point.name}
           </span>{" "}
           — {site.point.state} | Elev. media {meanElev}m | {topography.points.length} pontos topograficos
@@ -1400,23 +1400,25 @@ export default function MapaClient({
       {/* ── Custom popup styles ── */}
       <style jsx global>{`
         .fs-popup .leaflet-popup-content-wrapper {
-          border-radius: 10px;
-          background: #111827;
-          color: #F9FAFB;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+          border-radius: 12px;
+          background: #FFFFFF;
+          color: #151A17;
+          border: 1px solid #D6E5D8;
+          box-shadow: 0 8px 24px rgba(21, 26, 23, 0.08);
         }
         .fs-popup .leaflet-popup-tip {
-          background: #111827;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+          background: #FFFFFF;
+          box-shadow: 0 2px 8px rgba(21, 26, 23, 0.06);
         }
         .leaflet-popup-content-wrapper {
-          background: #111827;
-          color: #F9FAFB;
-          border-radius: 10px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+          background: #FFFFFF;
+          color: #151A17;
+          border-radius: 12px;
+          border: 1px solid #D6E5D8;
+          box-shadow: 0 8px 24px rgba(21, 26, 23, 0.08);
         }
         .leaflet-popup-tip {
-          background: #111827;
+          background: #FFFFFF;
         }
         .leaflet-control-zoom a {
           width: 32px !important;
@@ -1424,26 +1426,26 @@ export default function MapaClient({
           line-height: 32px !important;
           font-size: 16px !important;
           border-radius: 8px !important;
-          background: #111827 !important;
-          color: #F9FAFB !important;
-          border-color: #374151 !important;
+          background: #FFFFFF !important;
+          color: #151A17 !important;
+          border-color: #D6E5D8 !important;
         }
         .leaflet-control-zoom a:hover {
-          background: #1F2937 !important;
+          background: #E4EFE5 !important;
         }
         .leaflet-control-zoom {
           border-radius: 10px !important;
           overflow: hidden;
-          box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3) !important;
+          box-shadow: 0 2px 8px rgba(21, 26, 23, 0.06) !important;
           border: none !important;
         }
         .leaflet-control-scale-line {
           border-radius: 4px;
           font-size: 10px;
           padding: 2px 8px;
-          background: rgba(17, 24, 39, 0.8);
-          color: #D1D5DB;
-          border-color: #374151;
+          background: rgba(255, 255, 255, 0.9);
+          color: #4B5C50;
+          border-color: #D6E5D8;
         }
       `}</style>
     </div>

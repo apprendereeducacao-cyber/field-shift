@@ -7,46 +7,46 @@
     "lat": -28.6033,
     "lon": -53.6733
   },
-  "buffer_radius_m": 5000,
+  "buffer_radius_m": 20000,
   "period": "1985-2023",
-  "total_area_ha": 7749.12,
-  "generated": "2026-11-14 19:07",
+  "total_area_ha": 123987.08,
+  "generated": "2026-11-15 08:40",
   "current_state": {
     "soja": {
-      "area_ha": 6292.03,
-      "pct": 81.2
+      "area_ha": 97160.19,
+      "pct": 78.4
     },
     "outras_lavouras": {
-      "area_ha": 169.65,
-      "pct": 2.2
+      "area_ha": 2837.8,
+      "pct": 2.3
     },
     "lavoura_perene": {
       "area_ha": 0,
       "pct": 0.0
     },
     "pastagem": {
-      "area_ha": 14.09,
-      "pct": 0.2
+      "area_ha": 328.59,
+      "pct": 0.3
     },
     "campo_nativo": {
-      "area_ha": 37.04,
-      "pct": 0.5
+      "area_ha": 3862.3,
+      "pct": 3.1
     },
     "floresta": {
-      "area_ha": 499.88,
-      "pct": 6.5
+      "area_ha": 11107.1,
+      "pct": 9.0
     },
     "silvicultura": {
-      "area_ha": 27.64,
-      "pct": 0.4
+      "area_ha": 249.86,
+      "pct": 0.2
     },
     "agua": {
-      "area_ha": 36.21,
-      "pct": 0.5
+      "area_ha": 420.13,
+      "pct": 0.3
     },
     "urbano_outros": {
-      "area_ha": 672.58,
-      "pct": 8.7
+      "area_ha": 8021.11,
+      "pct": 6.5
     },
     "agricultura_geral": {
       "area_ha": 0,
@@ -55,16 +55,16 @@
   },
   "transitions": {
     "soja": {
-      "from_ha": 1279.44,
-      "to_ha": 6292.03,
-      "change_pct": 391.8,
+      "from_ha": 20507.56,
+      "to_ha": 97160.19,
+      "change_pct": 373.8,
       "from_year": 1985,
       "to_year": 2023
     },
     "outras_lavouras": {
-      "from_ha": 3998.45,
-      "to_ha": 169.65,
-      "change_pct": -95.8,
+      "from_ha": 51294.25,
+      "to_ha": 2837.8,
+      "change_pct": -94.5,
       "from_year": 1985,
       "to_year": 2023
     },
@@ -76,44 +76,44 @@
       "to_year": 2023
     },
     "pastagem": {
-      "from_ha": 495.87,
-      "to_ha": 14.09,
-      "change_pct": -97.2,
+      "from_ha": 4021.55,
+      "to_ha": 328.59,
+      "change_pct": -91.8,
       "from_year": 1985,
       "to_year": 2023
     },
     "campo_nativo": {
-      "from_ha": 244.34,
-      "to_ha": 37.04,
-      "change_pct": -84.8,
+      "from_ha": 23123.31,
+      "to_ha": 3862.3,
+      "change_pct": -83.3,
       "from_year": 1985,
       "to_year": 2023
     },
     "floresta": {
-      "from_ha": 576.92,
-      "to_ha": 499.88,
-      "change_pct": -13.4,
+      "from_ha": 11416.67,
+      "to_ha": 11107.1,
+      "change_pct": -2.7,
       "from_year": 1985,
       "to_year": 2023
     },
     "silvicultura": {
-      "from_ha": 1.53,
-      "to_ha": 27.64,
-      "change_pct": 1706.5,
+      "from_ha": 14.5,
+      "to_ha": 249.86,
+      "change_pct": 1623.2,
       "from_year": 1985,
       "to_year": 2023
     },
     "agua": {
-      "from_ha": 31.42,
-      "to_ha": 36.21,
-      "change_pct": 15.2,
+      "from_ha": 257.08,
+      "to_ha": 420.13,
+      "change_pct": 63.4,
       "from_year": 1985,
       "to_year": 2023
     },
     "urbano_outros": {
-      "from_ha": 1121.16,
-      "to_ha": 672.58,
-      "change_pct": -40.0,
+      "from_ha": 13352.15,
+      "to_ha": 8021.11,
+      "change_pct": -39.9,
       "from_year": 1985,
       "to_year": 2023
     },
@@ -129,317 +129,317 @@
     "soja": [
       {
         "year": 1985,
-        "area_ha": 1279.44
+        "area_ha": 20507.56
       },
       {
         "year": 1986,
-        "area_ha": 1279.44
+        "area_ha": 20508.11
       },
       {
         "year": 1987,
-        "area_ha": 2881.82
+        "area_ha": 40678.9
       },
       {
         "year": 1988,
-        "area_ha": 2913.73
+        "area_ha": 41167.0
       },
       {
         "year": 1989,
-        "area_ha": 3731.86
+        "area_ha": 50246.69
       },
       {
         "year": 1990,
-        "area_ha": 4006.6
+        "area_ha": 52845.1
       },
       {
         "year": 1991,
-        "area_ha": 4130.29
+        "area_ha": 54251.66
       },
       {
         "year": 1992,
-        "area_ha": 4403.51
+        "area_ha": 59080.88
       },
       {
         "year": 1993,
-        "area_ha": 4663.73
+        "area_ha": 62211.49
       },
       {
         "year": 1994,
-        "area_ha": 4711.34
+        "area_ha": 61476.4
       },
       {
         "year": 1995,
-        "area_ha": 4233.43
+        "area_ha": 53644.19
       },
       {
         "year": 1996,
-        "area_ha": 4146.86
+        "area_ha": 53578.09
       },
       {
         "year": 1997,
-        "area_ha": 4372.47
+        "area_ha": 58604.59
       },
       {
         "year": 1998,
-        "area_ha": 4435.11
+        "area_ha": 60026.99
       },
       {
         "year": 1999,
-        "area_ha": 4735.81
+        "area_ha": 66206.88
       },
       {
         "year": 2000,
-        "area_ha": 5593.47
+        "area_ha": 80151.97
       },
       {
         "year": 2001,
-        "area_ha": 5623.37
+        "area_ha": 81048.06
       },
       {
         "year": 2002,
-        "area_ha": 5800.41
+        "area_ha": 84157.42
       },
       {
         "year": 2003,
-        "area_ha": 5884.44
+        "area_ha": 85855.67
       },
       {
         "year": 2004,
-        "area_ha": 6054.72
+        "area_ha": 88450.79
       },
       {
         "year": 2005,
-        "area_ha": 6148.51
+        "area_ha": 90475.27
       },
       {
         "year": 2006,
-        "area_ha": 6272.85
+        "area_ha": 92410.98
       },
       {
         "year": 2007,
-        "area_ha": 6269.19
+        "area_ha": 93096.98
       },
       {
         "year": 2008,
-        "area_ha": 6242.88
+        "area_ha": 93612.32
       },
       {
         "year": 2009,
-        "area_ha": 6270.42
+        "area_ha": 94217.15
       },
       {
         "year": 2010,
-        "area_ha": 6282.99
+        "area_ha": 94525.95
       },
       {
         "year": 2011,
-        "area_ha": 6242.44
+        "area_ha": 94188.7
       },
       {
         "year": 2012,
-        "area_ha": 6132.67
+        "area_ha": 92917.04
       },
       {
         "year": 2013,
-        "area_ha": 6143.7
+        "area_ha": 93139.5
       },
       {
         "year": 2014,
-        "area_ha": 6224.53
+        "area_ha": 94391.96
       },
       {
         "year": 2015,
-        "area_ha": 6264.83
+        "area_ha": 95497.73
       },
       {
         "year": 2016,
-        "area_ha": 6276.02
+        "area_ha": 95824.09
       },
       {
         "year": 2017,
-        "area_ha": 6263.06
+        "area_ha": 95983.8
       },
       {
         "year": 2018,
-        "area_ha": 6278.6
+        "area_ha": 96403.2
       },
       {
         "year": 2019,
-        "area_ha": 6252.39
+        "area_ha": 96138.37
       },
       {
         "year": 2020,
-        "area_ha": 6261.79
+        "area_ha": 96367.52
       },
       {
         "year": 2021,
-        "area_ha": 6273.68
+        "area_ha": 96599.28
       },
       {
         "year": 2022,
-        "area_ha": 6286.75
+        "area_ha": 96975.39
       },
       {
         "year": 2023,
-        "area_ha": 6292.03
+        "area_ha": 97160.19
       }
     ],
     "outras_lavouras": [
       {
         "year": 1985,
-        "area_ha": 3998.45
+        "area_ha": 51294.25
       },
       {
         "year": 1986,
-        "area_ha": 3997.66
+        "area_ha": 51284.96
       },
       {
         "year": 1987,
-        "area_ha": 2453.07
+        "area_ha": 32581.05
       },
       {
         "year": 1988,
-        "area_ha": 2499.84
+        "area_ha": 33165.25
       },
       {
         "year": 1989,
-        "area_ha": 1757.75
+        "area_ha": 24920.19
       },
       {
         "year": 1990,
-        "area_ha": 1634.5
+        "area_ha": 24585.67
       },
       {
         "year": 1991,
-        "area_ha": 1625.75
+        "area_ha": 25222.39
       },
       {
         "year": 1992,
-        "area_ha": 1376.35
+        "area_ha": 20923.25
       },
       {
         "year": 1993,
-        "area_ha": 1299.42
+        "area_ha": 19643.25
       },
       {
         "year": 1994,
-        "area_ha": 1317.38
+        "area_ha": 21380.67
       },
       {
         "year": 1995,
-        "area_ha": 1843.34
+        "area_ha": 30090.01
       },
       {
         "year": 1996,
-        "area_ha": 1964.25
+        "area_ha": 31064.14
       },
       {
         "year": 1997,
-        "area_ha": 1777.34
+        "area_ha": 26412.55
       },
       {
         "year": 1998,
-        "area_ha": 1730.01
+        "area_ha": 25849.04
       },
       {
         "year": 1999,
-        "area_ha": 1434.54
+        "area_ha": 21897.66
       },
       {
         "year": 2000,
-        "area_ha": 635.82
+        "area_ha": 9634.91
       },
       {
         "year": 2001,
-        "area_ha": 744.93
+        "area_ha": 11254.25
       },
       {
         "year": 2002,
-        "area_ha": 605.99
+        "area_ha": 9260.31
       },
       {
         "year": 2003,
-        "area_ha": 424.13
+        "area_ha": 7251.0
       },
       {
         "year": 2004,
-        "area_ha": 278.34
+        "area_ha": 5715.67
       },
       {
         "year": 2005,
-        "area_ha": 231.41
+        "area_ha": 5021.49
       },
       {
         "year": 2006,
-        "area_ha": 185.59
+        "area_ha": 4425.08
       },
       {
         "year": 2007,
-        "area_ha": 204.23
+        "area_ha": 4297.7
       },
       {
         "year": 2008,
-        "area_ha": 235.07
+        "area_ha": 4285.52
       },
       {
         "year": 2009,
-        "area_ha": 224.61
+        "area_ha": 4225.85
       },
       {
         "year": 2010,
-        "area_ha": 221.6
+        "area_ha": 4151.74
       },
       {
         "year": 2011,
-        "area_ha": 253.93
+        "area_ha": 4574.25
       },
       {
         "year": 2012,
-        "area_ha": 335.77
+        "area_ha": 5754.88
       },
       {
         "year": 2013,
-        "area_ha": 323.27
+        "area_ha": 5685.84
       },
       {
         "year": 2014,
-        "area_ha": 227.93
+        "area_ha": 4568.35
       },
       {
         "year": 2015,
-        "area_ha": 181.82
+        "area_ha": 3729.68
       },
       {
         "year": 2016,
-        "area_ha": 174.32
+        "area_ha": 3593.54
       },
       {
         "year": 2017,
-        "area_ha": 185.93
+        "area_ha": 3559.61
       },
       {
         "year": 2018,
-        "area_ha": 169.4
+        "area_ha": 3251.95
       },
       {
         "year": 2019,
-        "area_ha": 206.69
+        "area_ha": 3767.37
       },
       {
         "year": 2020,
-        "area_ha": 201.33
+        "area_ha": 3608.1
       },
       {
         "year": 2021,
-        "area_ha": 190.51
+        "area_ha": 3407.33
       },
       {
         "year": 2022,
-        "area_ha": 175.16
+        "area_ha": 3004.93
       },
       {
         "year": 2023,
-        "area_ha": 169.65
+        "area_ha": 2837.8
       }
     ],
     "lavoura_perene": [
@@ -603,949 +603,949 @@
     "pastagem": [
       {
         "year": 1985,
-        "area_ha": 495.87
+        "area_ha": 4021.55
       },
       {
         "year": 1986,
-        "area_ha": 583.3
+        "area_ha": 4775.19
       },
       {
         "year": 1987,
-        "area_ha": 565.18
+        "area_ha": 4648.03
       },
       {
         "year": 1988,
-        "area_ha": 555.99
+        "area_ha": 4546.31
       },
       {
         "year": 1989,
-        "area_ha": 559.72
+        "area_ha": 4648.72
       },
       {
         "year": 1990,
-        "area_ha": 528.47
+        "area_ha": 4627.31
       },
       {
         "year": 1991,
-        "area_ha": 494.7
+        "area_ha": 4527.24
       },
       {
         "year": 1992,
-        "area_ha": 473.01
+        "area_ha": 4497.12
       },
       {
         "year": 1993,
-        "area_ha": 318.92
+        "area_ha": 4271.54
       },
       {
         "year": 1994,
-        "area_ha": 273.55
+        "area_ha": 4098.35
       },
       {
         "year": 1995,
-        "area_ha": 260.72
+        "area_ha": 3969.29
       },
       {
         "year": 1996,
-        "area_ha": 260.91
+        "area_ha": 3908.75
       },
       {
         "year": 1997,
-        "area_ha": 271.24
+        "area_ha": 3679.96
       },
       {
         "year": 1998,
-        "area_ha": 283.38
+        "area_ha": 3447.11
       },
       {
         "year": 1999,
-        "area_ha": 262.53
+        "area_ha": 2966.18
       },
       {
         "year": 2000,
-        "area_ha": 217.37
+        "area_ha": 2608.43
       },
       {
         "year": 2001,
-        "area_ha": 168.24
+        "area_ha": 2294.04
       },
       {
         "year": 2002,
-        "area_ha": 124.58
+        "area_ha": 1959.74
       },
       {
         "year": 2003,
-        "area_ha": 104.75
+        "area_ha": 1891.76
       },
       {
         "year": 2004,
-        "area_ha": 79.28
+        "area_ha": 1786.93
       },
       {
         "year": 2005,
-        "area_ha": 77.39
+        "area_ha": 1608.91
       },
       {
         "year": 2006,
-        "area_ha": 76.6
+        "area_ha": 1463.21
       },
       {
         "year": 2007,
-        "area_ha": 74.0
+        "area_ha": 1384.88
       },
       {
         "year": 2008,
-        "area_ha": 67.7
+        "area_ha": 1242.73
       },
       {
         "year": 2009,
-        "area_ha": 61.49
+        "area_ha": 1161.74
       },
       {
         "year": 2010,
-        "area_ha": 53.85
+        "area_ha": 1088.61
       },
       {
         "year": 2011,
-        "area_ha": 47.94
+        "area_ha": 999.84
       },
       {
         "year": 2012,
-        "area_ha": 43.46
+        "area_ha": 939.43
       },
       {
         "year": 2013,
-        "area_ha": 38.65
+        "area_ha": 867.75
       },
       {
         "year": 2014,
-        "area_ha": 35.74
+        "area_ha": 836.8
       },
       {
         "year": 2015,
-        "area_ha": 27.71
+        "area_ha": 788.28
       },
       {
         "year": 2016,
-        "area_ha": 20.62
+        "area_ha": 723.72
       },
       {
         "year": 2017,
-        "area_ha": 20.15
+        "area_ha": 685.79
       },
       {
         "year": 2018,
-        "area_ha": 18.97
+        "area_ha": 636.56
       },
       {
         "year": 2019,
-        "area_ha": 16.3
+        "area_ha": 548.9
       },
       {
         "year": 2020,
-        "area_ha": 17.55
+        "area_ha": 493.83
       },
       {
         "year": 2021,
-        "area_ha": 19.29
+        "area_ha": 460.67
       },
       {
         "year": 2022,
-        "area_ha": 17.0
+        "area_ha": 390.65
       },
       {
         "year": 2023,
-        "area_ha": 14.09
+        "area_ha": 328.59
       }
     ],
     "campo_nativo": [
       {
         "year": 1985,
-        "area_ha": 244.34
+        "area_ha": 23123.31
       },
       {
         "year": 1986,
-        "area_ha": 162.47
+        "area_ha": 22363.66
       },
       {
         "year": 1987,
-        "area_ha": 148.4
+        "area_ha": 21597.93
       },
       {
         "year": 1988,
-        "area_ha": 117.9
+        "area_ha": 20744.03
       },
       {
         "year": 1989,
-        "area_ha": 98.16
+        "area_ha": 19111.11
       },
       {
         "year": 1990,
-        "area_ha": 77.86
+        "area_ha": 17930.2
       },
       {
         "year": 1991,
-        "area_ha": 83.87
+        "area_ha": 17620.74
       },
       {
         "year": 1992,
-        "area_ha": 100.34
+        "area_ha": 18137.01
       },
       {
         "year": 1993,
-        "area_ha": 95.29
+        "area_ha": 16855.51
       },
       {
         "year": 1994,
-        "area_ha": 90.25
+        "area_ha": 16286.93
       },
       {
         "year": 1995,
-        "area_ha": 83.57
+        "area_ha": 15943.35
       },
       {
         "year": 1996,
-        "area_ha": 74.43
+        "area_ha": 15464.14
       },
       {
         "year": 1997,
-        "area_ha": 78.52
+        "area_ha": 15496.65
       },
       {
         "year": 1998,
-        "area_ha": 83.09
+        "area_ha": 15280.73
       },
       {
         "year": 1999,
-        "area_ha": 85.59
+        "area_ha": 13678.93
       },
       {
         "year": 2000,
-        "area_ha": 84.89
+        "area_ha": 12776.46
       },
       {
         "year": 2001,
-        "area_ha": 88.02
+        "area_ha": 11961.61
       },
       {
         "year": 2002,
-        "area_ha": 87.91
+        "area_ha": 11372.29
       },
       {
         "year": 2003,
-        "area_ha": 84.05
+        "area_ha": 10322.39
       },
       {
         "year": 2004,
-        "area_ha": 80.91
+        "area_ha": 9037.06
       },
       {
         "year": 2005,
-        "area_ha": 80.79
+        "area_ha": 8448.86
       },
       {
         "year": 2006,
-        "area_ha": 75.61
+        "area_ha": 8051.54
       },
       {
         "year": 2007,
-        "area_ha": 72.4
+        "area_ha": 7722.68
       },
       {
         "year": 2008,
-        "area_ha": 66.12
+        "area_ha": 7180.37
       },
       {
         "year": 2009,
-        "area_ha": 58.13
+        "area_ha": 6771.99
       },
       {
         "year": 2010,
-        "area_ha": 55.27
+        "area_ha": 6869.63
       },
       {
         "year": 2011,
-        "area_ha": 54.51
+        "area_ha": 6754.89
       },
       {
         "year": 2012,
-        "area_ha": 55.68
+        "area_ha": 6666.22
       },
       {
         "year": 2013,
-        "area_ha": 55.13
+        "area_ha": 6686.77
       },
       {
         "year": 2014,
-        "area_ha": 57.22
+        "area_ha": 6518.02
       },
       {
         "year": 2015,
-        "area_ha": 54.35
+        "area_ha": 6265.69
       },
       {
         "year": 2016,
-        "area_ha": 49.47
+        "area_ha": 5635.65
       },
       {
         "year": 2017,
-        "area_ha": 49.8
+        "area_ha": 5353.09
       },
       {
         "year": 2018,
-        "area_ha": 47.63
+        "area_ha": 5033.82
       },
       {
         "year": 2019,
-        "area_ha": 44.9
+        "area_ha": 4775.83
       },
       {
         "year": 2020,
-        "area_ha": 43.17
+        "area_ha": 4570.3
       },
       {
         "year": 2021,
-        "area_ha": 42.88
+        "area_ha": 4431.2
       },
       {
         "year": 2022,
-        "area_ha": 38.93
+        "area_ha": 4249.17
       },
       {
         "year": 2023,
-        "area_ha": 37.04
+        "area_ha": 3862.3
       }
     ],
     "floresta": [
       {
         "year": 1985,
-        "area_ha": 576.92
+        "area_ha": 11416.67
       },
       {
         "year": 1986,
-        "area_ha": 576.06
+        "area_ha": 11400.46
       },
       {
         "year": 1987,
-        "area_ha": 570.96
+        "area_ha": 11418.88
       },
       {
         "year": 1988,
-        "area_ha": 525.67
+        "area_ha": 11327.29
       },
       {
         "year": 1989,
-        "area_ha": 502.51
+        "area_ha": 11399.94
       },
       {
         "year": 1990,
-        "area_ha": 483.94
+        "area_ha": 11244.17
       },
       {
         "year": 1991,
-        "area_ha": 481.9
+        "area_ha": 11377.39
       },
       {
         "year": 1992,
-        "area_ha": 471.16
+        "area_ha": 11518.92
       },
       {
         "year": 1993,
-        "area_ha": 464.12
+        "area_ha": 11305.76
       },
       {
         "year": 1994,
-        "area_ha": 453.07
+        "area_ha": 10933.3
       },
       {
         "year": 1995,
-        "area_ha": 425.55
+        "area_ha": 10318.0
       },
       {
         "year": 1996,
-        "area_ha": 426.22
+        "area_ha": 10149.03
       },
       {
         "year": 1997,
-        "area_ha": 418.62
+        "area_ha": 10029.59
       },
       {
         "year": 1998,
-        "area_ha": 430.57
+        "area_ha": 10061.22
       },
       {
         "year": 1999,
-        "area_ha": 436.5
+        "area_ha": 10226.28
       },
       {
         "year": 2000,
-        "area_ha": 440.16
+        "area_ha": 10319.92
       },
       {
         "year": 2001,
-        "area_ha": 426.94
+        "area_ha": 10209.77
       },
       {
         "year": 2002,
-        "area_ha": 429.4
+        "area_ha": 10213.47
       },
       {
         "year": 2003,
-        "area_ha": 422.68
+        "area_ha": 10110.01
       },
       {
         "year": 2004,
-        "area_ha": 414.35
+        "area_ha": 9887.03
       },
       {
         "year": 2005,
-        "area_ha": 435.25
+        "area_ha": 9790.75
       },
       {
         "year": 2006,
-        "area_ha": 437.48
+        "area_ha": 9782.84
       },
       {
         "year": 2007,
-        "area_ha": 437.95
+        "area_ha": 9776.23
       },
       {
         "year": 2008,
-        "area_ha": 446.3
+        "area_ha": 9994.14
       },
       {
         "year": 2009,
-        "area_ha": 457.76
+        "area_ha": 10212.0
       },
       {
         "year": 2010,
-        "area_ha": 463.04
+        "area_ha": 10310.38
       },
       {
         "year": 2011,
-        "area_ha": 467.1
+        "area_ha": 10294.01
       },
       {
         "year": 2012,
-        "area_ha": 446.94
+        "area_ha": 10160.37
       },
       {
         "year": 2013,
-        "area_ha": 451.19
+        "area_ha": 10144.37
       },
       {
         "year": 2014,
-        "area_ha": 459.62
+        "area_ha": 10200.12
       },
       {
         "year": 2015,
-        "area_ha": 459.57
+        "area_ha": 10264.54
       },
       {
         "year": 2016,
-        "area_ha": 444.24
+        "area_ha": 10284.17
       },
       {
         "year": 2017,
-        "area_ha": 445.81
+        "area_ha": 10273.31
       },
       {
         "year": 2018,
-        "area_ha": 450.1
+        "area_ha": 10398.08
       },
       {
         "year": 2019,
-        "area_ha": 452.52
+        "area_ha": 10447.03
       },
       {
         "year": 2020,
-        "area_ha": 474.98
+        "area_ha": 10817.86
       },
       {
         "year": 2021,
-        "area_ha": 501.39
+        "area_ha": 10791.94
       },
       {
         "year": 2022,
-        "area_ha": 508.47
+        "area_ha": 10860.45
       },
       {
         "year": 2023,
-        "area_ha": 499.88
+        "area_ha": 11107.1
       }
     ],
     "silvicultura": [
       {
         "year": 1985,
-        "area_ha": 1.53
+        "area_ha": 14.5
       },
       {
         "year": 1986,
-        "area_ha": 1.53
+        "area_ha": 14.89
       },
       {
         "year": 1987,
-        "area_ha": 1.61
+        "area_ha": 15.68
       },
       {
         "year": 1988,
-        "area_ha": 29.12
+        "area_ha": 220.41
       },
       {
         "year": 1989,
-        "area_ha": 38.72
+        "area_ha": 258.66
       },
       {
         "year": 1990,
-        "area_ha": 44.23
+        "area_ha": 288.27
       },
       {
         "year": 1991,
-        "area_ha": 45.4
+        "area_ha": 302.24
       },
       {
         "year": 1992,
-        "area_ha": 67.75
+        "area_ha": 378.22
       },
       {
         "year": 1993,
-        "area_ha": 68.3
+        "area_ha": 388.76
       },
       {
         "year": 1994,
-        "area_ha": 65.55
+        "area_ha": 373.14
       },
       {
         "year": 1995,
-        "area_ha": 67.83
+        "area_ha": 398.92
       },
       {
         "year": 1996,
-        "area_ha": 68.23
+        "area_ha": 400.65
       },
       {
         "year": 1997,
-        "area_ha": 68.78
+        "area_ha": 404.74
       },
       {
         "year": 1998,
-        "area_ha": 67.29
+        "area_ha": 394.17
       },
       {
         "year": 1999,
-        "area_ha": 67.84
+        "area_ha": 413.53
       },
       {
         "year": 2000,
-        "area_ha": 68.71
+        "area_ha": 406.09
       },
       {
         "year": 2001,
-        "area_ha": 65.64
+        "area_ha": 406.4
       },
       {
         "year": 2002,
-        "area_ha": 64.85
+        "area_ha": 410.1
       },
       {
         "year": 2003,
-        "area_ha": 67.28
+        "area_ha": 414.71
       },
       {
         "year": 2004,
-        "area_ha": 56.83
+        "area_ha": 376.14
       },
       {
         "year": 2005,
-        "area_ha": 39.15
+        "area_ha": 331.05
       },
       {
         "year": 2006,
-        "area_ha": 35.37
+        "area_ha": 288.57
       },
       {
         "year": 2007,
-        "area_ha": 34.03
+        "area_ha": 272.35
       },
       {
         "year": 2008,
-        "area_ha": 32.22
+        "area_ha": 262.07
       },
       {
         "year": 2009,
-        "area_ha": 31.59
+        "area_ha": 259.4
       },
       {
         "year": 2010,
-        "area_ha": 31.81
+        "area_ha": 260.72
       },
       {
         "year": 2011,
-        "area_ha": 28.08
+        "area_ha": 233.71
       },
       {
         "year": 2012,
-        "area_ha": 27.92
+        "area_ha": 233.16
       },
       {
         "year": 2013,
-        "area_ha": 26.45
+        "area_ha": 214.42
       },
       {
         "year": 2014,
-        "area_ha": 26.45
+        "area_ha": 211.74
       },
       {
         "year": 2015,
-        "area_ha": 27.16
+        "area_ha": 214.27
       },
       {
         "year": 2016,
-        "area_ha": 27.4
+        "area_ha": 212.77
       },
       {
         "year": 2017,
-        "area_ha": 27.16
+        "area_ha": 229.6
       },
       {
         "year": 2018,
-        "area_ha": 26.38
+        "area_ha": 225.04
       },
       {
         "year": 2019,
-        "area_ha": 25.67
+        "area_ha": 227.16
       },
       {
         "year": 2020,
-        "area_ha": 26.93
+        "area_ha": 230.92
       },
       {
         "year": 2021,
-        "area_ha": 27.64
+        "area_ha": 249.7
       },
       {
         "year": 2022,
-        "area_ha": 27.64
+        "area_ha": 249.7
       },
       {
         "year": 2023,
-        "area_ha": 27.64
+        "area_ha": 249.86
       }
     ],
     "agua": [
       {
         "year": 1985,
-        "area_ha": 31.42
+        "area_ha": 257.08
       },
       {
         "year": 1986,
-        "area_ha": 33.07
+        "area_ha": 259.21
       },
       {
         "year": 1987,
-        "area_ha": 35.2
+        "area_ha": 266.85
       },
       {
         "year": 1988,
-        "area_ha": 31.81
+        "area_ha": 262.05
       },
       {
         "year": 1989,
-        "area_ha": 32.6
+        "area_ha": 256.54
       },
       {
         "year": 1990,
-        "area_ha": 37.29
+        "area_ha": 263.38
       },
       {
         "year": 1991,
-        "area_ha": 34.88
+        "area_ha": 251.65
       },
       {
         "year": 1992,
-        "area_ha": 36.61
+        "area_ha": 264.24
       },
       {
         "year": 1993,
-        "area_ha": 36.61
+        "area_ha": 270.42
       },
       {
         "year": 1994,
-        "area_ha": 37.09
+        "area_ha": 268.84
       },
       {
         "year": 1995,
-        "area_ha": 32.99
+        "area_ha": 263.68
       },
       {
         "year": 1996,
-        "area_ha": 29.37
+        "area_ha": 258.26
       },
       {
         "year": 1997,
-        "area_ha": 27.24
+        "area_ha": 251.88
       },
       {
         "year": 1998,
-        "area_ha": 30.54
+        "area_ha": 274.83
       },
       {
         "year": 1999,
-        "area_ha": 38.74
+        "area_ha": 285.59
       },
       {
         "year": 2000,
-        "area_ha": 35.35
+        "area_ha": 243.24
       },
       {
         "year": 2001,
-        "area_ha": 35.38
+        "area_ha": 245.82
       },
       {
         "year": 2002,
-        "area_ha": 33.73
+        "area_ha": 256.21
       },
       {
         "year": 2003,
-        "area_ha": 34.17
+        "area_ha": 274.46
       },
       {
         "year": 2004,
-        "area_ha": 34.72
+        "area_ha": 283.12
       },
       {
         "year": 2005,
-        "area_ha": 46.13
+        "area_ha": 314.44
       },
       {
         "year": 2006,
-        "area_ha": 48.97
+        "area_ha": 324.83
       },
       {
         "year": 2007,
-        "area_ha": 49.36
+        "area_ha": 329.64
       },
       {
         "year": 2008,
-        "area_ha": 49.83
+        "area_ha": 330.34
       },
       {
         "year": 2009,
-        "area_ha": 47.39
+        "area_ha": 328.89
       },
       {
         "year": 2010,
-        "area_ha": 53.77
+        "area_ha": 356.52
       },
       {
         "year": 2011,
-        "area_ha": 54.87
+        "area_ha": 358.94
       },
       {
         "year": 2012,
-        "area_ha": 49.12
+        "area_ha": 350.69
       },
       {
         "year": 2013,
-        "area_ha": 47.55
+        "area_ha": 358.31
       },
       {
         "year": 2014,
-        "area_ha": 51.56
+        "area_ha": 405.82
       },
       {
         "year": 2015,
-        "area_ha": 51.56
+        "area_ha": 438.05
       },
       {
         "year": 2016,
-        "area_ha": 46.37
+        "area_ha": 432.89
       },
       {
         "year": 2017,
-        "area_ha": 48.26
+        "area_ha": 449.44
       },
       {
         "year": 2018,
-        "area_ha": 48.1
+        "area_ha": 452.41
       },
       {
         "year": 2019,
-        "area_ha": 48.49
+        "area_ha": 457.52
       },
       {
         "year": 2020,
-        "area_ha": 46.21
+        "area_ha": 455.6
       },
       {
         "year": 2021,
-        "area_ha": 45.9
+        "area_ha": 462.65
       },
       {
         "year": 2022,
-        "area_ha": 46.21
+        "area_ha": 481.07
       },
       {
         "year": 2023,
-        "area_ha": 36.21
+        "area_ha": 420.13
       }
     ],
     "urbano_outros": [
       {
         "year": 1985,
-        "area_ha": 1121.16
+        "area_ha": 13352.15
       },
       {
         "year": 1986,
-        "area_ha": 1115.58
+        "area_ha": 13380.59
       },
       {
         "year": 1987,
-        "area_ha": 1092.88
+        "area_ha": 12779.76
       },
       {
         "year": 1988,
-        "area_ha": 1075.05
+        "area_ha": 12554.73
       },
       {
         "year": 1989,
-        "area_ha": 1027.8
+        "area_ha": 13145.22
       },
       {
         "year": 1990,
-        "area_ha": 936.24
+        "area_ha": 12202.97
       },
       {
         "year": 1991,
-        "area_ha": 852.34
+        "area_ha": 10433.78
       },
       {
         "year": 1992,
-        "area_ha": 820.39
+        "area_ha": 9187.43
       },
       {
         "year": 1993,
-        "area_ha": 802.72
+        "area_ha": 9040.35
       },
       {
         "year": 1994,
-        "area_ha": 800.89
+        "area_ha": 9169.44
       },
       {
         "year": 1995,
-        "area_ha": 801.69
+        "area_ha": 9359.65
       },
       {
         "year": 1996,
-        "area_ha": 778.85
+        "area_ha": 9164.01
       },
       {
         "year": 1997,
-        "area_ha": 734.9
+        "area_ha": 9107.1
       },
       {
         "year": 1998,
-        "area_ha": 689.14
+        "area_ha": 8652.97
       },
       {
         "year": 1999,
-        "area_ha": 687.57
+        "area_ha": 8312.03
       },
       {
         "year": 2000,
-        "area_ha": 673.34
+        "area_ha": 7846.07
       },
       {
         "year": 2001,
-        "area_ha": 596.6
+        "area_ha": 6567.12
       },
       {
         "year": 2002,
-        "area_ha": 602.25
+        "area_ha": 6357.52
       },
       {
         "year": 2003,
-        "area_ha": 727.61
+        "area_ha": 7867.07
       },
       {
         "year": 2004,
-        "area_ha": 749.96
+        "area_ha": 8450.33
       },
       {
         "year": 2005,
-        "area_ha": 690.49
+        "area_ha": 7996.31
       },
       {
         "year": 2006,
-        "area_ha": 616.64
+        "area_ha": 7240.04
       },
       {
         "year": 2007,
-        "area_ha": 607.95
+        "area_ha": 7106.61
       },
       {
         "year": 2008,
-        "area_ha": 608.99
+        "area_ha": 7079.58
       },
       {
         "year": 2009,
-        "area_ha": 597.74
+        "area_ha": 6810.04
       },
       {
         "year": 2010,
-        "area_ha": 586.79
+        "area_ha": 6423.53
       },
       {
         "year": 2011,
-        "area_ha": 600.23
+        "area_ha": 6582.72
       },
       {
         "year": 2012,
-        "area_ha": 657.56
+        "area_ha": 6965.27
       },
       {
         "year": 2013,
-        "area_ha": 663.18
+        "area_ha": 6890.1
       },
       {
         "year": 2014,
-        "area_ha": 666.07
+        "area_ha": 6854.25
       },
       {
         "year": 2015,
-        "area_ha": 682.11
+        "area_ha": 6788.83
       },
       {
         "year": 2016,
-        "area_ha": 710.69
+        "area_ha": 7280.24
       },
       {
         "year": 2017,
-        "area_ha": 708.95
+        "area_ha": 7452.44
       },
       {
         "year": 2018,
-        "area_ha": 709.95
+        "area_ha": 7586.02
       },
       {
         "year": 2019,
-        "area_ha": 702.16
+        "area_ha": 7624.88
       },
       {
         "year": 2020,
-        "area_ha": 677.16
+        "area_ha": 7442.93
       },
       {
         "year": 2021,
-        "area_ha": 647.83
+        "area_ha": 7584.29
       },
       {
         "year": 2022,
-        "area_ha": 648.96
+        "area_ha": 7775.72
       },
       {
         "year": 2023,
-        "area_ha": 672.58
+        "area_ha": 8021.11
       }
     ],
     "agricultura_geral": [

@@ -468,6 +468,14 @@ export type SmapYearlyTrend = {
   avg: number;
 };
 
+export type SmapTimeseries = {
+  date: string;
+  year: number;
+  month: number;
+  soil_moisture: number;
+  n_images: number;
+};
+
 export type SmapData = {
   source: string;
   description: string;
@@ -477,6 +485,7 @@ export type SmapData = {
   band_used: string;
   monthly_climatology: SmapMonthly[];
   yearly_trend: SmapYearlyTrend[];
+  timeseries: SmapTimeseries[];
 };
 
 export type GpmMonthly = {
@@ -492,6 +501,20 @@ export type GpmAnnual = {
   months_counted: number;
 };
 
+export type GpmTrend = {
+  first_half_avg_mm: number;
+  second_half_avg_mm: number;
+  change_pct: number;
+};
+
+export type GpmTimeseries = {
+  date: string;
+  year: number;
+  month: number;
+  precip_mm_month: number;
+  precip_mm_hr: number;
+};
+
 export type GpmData = {
   source: string;
   description: string;
@@ -501,6 +524,8 @@ export type GpmData = {
   location: string;
   monthly_climatology: GpmMonthly[];
   annual_totals: GpmAnnual[];
+  trend: GpmTrend;
+  timeseries: GpmTimeseries[];
 };
 
 export type GraceMonthly = {
@@ -553,6 +578,51 @@ export type ClimateExtData = {
     temperature: ClimateExtParam;
   };
 };
+
+export type LstMonthly = {
+  month: number;
+  name: string;
+  avg_lst_day_c: number | null;
+  avg_lst_night_c: number | null;
+};
+
+export type LstYearly = {
+  year: number;
+  avg_lst_day_c: number;
+  avg_lst_night_c: number;
+  n_images: number;
+};
+
+export type LstTrend = {
+  first_half_avg_c: number;
+  second_half_avg_c: number;
+  change_c: number;
+  direction: string;
+};
+
+export type LstData = {
+  source: string;
+  description: string;
+  resolution: string;
+  period: string;
+  unit: string;
+  total_images: number;
+  summary: {
+    summer_avg_day_c: number | null;
+    winter_avg_day_c: number | null;
+    amplitude_c: number | null;
+  };
+  trend: LstTrend | null;
+  monthly_climatology: LstMonthly[];
+  yearly_trend: LstYearly[];
+};
+
+let lstData: LstData | null = null;
+try {
+  lstData = require("../../data/lst.json") as LstData;
+} catch { /* file may not exist yet */ }
+
+export const lst = lstData;
 
 export const evapotranspiration = evapotranspirationData as EvapotranspirationData;
 export const smap = smapData as SmapData;

@@ -442,7 +442,7 @@ export default function MapaClient({ ndviTiles, topography, site, mapbiomas }: P
             <span>0.9 — Maximo</span>
           </div>
           <p className="mt-2 text-xs text-text-dim">
-            Media de 8 anos (2017-2024). Sentinel-2 L2A 10m via Google Earth Engine.
+            Historico completo (2015-2026). Sentinel-2 L2A 10m via Google Earth Engine.
           </p>
         </div>
       )}

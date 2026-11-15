@@ -53,7 +53,7 @@ for (var m = 1; m <= 12; m++) {
   var filtered = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
     .filterBounds(cruzAlta)
     .filter(ee.Filter.calendarRange(m, m, 'month'))
-    .filter(ee.Filter.calendarRange(2017, 2024, 'year'))
+    .filter(ee.Filter.calendarRange(2015, 2026, 'year'))
     .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 30))
     .map(maskS2clouds)
     .map(computeNDVI);

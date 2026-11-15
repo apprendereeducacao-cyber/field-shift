@@ -6,7 +6,6 @@ import Image from "next/image";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Sphere, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
-import Chat from "@/components/Chat";
 
 const DATA_PARTNERS = [
   "NASA POWER",
@@ -33,13 +32,17 @@ type ReportData = {
   municipality: string;
   uf: string;
   loading: boolean;
+  years: number[];
+  selectedYear: number;
   riskScore: number | null;
+  riskLabel: string | null;
   avgTemp: number | null;
   avgRain: number | null;
+  yearData: { yield: number; rain: number; temp: number; spiDjf: number } | null;
   topCrops: string[];
   coverCrops: string[];
-  soilHealth: string;
-  recommendation: string;
+  rotation: { name: string; subtitle: string; scores: Record<string, number>; totalScore: number; sequence: { crop: string; season: string }[] } | null;
+  strategies: { name: string; subtitle: string; totalScore: number; sequence: { crop: string; season: string }[] }[];
 };
 
 function GlobeWireframe({ targetLat, targetLon }: { targetLat?: number; targetLon?: number }) {
@@ -82,14 +85,18 @@ function GlobeWireframe({ targetLat, targetLon }: { targetLat?: number; targetLo
       <Sphere args={[1.98, 48, 48]}>
         <meshBasicMaterial color="#0B1A10" transparent opacity={0.92} />
       </Sphere>
-      <mesh ref={markerRef} position={markerPos}>
-        <sphereGeometry args={[0.05, 16, 16]} />
-        <meshBasicMaterial color="#E1F031" />
-      </mesh>
-      <mesh ref={haloRef} position={markerPos} rotation={[Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[0.07, 0.11, 32]} />
-        <meshBasicMaterial color="#96E18E" transparent opacity={0.5} side={THREE.DoubleSide} />
-      </mesh>
+      {targetLat !== undefined && (
+        <>
+          <mesh ref={markerRef} position={markerPos}>
+            <sphereGeometry args={[0.05, 16, 16]} />
+            <meshBasicMaterial color="#E1F031" />
+          </mesh>
+          <mesh ref={haloRef} position={markerPos} rotation={[Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[0.07, 0.11, 32]} />
+            <meshBasicMaterial color="#96E18E" transparent opacity={0.5} side={THREE.DoubleSide} />
+          </mesh>
+        </>
+      )}
     </group>
   );
 }
@@ -111,7 +118,54 @@ function GlobeScene({ targetLat, targetLon }: { targetLat?: number; targetLon?: 
   );
 }
 
-function CityReport({ report }: { report: ReportData }) {
+const SEASON_LABEL: Record<string, string> = {
+  summer: "Verao", winter: "Inverno", winter_late: "Inverno tardio", winter_mix: "Inverno consorcio",
+};
+function formatCrop(name: string) {
+  return name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function CityReport({ report, onYearChange }: { report: ReportData; onYearChange: (year: number) => void }) {
+  const [aiQuestion, setAiQuestion] = useState("");
+  const [aiAnswer, setAiAnswer] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
+
+  const askAI = async () => {
+    if (!aiQuestion.trim() || aiLoading) return;
+    setAiLoading(true);
+    setAiAnswer("");
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          anonymous_id: "home-report",
+          message: `Contexto: ${report.municipality}, ${report.uf}, safra ${report.selectedYear}. ${aiQuestion}`,
+        }),
+      });
+      if (!res.ok || !res.body) throw new Error("request failed");
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let text = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        for (const line of chunk.split("\n")) {
+          if (!line.startsWith("data: ")) continue;
+          try {
+            const parsed = JSON.parse(line.slice(6));
+            if (parsed.text) { text += parsed.text; setAiAnswer(text); }
+          } catch { /* partial line */ }
+        }
+      }
+      if (!text) setAiAnswer("Sem resposta do agronomo. Tente reformular.");
+    } catch {
+      setAiAnswer("Erro ao consultar o agronomo. Tente novamente.");
+    }
+    setAiLoading(false);
+  };
+
   if (report.loading) {
     return (
       <section className="mx-auto w-full max-w-4xl px-4 py-12 sm:px-10">
@@ -125,54 +179,126 @@ function CityReport({ report }: { report: ReportData }) {
 
   return (
     <section className="mx-auto w-full max-w-4xl space-y-6 px-4 py-12 sm:px-10">
-      <div className="text-center">
+      <div className="flex flex-col items-center gap-3 text-center">
         <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Relatorio climatico</p>
-        <h2 className="mt-2 text-[32px] font-light leading-tight tracking-[-0.02em] text-foreground sm:text-[40px]">
+        <h2 className="text-[32px] font-light leading-tight tracking-[-0.02em] text-foreground sm:text-[40px]">
           {report.municipality}, {report.uf}
         </h2>
+        {report.years.length > 0 && (
+          <div className="flex items-center gap-2">
+            <label className="text-sm text-muted-foreground">Safra:</label>
+            <select
+              value={report.selectedYear}
+              onChange={(e) => onYearChange(parseInt(e.target.value, 10))}
+              className="rounded-full border border-border bg-card px-4 py-1.5 text-sm font-semibold text-foreground outline-none focus:border-primary"
+            >
+              {report.years.map((y) => (
+                <option key={y} value={y}>{y}/{y + 1}</option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="rounded-[24px] border border-border bg-card p-6 text-center">
-          <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">Risco climatico</p>
-          <p className="mt-2 text-[40px] font-light tabular-nums text-primary">{report.riskScore ?? "—"}</p>
-          <p className="text-sm text-muted-foreground">de 100</p>
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div className="rounded-[24px] border border-border bg-card p-5 text-center">
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">Risco</p>
+          <p className="mt-2 text-[36px] font-light tabular-nums text-primary">{report.riskScore ?? "—"}</p>
+          <p className="text-xs text-muted-foreground">{report.riskLabel ? formatCrop(report.riskLabel) : "de 100"}</p>
         </div>
-        <div className="rounded-[24px] border border-border bg-card p-6 text-center">
-          <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">Temp. media anual</p>
-          <p className="mt-2 text-[40px] font-light tabular-nums text-ember-600">{report.avgTemp ? `${report.avgTemp.toFixed(1)}` : "—"}</p>
-          <p className="text-sm text-muted-foreground">graus C</p>
+        <div className="rounded-[24px] border border-border bg-card p-5 text-center">
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">Temperatura</p>
+          <p className="mt-2 text-[36px] font-light tabular-nums text-ember-600">{report.yearData?.temp?.toFixed(1) ?? report.avgTemp?.toFixed(1) ?? "—"}</p>
+          <p className="text-xs text-muted-foreground">graus C</p>
         </div>
-        <div className="rounded-[24px] border border-border bg-card p-6 text-center">
-          <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">Precipitacao anual</p>
-          <p className="mt-2 text-[40px] font-light tabular-nums text-rain-600">{report.avgRain ? `${report.avgRain.toFixed(0)}` : "—"}</p>
-          <p className="text-sm text-muted-foreground">mm</p>
+        <div className="rounded-[24px] border border-border bg-card p-5 text-center">
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">Chuva</p>
+          <p className="mt-2 text-[36px] font-light tabular-nums text-rain-600">{report.yearData?.rain?.toFixed(0) ?? report.avgRain?.toFixed(0) ?? "—"}</p>
+          <p className="text-xs text-muted-foreground">mm/ano</p>
+        </div>
+        <div className="rounded-[24px] border border-border bg-card p-5 text-center">
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">Produtividade</p>
+          <p className="mt-2 text-[36px] font-light tabular-nums text-leaf-600">{report.yearData?.yield?.toFixed(1) ?? "—"}</p>
+          <p className="text-xs text-muted-foreground">sc/ha</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="rounded-[24px] border border-border bg-card p-6">
           <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Rotacao recomendada</p>
-          <p className="mt-3 text-base leading-relaxed text-foreground">{report.recommendation}</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {report.topCrops.map((c) => (
-              <span key={c} className="rounded-full bg-forest-50 px-3 py-1 text-sm font-medium text-primary">{c}</span>
-            ))}
-          </div>
+          {report.rotation && (
+            <>
+              <p className="mt-2 text-base font-semibold text-foreground">{report.rotation.name}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{report.rotation.subtitle}</p>
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {report.rotation.sequence.map((s, i) => (
+                  <span key={i} className="rounded-full bg-forest-50 px-3 py-1 text-xs font-medium text-primary">
+                    {formatCrop(s.crop)} <span className="text-stone-400">({SEASON_LABEL[s.season] ?? s.season})</span>
+                  </span>
+                ))}
+              </div>
+              <div className="mt-3 text-right">
+                <span className="text-2xl font-light tabular-nums text-primary">{report.rotation.totalScore}</span>
+                <span className="ml-1 text-xs text-muted-foreground">/ 100</span>
+              </div>
+            </>
+          )}
+          {!report.rotation && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {report.topCrops.map((c) => (
+                <span key={c} className="rounded-full bg-forest-50 px-3 py-1 text-sm font-medium text-primary">{c}</span>
+              ))}
+            </div>
+          )}
         </div>
         <div className="rounded-[24px] border border-border bg-card p-6">
           <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Cobertura de inverno</p>
-          <p className="mt-3 text-sm text-muted-foreground">Plantas indicadas para entressafra nesta regiao:</p>
-          <div className="mt-4 flex flex-wrap gap-2">
+          <p className="mt-2 text-sm text-muted-foreground">Plantas indicadas para entressafra:</p>
+          <div className="mt-3 flex flex-wrap gap-2">
             {report.coverCrops.map((c) => (
               <span key={c} className="rounded-full bg-status-success-bg px-3 py-1 text-sm font-medium text-status-success">{c}</span>
             ))}
           </div>
-          <div className="mt-4 rounded-[16px] bg-forest-50 p-3">
-            <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Saude do solo</p>
-            <p className="mt-1 text-sm text-foreground">{report.soilHealth}</p>
-          </div>
+          {report.strategies.length > 1 && (
+            <div className="mt-4 border-t border-border pt-3">
+              <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">Outras estrategias</p>
+              {report.strategies.slice(1).map((s, i) => (
+                <div key={i} className="mt-2 flex items-center justify-between text-sm">
+                  <span className="text-foreground">{s.name}</span>
+                  <span className="tabular-nums text-primary">{s.totalScore}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
+      </div>
+
+      {/* ── AI Agronomo ── */}
+      <div className="rounded-[24px] border border-border bg-card p-6">
+        <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Consultar agronomo IA</p>
+        <p className="mt-1 text-sm text-muted-foreground">Pergunte sobre manejo, rotacao ou clima para {report.municipality}</p>
+        <div className="mt-3 flex gap-2">
+          <input
+            type="text"
+            value={aiQuestion}
+            onChange={(e) => setAiQuestion(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && askAI()}
+            placeholder="Ex: Qual a melhor epoca para plantar aveia-preta?"
+            className="flex-1 rounded-full border border-border bg-muted px-4 py-2.5 text-sm text-foreground placeholder:text-stone-400 outline-none focus:border-primary"
+          />
+          <button
+            onClick={askAI}
+            disabled={aiLoading || !aiQuestion.trim()}
+            className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover disabled:opacity-50"
+          >
+            {aiLoading ? "..." : "Perguntar"}
+          </button>
+        </div>
+        {aiAnswer && (
+          <div className="mt-4 rounded-[16px] bg-forest-50 p-4">
+            <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">{aiAnswer}</p>
+          </div>
+        )}
       </div>
 
       <div className="flex justify-center gap-3">
@@ -222,6 +348,54 @@ export default function HomeClient() {
     searchTimeout.current = setTimeout(() => searchMunicipalities(value), 300);
   };
 
+  const fetchReport = async (municipality: string, uf: string, year?: number) => {
+    try {
+      const url = year ? `/api/report?year=${year}` : "/api/report";
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setReport({
+        municipality: data.municipality ?? municipality,
+        uf: data.uf ?? uf,
+        loading: false,
+        years: data.years ?? [],
+        selectedYear: data.selectedYear ?? year ?? new Date().getFullYear(),
+        riskScore: data.riskScore,
+        riskLabel: data.riskLabel,
+        avgTemp: data.avgTemp,
+        avgRain: data.avgRain,
+        yearData: data.yearData,
+        topCrops: data.topCrops ?? [],
+        coverCrops: data.coverCrops ?? [],
+        rotation: data.rotation,
+        strategies: data.strategies ?? [],
+      });
+    } catch {
+      setReport({
+        municipality,
+        uf,
+        loading: false,
+        years: [],
+        selectedYear: new Date().getFullYear(),
+        riskScore: null,
+        riskLabel: null,
+        avgTemp: null,
+        avgRain: null,
+        yearData: null,
+        topCrops: ["Soja", "Milho", "Trigo", "Aveia"],
+        coverCrops: [],
+        rotation: null,
+        strategies: [],
+      });
+    }
+  };
+
+  const handleYearChange = (year: number) => {
+    if (!report) return;
+    setReport({ ...report, selectedYear: year, loading: true });
+    fetchReport(report.municipality, report.uf, year);
+  };
+
   const selectCity = async (mun: Municipality) => {
     const uf = mun.microrregiao.mesorregiao.UF.sigla;
     setQuery(`${mun.nome}, ${uf}`);
@@ -236,7 +410,6 @@ export default function HomeClient() {
       );
       const geoData = await geoRes.json();
       if (geoData.regiao_imediata) {
-        // Approximate: use Cruz Alta coords offset slightly by municipality ID for visual variety
         lat = -28.6 + ((mun.id % 100) - 50) * 0.05;
         lon = -53.6 + ((mun.id % 73) - 36) * 0.05;
       }
@@ -247,34 +420,24 @@ export default function HomeClient() {
       municipality: mun.nome,
       uf,
       loading: true,
+      years: [],
+      selectedYear: new Date().getFullYear(),
       riskScore: null,
+      riskLabel: null,
       avgTemp: null,
       avgRain: null,
+      yearData: null,
       topCrops: [],
       coverCrops: [],
-      soilHealth: "",
-      recommendation: "",
+      rotation: null,
+      strategies: [],
     });
 
     setTimeout(() => {
       reportRef.current?.scrollIntoView({ behavior: "smooth" });
     }, 300);
 
-    // Simulate loading with real data from Cruz Alta (our only dataset)
-    setTimeout(() => {
-      setReport({
-        municipality: mun.nome,
-        uf,
-        loading: false,
-        riskScore: 62,
-        avgTemp: 19.2,
-        avgRain: 1728,
-        topCrops: ["Soja", "Milho", "Trigo", "Aveia"],
-        coverCrops: ["Aveia-preta", "Nabo forrageiro", "Ervilhaca", "Azevem", "Tremoço"],
-        soilHealth: "Latossolo Vermelho distrofico tipico. Rotacao com leguminosas de inverno aumenta nitrogenio disponivel em ate 40 kg/ha e reduz compactacao na camada 0-20 cm.",
-        recommendation: "Para esta regiao, a rotacao Soja/Aveia-preta e Milho/Ervilhaca em anos alternados oferece o melhor equilibrio entre retorno economico e saude do solo. A cobertura de inverno protege contra erosao e mantém a umidade nos meses secos.",
-      });
-    }, 2000);
+    fetchReport(mun.nome, uf);
   };
 
   return (
@@ -292,14 +455,7 @@ export default function HomeClient() {
         </div>
 
         <div className="relative z-10 flex flex-col items-center px-4 text-center">
-          <div className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-lime-signal" />
-            <p className="text-[11px] font-semibold tracking-[0.12em] text-stone-300 uppercase">
-              NASA Space Apps 2026
-            </p>
-          </div>
-
-          <h1 className="mt-4 text-[44px] font-light leading-[1.1] tracking-[-0.035em] text-stone-50 sm:text-[56px]">
+          <h1 className="text-[44px] font-light leading-[1.1] tracking-[-0.035em] text-stone-50 sm:text-[56px]">
             Adapte sua lavoura<br />com dados da NASA
           </h1>
           <p className="mt-4 max-w-md text-base text-stone-300" style={{ letterSpacing: "-0.005em" }}>
@@ -351,11 +507,6 @@ export default function HomeClient() {
             )}
           </div>
 
-          <div className="mt-12 animate-bounce">
-            <svg className="h-5 w-5 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7" />
-            </svg>
-          </div>
         </div>
       </section>
 
@@ -383,15 +534,8 @@ export default function HomeClient() {
       {/* ── CITY REPORT (appears after search) ── */}
       {report && (
         <div ref={reportRef} style={{ background: "#DCE8DD", color: "#151A17" }}>
-          <CityReport report={report} />
+          <CityReport report={report} onYearChange={handleYearChange} />
         </div>
-      )}
-
-      {/* ── CHAT ── */}
-      {!report && (
-        <section className="mx-auto w-full max-w-3xl px-4 py-12 sm:px-10">
-          <Chat />
-        </section>
       )}
     </div>
   );

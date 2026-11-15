@@ -22,6 +22,18 @@ const DATA_PARTNERS = [
   "SRTM",
 ];
 
+const MONTH_NAMES_SHORT = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+const RISK_KEYS = ["dry_spell", "heat", "heavy_rain", "frost"] as const;
+const RISK_LABELS: Record<string, string> = { dry_spell: "Seca longa", heat: "Calor forte", heavy_rain: "Chuvarada", frost: "Geada" };
+function riskText(v: number) { return v <= 0 ? "-" : `${Math.round(v * 10)} em 10`; }
+function riskColor(v: number) {
+  if (v <= 0) return "text-stone-400";
+  if (v <= 0.2) return "bg-emerald-100 text-emerald-700";
+  if (v <= 0.5) return "bg-amber-100 text-amber-700";
+  if (v <= 0.75) return "bg-orange-100 text-orange-700";
+  return "bg-red-100 text-red-700";
+}
+
 type Municipality = {
   id: number;
   nome: string;
@@ -43,46 +55,64 @@ type ReportData = {
   coverCrops: string[];
   rotation: { name: string; subtitle: string; scores: Record<string, number>; totalScore: number; sequence: { crop: string; season: string }[] } | null;
   strategies: { name: string; subtitle: string; totalScore: number; sequence: { crop: string; season: string }[] }[];
+  riskCalendar: { dry_spell: number; heat: number; heavy_rain: number; frost: number }[];
 };
 
 /* ── Producer Form Data ── */
 const SUMMER_CROPS = [
   { value: "soja", label: "Soja" },
   { value: "milho", label: "Milho" },
+  { value: "feijao", label: "Feijão" },
   { value: "outro", label: "Outro" },
   { value: "nenhum", label: "Nenhum" },
 ];
 
+const SAFRINHA_CROPS = [
+  { value: "milho_safrinha", label: "Milho safrinha" },
+  { value: "sorgo", label: "Sorgo" },
+  { value: "feijao", label: "Feijão" },
+  { value: "girassol", label: "Girassol" },
+  { value: "brachiaria", label: "Brachiaria (cobertura)" },
+  { value: "crotalaria", label: "Crotalária (adubo verde)" },
+  { value: "milheto", label: "Milheto (cobertura)" },
+  { value: "pousio", label: "Não plantou safrinha" },
+];
+
 const WINTER_CROPS = [
   { value: "trigo", label: "Trigo" },
-  { value: "aveia_preta", label: "Aveia Preta" },
+  { value: "aveia_preta", label: "Aveia-preta" },
+  { value: "centeio", label: "Centeio" },
   { value: "ervilhaca", label: "Ervilhaca" },
-  { value: "nabo_forrageiro", label: "Nabo Forrageiro" },
-  { value: "azevem", label: "Azevem" },
+  { value: "nabo_forrageiro", label: "Nabo forrageiro" },
+  { value: "azevem", label: "Azevém" },
   { value: "canola", label: "Canola" },
-  { value: "pousio", label: "Pousio (nao plantou nada)" },
+  { value: "consorcio", label: "Consórcio (aveia + ervilhaca)" },
+  { value: "pousio", label: "Pousio (não plantou nada)" },
   { value: "outro", label: "Outro" },
 ];
 
 const YIELD_RESULTS = [
-  { value: "boa", label: "Boa (acima da media)" },
+  { value: "boa", label: "Boa (acima da média)" },
   { value: "normal", label: "Normal" },
-  { value: "ruim", label: "Ruim (abaixo da media)" },
+  { value: "ruim", label: "Ruim (abaixo da média)" },
   { value: "perda_total", label: "Perda total" },
 ];
 
 const PROBLEMS = [
   { value: "nenhum", label: "Nenhum problema grave" },
-  { value: "seca", label: "Seca" },
-  { value: "chuva_demais", label: "Chuva demais" },
-  { value: "praga_doenca", label: "Praga ou doenca" },
+  { value: "seca", label: "Seca / estiagem" },
+  { value: "chuva_demais", label: "Excesso de chuva" },
+  { value: "praga_doenca", label: "Praga ou doença" },
+  { value: "nematoides", label: "Nematóides" },
   { value: "solo_compactado", label: "Solo compactado" },
   { value: "geada", label: "Geada" },
+  { value: "granizo", label: "Granizo" },
 ];
 
 type YearFormData = {
   label: string;
   summer_crop: string;
+  safrinha_crop: string;
   winter_crop: string;
   yield_result: string;
   main_problem: string;
@@ -94,6 +124,7 @@ const YEAR_LABELS = [`Safra ${currentYear - 1}/${currentYear}`, `Safra ${current
 const DEFAULT_YEAR: YearFormData = {
   label: "",
   summer_crop: "soja",
+  safrinha_crop: "pousio",
   winter_crop: "pousio",
   yield_result: "normal",
   main_problem: "nenhum",
@@ -246,13 +277,19 @@ function ProducerForm({ municipality, availableYears, onComplete }: { municipali
               </select>
             </div>
             <div>
+              <label className="mb-1 block text-sm text-muted-foreground">Plantou safrinha?</label>
+              <select value={year.safrinha_crop} onChange={(e) => updateYear(i, "safrinha_crop", e.target.value)} className="w-full rounded-full border border-border bg-muted px-4 py-2 text-sm text-foreground outline-none focus:border-primary">
+                {SAFRINHA_CROPS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </div>
+            <div>
               <label className="mb-1 block text-sm text-muted-foreground">O que plantou no inverno?</label>
               <select value={year.winter_crop} onChange={(e) => updateYear(i, "winter_crop", e.target.value)} className="w-full rounded-full border border-border bg-muted px-4 py-2 text-sm text-foreground outline-none focus:border-primary">
                 {WINTER_CROPS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
               </select>
             </div>
             <div>
-              <label className="mb-1 block text-sm text-muted-foreground">Como foi a safra de verao?</label>
+              <label className="mb-1 block text-sm text-muted-foreground">Como foi a safra de verão?</label>
               <select value={year.yield_result} onChange={(e) => updateYear(i, "yield_result", e.target.value)} className="w-full rounded-full border border-border bg-muted px-4 py-2 text-sm text-foreground outline-none focus:border-primary">
                 {YIELD_RESULTS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
               </select>
@@ -397,53 +434,115 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      {/* ── Calendario de riscos ── */}
+      {report.riskCalendar?.length === 12 && (
         <div className="rounded-[24px] border border-border bg-card p-6">
-          <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Rotacao recomendada</p>
-          {report.rotation && (
-            <>
-              <p className="mt-2 text-base font-semibold text-foreground">{report.rotation.name}</p>
-              <p className="mt-1 text-sm text-muted-foreground">{report.rotation.subtitle}</p>
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {report.rotation.sequence.map((s, i) => (
-                  <span key={i} className="rounded-full bg-forest-50 px-3 py-1 text-xs font-medium text-primary">
-                    {formatCrop(s.crop)} <span className="text-stone-400">({SEASON_LABEL[s.season] ?? s.season})</span>
-                  </span>
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Calendário de riscos</p>
+          <p className="mt-1 text-sm text-muted-foreground">De cada 10 anos, quantas vezes cada problema aconteceu em cada mês.</p>
+          <div className="mt-4 overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr>
+                  <th className="py-2 px-2 text-left text-xs text-muted-foreground font-medium">Risco</th>
+                  {MONTH_NAMES_SHORT.map((m) => (
+                    <th key={m} className="py-2 px-1 text-center text-xs text-muted-foreground font-medium min-w-[44px]">{m}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {RISK_KEYS.map((key) => (
+                  <tr key={key} className="border-t border-border">
+                    <td className="py-2.5 px-2 text-xs text-muted-foreground font-medium whitespace-nowrap">{RISK_LABELS[key]}</td>
+                    {report.riskCalendar.map((month, i) => (
+                      <td key={i} className="py-2.5 px-1 text-center">
+                        <span className={`inline-block w-full rounded py-0.5 px-0.5 text-[10px] font-semibold ${riskColor(month[key])}`}>
+                          {riskText(month[key])}
+                        </span>
+                      </td>
+                    ))}
+                  </tr>
                 ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="flex flex-wrap gap-3 mt-3 text-[10px] text-stone-400">
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-emerald-100" /> Raro</span>
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-amber-100" /> Às vezes</span>
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-orange-100" /> Frequente</span>
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-red-100" /> Quase todo ano</span>
+          </div>
+        </div>
+      )}
+
+      <div>
+        <div className="mb-4 text-center">
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Escolha sua estrategia</p>
+          <h3 className="mt-1 text-lg font-semibold text-foreground">3 planos de rotacao para {report.municipality}</h3>
+          <p className="mt-1 text-sm text-muted-foreground">Baseado em 44 anos de dados climaticos e regras agronomicas</p>
+        </div>
+
+        {report.strategies.length > 0 ? (
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+            {report.strategies.slice(0, 3).map((s, i) => (
+              <div key={i} className={`relative rounded-[24px] border bg-card p-6 transition-shadow hover:shadow-md ${i === 0 ? "border-primary shadow-sm" : "border-border"}`}>
+                {i === 0 && (
+                  <span className="absolute -top-3 left-6 rounded-full bg-primary px-3 py-0.5 text-[10px] font-bold tracking-wide text-primary-foreground uppercase">Recomendada</span>
+                )}
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-base font-semibold text-foreground">{s.name}</p>
+                    <p className="mt-0.5 text-sm text-muted-foreground">{s.subtitle}</p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-2xl font-light tabular-nums text-primary">{s.totalScore}</span>
+                    <span className="block text-[10px] text-muted-foreground">/ 100</span>
+                  </div>
+                </div>
+                <div className="mt-4 flex flex-wrap gap-1.5">
+                  {s.sequence.map((seq, j) => (
+                    <span key={j} className="rounded-full bg-forest-50 px-3 py-1 text-xs font-medium text-primary">
+                      {formatCrop(seq.crop)} <span className="text-stone-400">({SEASON_LABEL[seq.season] ?? seq.season})</span>
+                    </span>
+                  ))}
+                </div>
               </div>
-              <div className="mt-3 text-right">
-                <span className="text-2xl font-light tabular-nums text-primary">{report.rotation.totalScore}</span>
-                <span className="ml-1 text-xs text-muted-foreground">/ 100</span>
-              </div>
-            </>
-          )}
-          {!report.rotation && (
+            ))}
+          </div>
+        ) : report.rotation ? (
+          <div className="rounded-[24px] border border-primary bg-card p-6 shadow-sm">
+            <p className="text-base font-semibold text-foreground">{report.rotation.name}</p>
+            <p className="mt-0.5 text-sm text-muted-foreground">{report.rotation.subtitle}</p>
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {report.rotation.sequence.map((s, i) => (
+                <span key={i} className="rounded-full bg-forest-50 px-3 py-1 text-xs font-medium text-primary">
+                  {formatCrop(s.crop)} <span className="text-stone-400">({SEASON_LABEL[s.season] ?? s.season})</span>
+                </span>
+              ))}
+            </div>
+            <div className="mt-3 text-right">
+              <span className="text-2xl font-light tabular-nums text-primary">{report.rotation.totalScore}</span>
+              <span className="ml-1 text-xs text-muted-foreground">/ 100</span>
+            </div>
+          </div>
+        ) : (
+          <div className="rounded-[24px] border border-border bg-card p-6">
+            <p className="text-sm text-muted-foreground">Culturas indicadas para a regiao:</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {report.topCrops.map((c) => (
                 <span key={c} className="rounded-full bg-forest-50 px-3 py-1 text-sm font-medium text-primary">{c}</span>
               ))}
             </div>
-          )}
-        </div>
-        <div className="rounded-[24px] border border-border bg-card p-6">
-          <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Cobertura de inverno</p>
-          <p className="mt-2 text-sm text-muted-foreground">Plantas indicadas para entressafra:</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {report.coverCrops.map((c) => (
-              <span key={c} className="rounded-full bg-status-success-bg px-3 py-1 text-sm font-medium text-status-success">{c}</span>
-            ))}
           </div>
-          {report.strategies.length > 1 && (
-            <div className="mt-4 border-t border-border pt-3">
-              <p className="text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">Outras estrategias</p>
-              {report.strategies.slice(1).map((s, i) => (
-                <div key={i} className="mt-2 flex items-center justify-between text-sm">
-                  <span className="text-foreground">{s.name}</span>
-                  <span className="tabular-nums text-primary">{s.totalScore}</span>
-                </div>
-              ))}
-            </div>
-          )}
+        )}
+      </div>
+
+      <div className="rounded-[24px] border border-border bg-card p-6">
+        <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Cobertura de solo</p>
+        <p className="mt-2 text-sm text-muted-foreground">Plantas indicadas para entressafra e protecao do solo:</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {report.coverCrops.map((c) => (
+            <span key={c} className="rounded-full bg-status-success-bg px-3 py-1 text-sm font-medium text-status-success">{c}</span>
+          ))}
         </div>
       </div>
 
@@ -577,6 +676,7 @@ export default function HomeClient() {
         coverCrops: data.coverCrops ?? [],
         rotation: data.rotation,
         strategies: data.strategies ?? [],
+        riskCalendar: data.riskCalendar ?? [],
       });
     } catch {
       setReport({
@@ -594,6 +694,7 @@ export default function HomeClient() {
         coverCrops: [],
         rotation: null,
         strategies: [],
+        riskCalendar: [],
       });
     }
   };
@@ -686,6 +787,7 @@ export default function HomeClient() {
       coverCrops: [],
       rotation: null,
       strategies: [],
+      riskCalendar: [],
     });
 
     setTimeout(() => {
@@ -700,14 +802,14 @@ export default function HomeClient() {
       {/* ── HERO ORBIT ── */}
       <section
         data-theme="orbit"
-        className="relative flex min-h-[85vh] flex-col items-center justify-center overflow-hidden"
+        className="relative flex min-h-[56vh] flex-col items-center justify-center overflow-hidden"
         style={{ background: "radial-gradient(120% 90% at 0% 0%, rgba(70,154,92,0.55) 0%, rgba(11,26,16,0) 60%), #0B1A10" }}
       >
         <div className="absolute inset-0 opacity-50" style={{ backgroundImage: "radial-gradient(rgba(150,225,142,0.16) 1px, transparent 1px)", backgroundSize: "16px 16px" }} />
 
         {/* Satellite image inside globe — circular clip with radial fade */}
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <div className="relative h-[min(70vw,520px)] w-[min(70vw,520px)]">
+          <div className="relative h-[min(55vw,380px)] w-[min(55vw,380px)]">
             <div className="absolute inset-0 overflow-hidden rounded-full" style={{ maskImage: "radial-gradient(circle, rgba(0,0,0,1) 30%, rgba(0,0,0,0.6) 55%, transparent 72%)", WebkitMaskImage: "radial-gradient(circle, rgba(0,0,0,1) 30%, rgba(0,0,0,0.6) 55%, transparent 72%)" }}>
               <Image
                 src="/hero-satellite.jpg"
@@ -779,21 +881,21 @@ export default function HomeClient() {
       </section>
 
       {/* ── SATELITES PARCEIROS ── */}
-      <section className="border-y border-border bg-muted py-8 overflow-hidden">
-        <h2 className="mb-6 text-center text-lg font-semibold tracking-[-0.01em] text-foreground sm:text-xl">
-          Satelites Parceiros
+      <section className="border-y border-border bg-shell py-8 overflow-hidden">
+        <h2 className="text-center text-lg font-semibold tracking-[-0.01em] text-white sm:text-xl">
+          Satélites Parceiros
         </h2>
-        <div className="relative">
-          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-muted to-transparent" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-muted to-transparent" />
-          <div className="flex animate-scroll gap-5">
+        <div className="relative mt-5">
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-shell to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-shell to-transparent" />
+          <div className="flex animate-scroll gap-4">
             {[...DATA_PARTNERS, ...DATA_PARTNERS].map((name, i) => (
-              <span
+              <div
                 key={i}
-                className="shrink-0 rounded-full border border-border bg-card px-6 py-2.5 text-sm font-semibold text-foreground shadow-xs transition-colors hover:border-primary hover:text-primary"
+                className="flex shrink-0 items-center justify-center rounded-[16px] border border-white/10 bg-[#165337] px-6 py-4 text-sm font-semibold text-white shadow-md"
               >
                 {name}
-              </span>
+              </div>
             ))}
           </div>
         </div>

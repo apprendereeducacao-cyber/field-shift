@@ -301,9 +301,10 @@ export default function MapaClient({
         container.innerHTML = "";
       }
 
+      const initialZoom = Math.min(ndviTiles.zoom, 11);
       const map = L.map(container, {
         center: [site.point.lat, site.point.lon],
-        zoom: ndviTiles.zoom,
+        zoom: initialZoom,
         zoomControl: false,
         attributionControl: false,
       });
@@ -887,13 +888,13 @@ export default function MapaClient({
     <div
       ref={containerRef}
       className="relative flex flex-col"
-      style={{ height: isFullscreen ? "100vh" : "calc(100vh - 120px)", minHeight: "500px" }}
+      style={{ height: isFullscreen ? "100vh" : "calc(100vh - 72px)", minHeight: "500px" }}
     >
       {/* ── Map container ── */}
       <div ref={mapRef} className="absolute inset-0 z-0 bg-muted" />
 
       {/* ── Top bar ── */}
-      <div className="pointer-events-none absolute left-0 right-0 top-0 z-[500] flex items-start justify-between p-3">
+      <div className="pointer-events-none absolute left-0 right-0 top-0 z-[500] flex items-start justify-between p-3 pr-4">
         <button
           onClick={() => setPanelOpen(!panelOpen)}
           className="pointer-events-auto flex items-center gap-2 rounded-full bg-card/95 px-4 py-2 text-sm font-semibold text-foreground shadow-lg backdrop-blur-sm transition-colors hover:bg-card"
@@ -1438,6 +1439,8 @@ export default function MapaClient({
           overflow: hidden;
           box-shadow: 0 2px 8px rgba(21, 26, 23, 0.06) !important;
           border: none !important;
+          margin-top: 56px !important;
+          margin-right: 16px !important;
         }
         .leaflet-control-scale-line {
           border-radius: 4px;

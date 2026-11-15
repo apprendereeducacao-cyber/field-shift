@@ -77,6 +77,7 @@ export async function GET(request: Request) {
         totalScore: s.total_score,
         sequence: s.sequence,
       })),
+      riskCalendar: site.q2.months,
     });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });

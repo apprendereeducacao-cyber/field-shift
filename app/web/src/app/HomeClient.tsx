@@ -148,9 +148,17 @@ function GlobeScene() {
 }
 
 const SEASON_LABEL: Record<string, string> = {
-  summer: "Verao", winter: "Inverno", winter_late: "Inverno tardio", winter_mix: "Inverno consorcio",
+  summer: "Verao", safrinha: "Safrinha", winter: "Inverno", winter_late: "Pos-colheita inverno", winter_mix: "Inverno consorcio",
+};
+const CROP_DISPLAY: Record<string, string> = {
+  aveia_preta_ervilhaca: "Aveia-preta + Ervilhaca (mix)",
+  centeio_nabo: "Centeio + Nabo forrageiro (mix)",
+  brachiaria_ruziziensis: "Brachiaria ruziziensis",
+  nabo_forrageiro: "Nabo forrageiro",
+  aveia_preta: "Aveia-preta",
 };
 function formatCrop(name: string) {
+  if (CROP_DISPLAY[name]) return CROP_DISPLAY[name];
   return name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
@@ -161,12 +169,13 @@ function isAvailableCity(name: string): boolean {
 }
 
 /* ── Inline Producer Form ── */
+type SeasonData = { summer: string; safrinha: string; winter: string; yield_result: string; problem: string };
+const EMPTY_SEASON: SeasonData = { summer: "soja", safrinha: "pousio", winter: "pousio", yield_result: "normal", problem: "nenhum" };
+
 function ProducerForm({ municipality, onComplete }: { municipality: string; onComplete: () => void }) {
-  const [summerCrop, setSummerCrop] = useState("soja");
-  const [safrinhaCrop, setSafrinhaCrop] = useState("pousio");
-  const [winterCrop, setWinterCrop] = useState("pousio");
-  const [yieldResult, setYieldResult] = useState("normal");
-  const [mainProblem, setMainProblem] = useState("nenhum");
+  const thisYear = new Date().getFullYear();
+  const labels = [`${thisYear - 1}/${thisYear}`, `${thisYear - 2}/${thisYear - 1}`];
+  const [seasons, setSeasons] = useState<SeasonData[]>([{ ...EMPTY_SEASON }, { ...EMPTY_SEASON }]);
   const [hasCattle, setHasCattle] = useState(false);
   const [soilCompacted, setSoilCompacted] = useState(false);
   const [usedGreenManure, setUsedGreenManure] = useState(false);
@@ -176,11 +185,7 @@ function ProducerForm({ municipality, onComplete }: { municipality: string; onCo
       const raw = localStorage.getItem("fieldshift_produtor");
       if (raw) {
         const data = JSON.parse(raw);
-        if (data.summer_crop) setSummerCrop(data.summer_crop);
-        if (data.safrinha_crop) setSafrinhaCrop(data.safrinha_crop);
-        if (data.winter_crop) setWinterCrop(data.winter_crop);
-        if (data.yield_result) setYieldResult(data.yield_result);
-        if (data.main_problem) setMainProblem(data.main_problem);
+        if (data.seasons?.length === 2) setSeasons(data.seasons);
         setHasCattle(data.has_cattle ?? false);
         setSoilCompacted(data.soil_compacted ?? false);
         setUsedGreenManure(data.used_green_manure ?? false);
@@ -188,74 +193,65 @@ function ProducerForm({ municipality, onComplete }: { municipality: string; onCo
     } catch { /* ignore */ }
   }, []);
 
+  function update(i: number, field: keyof SeasonData, value: string) {
+    setSeasons((prev) => { const next = [...prev]; next[i] = { ...next[i], [field]: value }; return next; });
+  }
+
   function handleSubmit() {
-    const data = {
-      summer_crop: summerCrop,
-      safrinha_crop: safrinhaCrop,
-      winter_crop: winterCrop,
-      yield_result: yieldResult,
-      main_problem: mainProblem,
-      has_cattle: hasCattle,
-      soil_compacted: soilCompacted,
-      used_green_manure: usedGreenManure,
-      saved_at: new Date().toISOString(),
-    };
-    try {
-      localStorage.setItem("fieldshift_produtor", JSON.stringify(data));
-    } catch { /* ignore */ }
+    const data = { seasons, has_cattle: hasCattle, soil_compacted: soilCompacted, used_green_manure: usedGreenManure, saved_at: new Date().toISOString() };
+    try { localStorage.setItem("fieldshift_produtor", JSON.stringify(data)); } catch { /* ignore */ }
     onComplete();
   }
 
-  function handleSkip() {
-    onComplete();
-  }
-
-  const selectClass = "w-full rounded-full border border-border bg-muted px-4 py-2.5 text-sm text-foreground outline-none focus:border-primary";
+  const sel = "w-full appearance-none rounded-xl border border-border bg-muted px-4 py-2 text-sm text-foreground outline-none focus:border-primary";
 
   return (
-    <section className="mx-auto w-full max-w-xl space-y-5 px-4 py-10 sm:px-10">
+    <section className="mx-auto w-full max-w-2xl space-y-5 px-4 py-10 sm:px-10">
       <div className="text-center">
         <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Sobre sua lavoura</p>
         <h2 className="mt-2 text-[28px] font-light leading-tight tracking-[-0.02em] text-foreground sm:text-[32px]">
           Conte sobre {municipality}
         </h2>
         <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-          Preencha o que plantou na ultima safra para receber recomendacoes personalizadas.
+          Informe o que plantou nas 2 ultimas safras para recomendacoes personalizadas.
         </p>
       </div>
 
-      <div className="rounded-[24px] border border-border bg-card p-6 space-y-4">
-        <div>
-          <label className="mb-1.5 block text-sm font-medium text-foreground">Safra de verao</label>
-          <select value={summerCrop} onChange={(e) => setSummerCrop(e.target.value)} className={selectClass}>
-            {SUMMER_CROPS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </select>
+      {seasons.map((s, i) => (
+        <div key={i} className="rounded-[24px] border border-border bg-card p-6 space-y-4">
+          <h3 className="text-base font-semibold text-foreground">Safra {labels[i]}</h3>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-muted-foreground uppercase tracking-wide">Verao</label>
+            <select value={s.summer} onChange={(e) => update(i, "summer", e.target.value)} className={sel}>
+              {SUMMER_CROPS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-muted-foreground uppercase tracking-wide">Safrinha</label>
+            <select value={s.safrinha} onChange={(e) => update(i, "safrinha", e.target.value)} className={sel}>
+              {SAFRINHA_CROPS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-muted-foreground uppercase tracking-wide">Inverno</label>
+            <select value={s.winter} onChange={(e) => update(i, "winter", e.target.value)} className={sel}>
+              {WINTER_CROPS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+          <div className="border-t border-border pt-3">
+            <label className="mb-1 block text-xs font-medium text-muted-foreground uppercase tracking-wide">Resultado do verao</label>
+            <select value={s.yield_result} onChange={(e) => update(i, "yield_result", e.target.value)} className={sel}>
+              {YIELD_RESULTS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-muted-foreground uppercase tracking-wide">Maior problema</label>
+            <select value={s.problem} onChange={(e) => update(i, "problem", e.target.value)} className={sel}>
+              {PROBLEMS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
         </div>
-        <div>
-          <label className="mb-1.5 block text-sm font-medium text-foreground">Safrinha</label>
-          <select value={safrinhaCrop} onChange={(e) => setSafrinhaCrop(e.target.value)} className={selectClass}>
-            {SAFRINHA_CROPS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </select>
-        </div>
-        <div>
-          <label className="mb-1.5 block text-sm font-medium text-foreground">Safra de inverno</label>
-          <select value={winterCrop} onChange={(e) => setWinterCrop(e.target.value)} className={selectClass}>
-            {WINTER_CROPS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </select>
-        </div>
-        <div className="border-t border-border pt-4">
-          <label className="mb-1.5 block text-sm font-medium text-foreground">Como foi a ultima safra de verao?</label>
-          <select value={yieldResult} onChange={(e) => setYieldResult(e.target.value)} className={selectClass}>
-            {YIELD_RESULTS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </select>
-        </div>
-        <div>
-          <label className="mb-1.5 block text-sm font-medium text-foreground">Qual o maior problema da lavoura?</label>
-          <select value={mainProblem} onChange={(e) => setMainProblem(e.target.value)} className={selectClass}>
-            {PROBLEMS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </select>
-        </div>
-      </div>
+      ))}
 
       <div className="space-y-3">
         <h3 className="text-base font-semibold text-foreground">Sobre a propriedade</h3>
@@ -281,7 +277,7 @@ function ProducerForm({ municipality, onComplete }: { municipality: string; onCo
         <button onClick={handleSubmit} className="h-11 w-full rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover sm:w-auto sm:px-12">
           Ver meu relatorio
         </button>
-        <button onClick={handleSkip} className="text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground">
+        <button onClick={() => onComplete()} className="text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground">
           Pular — ver relatorio sem personalizar
         </button>
       </div>
@@ -490,13 +486,32 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
       </div>
 
       <div className="rounded-[24px] border border-border bg-card p-6">
-        <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Cobertura de solo</p>
-        <p className="mt-2 text-sm text-muted-foreground">Plantas indicadas para entressafra e protecao do solo:</p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {report.coverCrops.map((c) => (
-            <span key={c} className="rounded-full bg-status-success-bg px-3 py-1 text-sm font-medium text-status-success">{c}</span>
-          ))}
+        <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Mix de cobertura recomendados</p>
+        <p className="mt-2 text-sm text-muted-foreground">Combinacoes de plantas que equilibram palhada, nitrogenio e descompactacao:</p>
+        <div className="mt-4 space-y-3">
+          <div className="rounded-xl border border-border bg-muted/50 p-4">
+            <p className="text-sm font-semibold text-foreground">Aveia-preta + Ervilhaca</p>
+            <p className="mt-1 text-xs text-muted-foreground">Graminea (palhada duradoura, C:N alta) + leguminosa (fixa 80-120 kg N/ha). O mix mais usado no Sul.</p>
+          </div>
+          <div className="rounded-xl border border-border bg-muted/50 p-4">
+            <p className="text-sm font-semibold text-foreground">Centeio + Nabo forrageiro</p>
+            <p className="mt-1 text-xs text-muted-foreground">Centeio resiste a geada forte (-8C) e gera palha. Nabo descompacta 20-40 cm e cicla nutrientes.</p>
+          </div>
+          <div className="rounded-xl border border-border bg-muted/50 p-4">
+            <p className="text-sm font-semibold text-foreground">Aveia-preta + Ervilhaca + Nabo</p>
+            <p className="mt-1 text-xs text-muted-foreground">Triplo mix: palhada + nitrogenio + descompactacao. Ideal para solos degradados ou compactados.</p>
+          </div>
         </div>
+        {report.coverCrops.length > 0 && (
+          <div className="mt-4 border-t border-border pt-3">
+            <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">Plantas disponiveis na regiao</p>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {report.coverCrops.map((c) => (
+                <span key={c} className="rounded-full bg-status-success-bg px-2.5 py-0.5 text-xs font-medium text-status-success">{c}</span>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ── AI Agronomo ── */}

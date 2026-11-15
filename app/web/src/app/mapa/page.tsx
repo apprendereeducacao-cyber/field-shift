@@ -224,8 +224,8 @@ export default function MapaPage() {
         (p.elevation_m - min) / range,
       ]);
       const heat = L.heatLayer(heatData, {
-        radius: 60,
-        blur: 40,
+        radius: 25,
+        blur: 20,
         maxZoom: 14,
         max: 1.0,
         gradient: {
@@ -237,29 +237,6 @@ export default function MapaPage() {
         },
       }).addTo(map);
       overlaysRef.current.push(heat);
-
-      topo.points.forEach((p) => {
-        const marker = L.circleMarker([p.latitude, p.longitude], {
-          radius: 4,
-          fillColor: "#fff",
-          fillOpacity: 0.9,
-          color: "#000",
-          weight: 1,
-        }).addTo(map);
-        marker.bindTooltip(`${p.elevation_m}m`, {
-          permanent: false,
-          direction: "top",
-          className: "elev-tooltip",
-        });
-        overlaysRef.current.push(marker);
-      });
-
-      const style = document.createElement("style");
-      style.textContent = `.elev-tooltip{background:#111827!important;border:1px solid #374151!important;color:#fff!important;font-size:11px!important;font-weight:600!important;padding:2px 6px!important;border-radius:4px!important;box-shadow:0 2px 6px rgba(0,0,0,0.5)!important}`;
-      style.id = "elev-tooltip-style";
-      if (!document.getElementById("elev-tooltip-style")) {
-        document.head.appendChild(style);
-      }
     }
 
     if (activeLayer === "temperatura") {
@@ -274,8 +251,8 @@ export default function MapaPage() {
         (temps[i] - minT) / rangeT,
       ]);
       const heat = L.heatLayer(heatData, {
-        radius: 60,
-        blur: 40,
+        radius: 25,
+        blur: 20,
         maxZoom: 14,
         max: 1.0,
         gradient: {
@@ -287,29 +264,6 @@ export default function MapaPage() {
         },
       }).addTo(map);
       overlaysRef.current.push(heat);
-
-      topo.points.forEach((p, i) => {
-        const marker = L.circleMarker([p.latitude, p.longitude], {
-          radius: 4,
-          fillColor: "#fff",
-          fillOpacity: 0.9,
-          color: "#000",
-          weight: 1,
-        }).addTo(map);
-        marker.bindTooltip(`${temps[i].toFixed(1)}°C`, {
-          permanent: false,
-          direction: "top",
-          className: "temp-tooltip",
-        });
-        overlaysRef.current.push(marker);
-      });
-
-      const style = document.createElement("style");
-      style.textContent = `.temp-tooltip{background:#111827!important;border:1px solid #374151!important;color:#fff!important;font-size:11px!important;font-weight:600!important;padding:2px 6px!important;border-radius:4px!important;box-shadow:0 2px 6px rgba(0,0,0,0.5)!important}`;
-      style.id = "temp-tooltip-style";
-      if (!document.getElementById("temp-tooltip-style")) {
-        document.head.appendChild(style);
-      }
     }
 
     if (activeLayer === "ndvi") {
@@ -362,7 +316,7 @@ export default function MapaPage() {
       </div>
 
       <div className="overflow-hidden rounded-xl border border-border">
-        <div ref={mapRef} className="h-[600px] w-full bg-bg-surface-alt" />
+        <div ref={mapRef} className="h-[400px] w-full bg-bg-surface-alt" />
       </div>
 
       {activeLayer === "relevo" && (
@@ -390,7 +344,7 @@ export default function MapaPage() {
             </span>
           </div>
           <p className="mt-3 text-xs text-text-dim">
-            {topo.points.length} pontos com gradiente continuo. Desnivel de{" "}
+            Grade de {topo.points.length} pontos reais (SRTM). Desnivel de{" "}
             {topo.summary.range_m}m na regiao. Fonte: SRTM/Copernicus DEM.
           </p>
         </div>

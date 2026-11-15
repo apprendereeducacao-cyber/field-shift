@@ -62,7 +62,7 @@ const LAND_USE_LABELS: Record<string, string> = {
   floresta: "Floresta",
   outras_lavouras: "Outras lavouras",
   campo_nativo: "Campo nativo",
-  agua: "Água",
+  agua: "Agua",
   silvicultura: "Silvicultura",
   pastagem: "Pastagem",
   lavoura_perene: "Lavoura perene",
@@ -78,31 +78,14 @@ const LAYERS: { key: Layer; label: string }[] = [
   { key: "uso-do-solo", label: "Uso do Solo" },
 ];
 
-function elevColor(elev: number): string {
-  const { min_elevation_m: min, max_elevation_m: max } = topo.summary;
-  const pct = (elev - min) / (max - min);
-  if (pct < 0.25) return "#1B5E20";
-  if (pct < 0.5) return "#66BB6A";
-  if (pct < 0.75) return "#FDD835";
-  return "#E65100";
-}
-
 function tempFromElevation(elev: number): number {
   return avgTmax + ((meanElev - elev) * 0.65) / 100;
-}
-
-function tempColor(temp: number): string {
-  if (temp < 24) return "#1E88E5";
-  if (temp < 25) return "#42A5F5";
-  if (temp < 25.5) return "#FDD835";
-  if (temp < 26) return "#FF9800";
-  return "#E65100";
 }
 
 export default function MapaPage() {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
-  const markersRef = useRef<any[]>([]);
+  const overlaysRef = useRef<any[]>([]);
   const ndviOverlayRef = useRef<any>(null);
   const mountedRef = useRef(true);
 
@@ -116,12 +99,20 @@ export default function MapaPage() {
     mountedRef.current = true;
     if (!mapRef.current) return;
 
+    let scriptsLoaded = 0;
+    const SCRIPTS_NEEDED = 2;
+
+    function tryInit() {
+      scriptsLoaded++;
+      if (scriptsLoaded >= SCRIPTS_NEEDED) initMap();
+    }
+
     function initMap() {
       if (!mountedRef.current || !mapRef.current) return;
       if (mapInstance.current) return;
 
       const L = (window as any).L;
-      if (!L) return;
+      if (!L || !L.heatLayer) return;
 
       const container = mapRef.current;
       if ((container as any)._leaflet_id) {
@@ -135,44 +126,61 @@ export default function MapaPage() {
         zoomControl: true,
       });
 
-      const baseTiles = L.tileLayer(
-        "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-        { attribution: "&copy; OpenStreetMap contributors", maxZoom: 19 }
-      );
-      baseTiles.addTo(map);
-      const tilePane = map.getPane("tilePane");
-      if (tilePane) {
-        tilePane.style.filter =
-          "brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.5)";
-      }
+      L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        {
+          attribution: "Esri, Maxar, Earthstar Geographics",
+          maxZoom: 19,
+        }
+      ).addTo(map);
+
+      L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
+        { maxZoom: 19, opacity: 0.7 }
+      ).addTo(map);
 
       mapInstance.current = map;
       setLeafletReady(true);
     }
 
-    if ((window as any).L) {
-      initMap();
-    } else {
-      if (!document.querySelector('link[href*="leaflet.min.css"]')) {
-        const link = document.createElement("link");
-        link.rel = "stylesheet";
-        link.href =
-          "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css";
-        document.head.appendChild(link);
-      }
-
+    function loadScript(src: string, onLoad: () => void) {
       const existing = document.querySelector(
-        'script[src*="leaflet.min.js"]'
+        `script[src="${src}"]`
       ) as HTMLScriptElement | null;
       if (existing) {
-        existing.addEventListener("load", initMap);
-      } else {
-        const script = document.createElement("script");
-        script.src =
-          "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js";
-        script.onload = initMap;
-        document.head.appendChild(script);
+        if ((window as any).L?.heatLayer || !src.includes("heat")) {
+          onLoad();
+        } else {
+          existing.addEventListener("load", onLoad);
+        }
+        return;
       }
+      const script = document.createElement("script");
+      script.src = src;
+      script.onload = onLoad;
+      document.head.appendChild(script);
+    }
+
+    if (!document.querySelector('link[href*="leaflet.min.css"]')) {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href =
+        "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css";
+      document.head.appendChild(link);
+    }
+
+    if ((window as any).L?.heatLayer) {
+      initMap();
+    } else {
+      loadScript(
+        "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js",
+        () =>
+          loadScript(
+            "https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js",
+            tryInit
+          )
+      );
+      scriptsLoaded++;
     }
 
     return () => {
@@ -190,34 +198,64 @@ export default function MapaPage() {
     const L = (window as any).L;
     const map = mapInstance.current;
 
-    markersRef.current.forEach((m) => {
-      try { map.removeLayer(m); } catch { /* ok */ }
+    overlaysRef.current.forEach((m) => {
+      try {
+        map.removeLayer(m);
+      } catch {
+        /* ok */
+      }
     });
-    markersRef.current = [];
+    overlaysRef.current = [];
     if (ndviOverlayRef.current) {
-      try { map.removeLayer(ndviOverlayRef.current); } catch { /* ok */ }
+      try {
+        map.removeLayer(ndviOverlayRef.current);
+      } catch {
+        /* ok */
+      }
       ndviOverlayRef.current = null;
     }
 
     if (activeLayer === "relevo") {
+      const { min_elevation_m: min, max_elevation_m: max } = topo.summary;
+      const range = max - min || 1;
+      const heatData = topo.points.map((p) => [
+        p.latitude,
+        p.longitude,
+        (p.elevation_m - min) / range,
+      ]);
+      const heat = L.heatLayer(heatData, {
+        radius: 60,
+        blur: 40,
+        maxZoom: 14,
+        max: 1.0,
+        gradient: {
+          0.0: "#1B5E20",
+          0.25: "#388E3C",
+          0.5: "#66BB6A",
+          0.75: "#FDD835",
+          1.0: "#E65100",
+        },
+      }).addTo(map);
+      overlaysRef.current.push(heat);
+
       topo.points.forEach((p) => {
         const marker = L.circleMarker([p.latitude, p.longitude], {
-          radius: 12,
-          fillColor: elevColor(p.elevation_m),
-          fillOpacity: 0.85,
-          color: "#fff",
+          radius: 4,
+          fillColor: "#fff",
+          fillOpacity: 0.9,
+          color: "#000",
           weight: 1,
         }).addTo(map);
         marker.bindTooltip(`${p.elevation_m}m`, {
-          permanent: true,
-          direction: "center",
+          permanent: false,
+          direction: "top",
           className: "elev-tooltip",
         });
-        markersRef.current.push(marker);
+        overlaysRef.current.push(marker);
       });
 
       const style = document.createElement("style");
-      style.textContent = `.elev-tooltip{background:transparent!important;border:none!important;box-shadow:none!important;color:#fff!important;font-size:10px!important;font-weight:700!important;text-shadow:0 1px 3px #000}`;
+      style.textContent = `.elev-tooltip{background:#111827!important;border:1px solid #374151!important;color:#fff!important;font-size:11px!important;font-weight:600!important;padding:2px 6px!important;border-radius:4px!important;box-shadow:0 2px 6px rgba(0,0,0,0.5)!important}`;
       style.id = "elev-tooltip-style";
       if (!document.getElementById("elev-tooltip-style")) {
         document.head.appendChild(style);
@@ -225,25 +263,49 @@ export default function MapaPage() {
     }
 
     if (activeLayer === "temperatura") {
-      topo.points.forEach((p) => {
-        const temp = tempFromElevation(p.elevation_m);
+      const temps = topo.points.map((p) => tempFromElevation(p.elevation_m));
+      const minT = Math.min(...temps);
+      const maxT = Math.max(...temps);
+      const rangeT = maxT - minT || 1;
+
+      const heatData = topo.points.map((p, i) => [
+        p.latitude,
+        p.longitude,
+        (temps[i] - minT) / rangeT,
+      ]);
+      const heat = L.heatLayer(heatData, {
+        radius: 60,
+        blur: 40,
+        maxZoom: 14,
+        max: 1.0,
+        gradient: {
+          0.0: "#1E88E5",
+          0.3: "#42A5F5",
+          0.5: "#FDD835",
+          0.7: "#FF9800",
+          1.0: "#E65100",
+        },
+      }).addTo(map);
+      overlaysRef.current.push(heat);
+
+      topo.points.forEach((p, i) => {
         const marker = L.circleMarker([p.latitude, p.longitude], {
-          radius: 18,
-          fillColor: tempColor(temp),
-          fillOpacity: 0.6,
-          color: tempColor(temp),
-          weight: 2,
+          radius: 4,
+          fillColor: "#fff",
+          fillOpacity: 0.9,
+          color: "#000",
+          weight: 1,
         }).addTo(map);
-        marker.bindTooltip(`${temp.toFixed(1)}°C`, {
-          permanent: true,
-          direction: "center",
+        marker.bindTooltip(`${temps[i].toFixed(1)}°C`, {
+          permanent: false,
+          direction: "top",
           className: "temp-tooltip",
         });
-        markersRef.current.push(marker);
+        overlaysRef.current.push(marker);
       });
 
       const style = document.createElement("style");
-      style.textContent = `.temp-tooltip{background:transparent!important;border:none!important;box-shadow:none!important;color:#fff!important;font-size:10px!important;font-weight:700!important;text-shadow:0 1px 3px #000}`;
+      style.textContent = `.temp-tooltip{background:#111827!important;border:1px solid #374151!important;color:#fff!important;font-size:11px!important;font-weight:600!important;padding:2px 6px!important;border-radius:4px!important;box-shadow:0 2px 6px rgba(0,0,0,0.5)!important}`;
       style.id = "temp-tooltip-style";
       if (!document.getElementById("temp-tooltip-style")) {
         document.head.appendChild(style);
@@ -257,7 +319,6 @@ export default function MapaPage() {
           map.createPane("ndviPane");
           const pane = map.getPane("ndviPane")!;
           pane.style.zIndex = "450";
-          pane.style.filter = "none";
         }
         ndviOverlayRef.current = L.tileLayer(url, {
           opacity: 0.75,
@@ -279,8 +340,8 @@ export default function MapaPage() {
           Mapa de Cruz Alta
         </h1>
         <p className="mt-2 text-sm text-text-muted">
-          Visualize o terreno, a temperatura estimada, a vegetação por satélite e
-          o uso do solo na região. Alterne entre as camadas abaixo.
+          Imagem de satelite real da regiao. Passe o mouse nos pontos para ver os
+          valores. Alterne entre as camadas abaixo.
         </p>
       </div>
 
@@ -307,27 +368,30 @@ export default function MapaPage() {
       {activeLayer === "relevo" && (
         <div className="rounded-lg border border-border bg-bg-surface p-4">
           <p className="text-xs font-medium tracking-wider text-text-dim uppercase">
-            Legenda — Elevação
+            Legenda — Elevacao (mapa de calor)
           </p>
-          <div className="mt-3 flex items-center gap-3">
-            {[
-              { color: "#1B5E20", label: `${topo.summary.min_elevation_m}m (vale)` },
-              { color: "#66BB6A", label: "Médio-baixo" },
-              { color: "#FDD835", label: "Médio-alto" },
-              { color: "#E65100", label: `${topo.summary.max_elevation_m}m (topo)` },
-            ].map((item) => (
-              <div key={item.label} className="flex items-center gap-1.5">
-                <span
-                  className="inline-block h-3 w-3 rounded-full"
-                  style={{ backgroundColor: item.color }}
-                />
-                <span className="text-xs text-text-muted">{item.label}</span>
-              </div>
-            ))}
+          <div className="mt-3 flex items-center gap-1">
+            <span className="text-xs text-text-muted">
+              {topo.summary.min_elevation_m}m
+            </span>
+            <div className="flex h-3 flex-1 overflow-hidden rounded-full">
+              {["#1B5E20", "#388E3C", "#66BB6A", "#FDD835", "#E65100"].map(
+                (c) => (
+                  <div
+                    key={c}
+                    className="flex-1"
+                    style={{ backgroundColor: c }}
+                  />
+                )
+              )}
+            </div>
+            <span className="text-xs text-text-muted">
+              {topo.summary.max_elevation_m}m
+            </span>
           </div>
           <p className="mt-3 text-xs text-text-dim">
-            Grade 5x5 com {topo.points.length} pontos. Desnível de{" "}
-            {topo.summary.range_m}m na região. Fonte: SRTM/Copernicus DEM.
+            {topo.points.length} pontos com gradiente continuo. Desnivel de{" "}
+            {topo.summary.range_m}m na regiao. Fonte: SRTM/Copernicus DEM.
           </p>
         </div>
       )}
@@ -335,27 +399,25 @@ export default function MapaPage() {
       {activeLayer === "temperatura" && (
         <div className="rounded-lg border border-border bg-bg-surface p-4">
           <p className="text-xs font-medium tracking-wider text-text-dim uppercase">
-            Legenda — Temperatura máxima estimada
+            Legenda — Temperatura maxima estimada (mapa de calor)
           </p>
-          <div className="mt-3 flex items-center gap-3">
-            {[
-              { color: "#1E88E5", label: "< 24°C (frio)" },
-              { color: "#42A5F5", label: "24-25°C" },
-              { color: "#FDD835", label: "25-25.5°C" },
-              { color: "#FF9800", label: "25.5-26°C" },
-              { color: "#E65100", label: "> 26°C (quente)" },
-            ].map((item) => (
-              <div key={item.label} className="flex items-center gap-1.5">
-                <span
-                  className="inline-block h-3 w-3 rounded-full"
-                  style={{ backgroundColor: item.color }}
-                />
-                <span className="text-xs text-text-muted">{item.label}</span>
-              </div>
-            ))}
+          <div className="mt-3 flex items-center gap-1">
+            <span className="text-xs text-text-muted">Frio</span>
+            <div className="flex h-3 flex-1 overflow-hidden rounded-full">
+              {["#1E88E5", "#42A5F5", "#FDD835", "#FF9800", "#E65100"].map(
+                (c) => (
+                  <div
+                    key={c}
+                    className="flex-1"
+                    style={{ backgroundColor: c }}
+                  />
+                )
+              )}
+            </div>
+            <span className="text-xs text-text-muted">Quente</span>
           </div>
           <p className="mt-3 text-xs text-text-dim">
-            Lapse rate de -0.65°C por 100m de altitude, aplicado sobre a média
+            Lapse rate de -0.65°C por 100m de altitude, aplicado sobre a media
             regional de {avgTmax.toFixed(1)}°C (NASA POWER 1981-2025). Vales
             tendem a ser mais quentes, topos mais frios.
           </p>
@@ -401,7 +463,11 @@ export default function MapaPage() {
             </p>
             <div className="mt-2 flex h-4 overflow-hidden rounded-full">
               {ndvi.palette.map((color, i) => (
-                <div key={i} className="flex-1" style={{ backgroundColor: color }} />
+                <div
+                  key={i}
+                  className="flex-1"
+                  style={{ backgroundColor: color }}
+                />
               ))}
             </div>
             <div className="mt-1 flex justify-between text-[10px] text-text-dim">
@@ -455,15 +521,15 @@ export default function MapaPage() {
           <p className="mt-4 text-xs text-text-dim">
             Dados de cobertura e uso do solo num raio de 15km ao redor de Cruz
             Alta. Fonte: MapBiomas Collection 9 (Landsat 30m, 1985-2023). A soja
-            domina com mais de 80% da área.
+            domina com mais de 80% da area.
           </p>
         </div>
       )}
 
       <div className="rounded-lg border border-border bg-bg-surface p-4 text-xs text-text-dim">
-        <strong>Fontes:</strong> SRTM/Copernicus DEM (elevação) | NASA POWER
+        <strong>Fontes:</strong> SRTM/Copernicus DEM (elevacao) | NASA POWER
         1981-2025 (temperatura) | MODIS MOD13Q1 via Google Earth Engine (NDVI) |
-        MapBiomas Collection 9 (uso do solo) | Mapa base: OpenStreetMap
+        MapBiomas Collection 9 (uso do solo) | Imagem: Esri World Imagery
       </div>
     </div>
   );

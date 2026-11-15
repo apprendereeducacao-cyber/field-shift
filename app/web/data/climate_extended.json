@@ -1,0 +1,322 @@
+{
+  "source": "NASA POWER - variaveis climaticas adicionais",
+  "period": "1981-2025",
+  "parameters": {
+    "solar_radiation": {
+      "param": "ALLSKY_SFC_SW_DWN",
+      "unit": "kW-hr/m2/day",
+      "description": "Radiacao solar na superficie",
+      "monthly": [
+        {
+          "month": 1,
+          "name": "Jan",
+          "value": 23.687,
+          "n_years": 42
+        },
+        {
+          "month": 2,
+          "name": "Fev",
+          "value": 21.946,
+          "n_years": 42
+        },
+        {
+          "month": 3,
+          "name": "Mar",
+          "value": 18.714,
+          "n_years": 42
+        },
+        {
+          "month": 4,
+          "name": "Abr",
+          "value": 14.469,
+          "n_years": 42
+        },
+        {
+          "month": 5,
+          "name": "Mai",
+          "value": 11.379,
+          "n_years": 42
+        },
+        {
+          "month": 6,
+          "name": "Jun",
+          "value": 9.39,
+          "n_years": 42
+        },
+        {
+          "month": 7,
+          "name": "Jul",
+          "value": 10.48,
+          "n_years": 42
+        },
+        {
+          "month": 8,
+          "name": "Ago",
+          "value": 13.027,
+          "n_years": 42
+        },
+        {
+          "month": 9,
+          "name": "Set",
+          "value": 15.006,
+          "n_years": 42
+        },
+        {
+          "month": 10,
+          "name": "Out",
+          "value": 18.56,
+          "n_years": 42
+        },
+        {
+          "month": 11,
+          "name": "Nov",
+          "value": 23.005,
+          "n_years": 42
+        },
+        {
+          "month": 12,
+          "name": "Dez",
+          "value": 24.268,
+          "n_years": 42
+        }
+      ]
+    },
+    "wind_speed_2m": {
+      "param": "WS2M",
+      "unit": "m/s",
+      "description": "Velocidade do vento a 2m",
+      "monthly": [
+        {
+          "month": 1,
+          "name": "Jan",
+          "value": 1.063,
+          "n_years": 45
+        },
+        {
+          "month": 2,
+          "name": "Fev",
+          "value": 1.004,
+          "n_years": 45
+        },
+        {
+          "month": 3,
+          "name": "Mar",
+          "value": 1.023,
+          "n_years": 45
+        },
+        {
+          "month": 4,
+          "name": "Abr",
+          "value": 1.078,
+          "n_years": 45
+        },
+        {
+          "month": 5,
+          "name": "Mai",
+          "value": 1.21,
+          "n_years": 45
+        },
+        {
+          "month": 6,
+          "name": "Jun",
+          "value": 1.294,
+          "n_years": 45
+        },
+        {
+          "month": 7,
+          "name": "Jul",
+          "value": 1.266,
+          "n_years": 45
+        },
+        {
+          "month": 8,
+          "name": "Ago",
+          "value": 1.226,
+          "n_years": 45
+        },
+        {
+          "month": 9,
+          "name": "Set",
+          "value": 1.293,
+          "n_years": 45
+        },
+        {
+          "month": 10,
+          "name": "Out",
+          "value": 1.376,
+          "n_years": 45
+        },
+        {
+          "month": 11,
+          "name": "Nov",
+          "value": 1.397,
+          "n_years": 45
+        },
+        {
+          "month": 12,
+          "name": "Dez",
+          "value": 1.199,
+          "n_years": 45
+        }
+      ]
+    },
+    "relative_humidity": {
+      "param": "RH2M",
+      "unit": "%",
+      "description": "Umidade relativa a 2m",
+      "monthly": [
+        {
+          "month": 1,
+          "name": "Jan",
+          "value": 75.611,
+          "n_years": 45
+        },
+        {
+          "month": 2,
+          "name": "Fev",
+          "value": 76.866,
+          "n_years": 45
+        },
+        {
+          "month": 3,
+          "name": "Mar",
+          "value": 77.071,
+          "n_years": 45
+        },
+        {
+          "month": 4,
+          "name": "Abr",
+          "value": 79.742,
+          "n_years": 45
+        },
+        {
+          "month": 5,
+          "name": "Mai",
+          "value": 82.502,
+          "n_years": 45
+        },
+        {
+          "month": 6,
+          "name": "Jun",
+          "value": 85.649,
+          "n_years": 45
+        },
+        {
+          "month": 7,
+          "name": "Jul",
+          "value": 85.381,
+          "n_years": 45
+        },
+        {
+          "month": 8,
+          "name": "Ago",
+          "value": 83.383,
+          "n_years": 45
+        },
+        {
+          "month": 9,
+          "name": "Set",
+          "value": 81.27,
+          "n_years": 45
+        },
+        {
+          "month": 10,
+          "name": "Out",
+          "value": 79.338,
+          "n_years": 45
+        },
+        {
+          "month": 11,
+          "name": "Nov",
+          "value": 75.465,
+          "n_years": 45
+        },
+        {
+          "month": 12,
+          "name": "Dez",
+          "value": 74.216,
+          "n_years": 45
+        }
+      ]
+    },
+    "temperature": {
+      "param": "T2M",
+      "unit": "C",
+      "description": "Temperatura media a 2m",
+      "monthly": [
+        {
+          "month": 1,
+          "name": "Jan",
+          "value": 24.298,
+          "n_years": 45
+        },
+        {
+          "month": 2,
+          "name": "Fev",
+          "value": 23.846,
+          "n_years": 45
+        },
+        {
+          "month": 3,
+          "name": "Mar",
+          "value": 22.545,
+          "n_years": 45
+        },
+        {
+          "month": 4,
+          "name": "Abr",
+          "value": 19.594,
+          "n_years": 45
+        },
+        {
+          "month": 5,
+          "name": "Mai",
+          "value": 15.854,
+          "n_years": 45
+        },
+        {
+          "month": 6,
+          "name": "Jun",
+          "value": 13.668,
+          "n_years": 45
+        },
+        {
+          "month": 7,
+          "name": "Jul",
+          "value": 13.002,
+          "n_years": 45
+        },
+        {
+          "month": 8,
+          "name": "Ago",
+          "value": 14.682,
+          "n_years": 45
+        },
+        {
+          "month": 9,
+          "name": "Set",
+          "value": 16.566,
+          "n_years": 45
+        },
+        {
+          "month": 10,
+          "name": "Out",
+          "value": 19.305,
+          "n_years": 45
+        },
+        {
+          "month": 11,
+          "name": "Nov",
+          "value": 21.42,
+          "n_years": 45
+        },
+        {
+          "month": 12,
+          "name": "Dez",
+          "value": 23.456,
+          "n_years": 45
+        }
+      ]
+    }
+  }
+}

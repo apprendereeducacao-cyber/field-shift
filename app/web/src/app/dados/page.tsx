@@ -9,6 +9,11 @@ import {
   soilMoisture,
   ndvi,
   mapbiomas,
+  evapotranspiration,
+  smap,
+  gpm,
+  grace,
+  climateExt,
   MONTH_NAMES,
   KEY_FINDINGS,
   type TimelineYear,
@@ -35,11 +40,12 @@ const ENSO_LABELS: Record<string, string> = {
   neutro: "Neutro",
 };
 
-type TabKey = "clima" | "historico" | "solo" | "vegetacao" | "uso-do-solo";
+type TabKey = "clima" | "historico" | "solo" | "vegetacao" | "uso-do-solo" | "satelite";
 
 const TABS: { key: TabKey; label: string }[] = [
-  { key: "clima", label: "Riscos Climáticos" },
-  { key: "historico", label: "Histórico 44 anos" },
+  { key: "clima", label: "Riscos Climaticos" },
+  { key: "historico", label: "Historico 44 anos" },
+  { key: "satelite", label: "Satelite NASA" },
   { key: "solo", label: "Solo e Terreno" },
   { key: "vegetacao", label: "NDVI" },
   { key: "uso-do-solo", label: "Uso do Solo" },
@@ -1058,6 +1064,613 @@ function UsoDoSoloTab() {
   );
 }
 
+// ── TAB: Satelite NASA ──────────────────────────────────
+
+function SateliteTab() {
+  const [subTab, setSubTab] = useState<
+    "grace" | "smap" | "gpm" | "et" | "clima-ext"
+  >("grace");
+
+  const SUB_TABS = [
+    { key: "grace" as const, label: "Agua Subterranea (GRACE)" },
+    { key: "smap" as const, label: "Umidade Solo (SMAP)" },
+    { key: "gpm" as const, label: "Chuva Satelite (GPM)" },
+    { key: "et" as const, label: "Evapotranspiracao" },
+    { key: "clima-ext" as const, label: "Clima Completo" },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <p className="text-sm text-text-secondary">
+        Dados de 5 satelites NASA processados para Cruz Alta — agua subterranea,
+        umidade do solo por microondas, chuva por radar, evapotranspiracao e
+        variaveis climaticas estendidas.
+      </p>
+      <div className="flex flex-wrap gap-2">
+        {SUB_TABS.map((t) => (
+          <button
+            key={t.key}
+            onClick={() => setSubTab(t.key)}
+            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+              subTab === t.key
+                ? "bg-primary/20 text-primary-light"
+                : "bg-bg-surface text-text-muted hover:bg-bg-surface-alt"
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {subTab === "grace" && <GraceSection />}
+      {subTab === "smap" && <SmapSection />}
+      {subTab === "gpm" && <GpmSection />}
+      {subTab === "et" && <ETSection />}
+      {subTab === "clima-ext" && <ClimaExtSection />}
+    </div>
+  );
+}
+
+function GraceSection() {
+  const trend = grace.trend;
+  const clim = grace.monthly_climatology;
+  const ts = grace.timeseries;
+  const maxClim = Math.max(...clim.map((m) => Math.abs(m.avg_tws_anomaly_cm)));
+
+  const annualAvg: { year: number; avg: number }[] = [];
+  const byYear = new Map<number, number[]>();
+  for (const r of ts) {
+    if (!byYear.has(r.year)) byYear.set(r.year, []);
+    byYear.get(r.year)!.push(r.tws_anomaly_cm);
+  }
+  for (const [year, vals] of byYear) {
+    annualAvg.push({ year, avg: vals.reduce((a, b) => a + b, 0) / vals.length });
+  }
+  const minY = Math.min(...annualAvg.map((a) => a.avg));
+  const maxY = Math.max(...annualAvg.map((a) => a.avg));
+  const rangeY = maxY - minY || 1;
+
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-4 sm:grid-cols-3">
+        <StatCard
+          value={`+${trend.change_cm.toFixed(1)} cm`}
+          label="Agua subterranea ganhando"
+          sub={`De ${trend.first_half_avg.toFixed(1)} para ${trend.second_half_avg.toFixed(1)} cm (2002-2024)`}
+        />
+        <StatCard
+          value={`${ts.length}`}
+          label="Medicoes do GRACE"
+          sub="Meses com dados (2002-2024)"
+        />
+        <StatCard
+          value={clim.reduce((best, m) => m.avg_tws_anomaly_cm > best.avg_tws_anomaly_cm ? m : best).name}
+          label="Mes com mais agua"
+          sub={`${clim.reduce((best, m) => m.avg_tws_anomaly_cm > best.avg_tws_anomaly_cm ? m : best).avg_tws_anomaly_cm.toFixed(1)} cm anomalia`}
+        />
+      </div>
+
+      <div className="rounded-xl border-2 border-primary bg-primary/5 p-5">
+        <p className="text-xs font-medium tracking-wider text-primary-light uppercase">
+          O que isso significa pro produtor
+        </p>
+        <p className="mt-2 text-sm text-text-secondary">
+          A regiao de Cruz Alta esta <strong className="text-primary-light">ganhando agua subterranea</strong> — +{trend.change_cm.toFixed(1)} cm
+          em 22 anos de medicao por satelite. Isso indica que o lencol freatico esta se recarregando,
+          o que e bom sinal para periodos de seca. Setembro e o mes com maior reserva, e fevereiro
+          o menor — coincide com o pico de consumo da soja.
+        </p>
+      </div>
+
+      <div>
+        <h3 className="text-sm font-semibold text-text-primary mb-3">
+          Sazonalidade da agua subterranea (media mensal)
+        </h3>
+        <div className="rounded-lg border border-border bg-bg-surface p-4">
+          <div className="flex items-end gap-2" style={{ height: 180 }}>
+            {clim.map((m, i) => {
+              const val = m.avg_tws_anomaly_cm;
+              const isPositive = val >= 0;
+              const pct = (Math.abs(val) / maxClim) * 45;
+              return (
+                <div
+                  key={m.month}
+                  className="flex flex-1 flex-col items-center justify-center"
+                  style={{ height: "100%" }}
+                >
+                  <div className="relative flex flex-col items-center" style={{ height: "100%" }}>
+                    <div className="flex-1 flex items-end">
+                      {isPositive && (
+                        <div
+                          className="w-full max-w-8 rounded-t-sm bg-sky-500"
+                          style={{ height: `${pct}%` }}
+                          title={`${m.name}: ${val.toFixed(1)} cm`}
+                        />
+                      )}
+                    </div>
+                    <div className="w-full border-t border-text-dim/30" />
+                    <div className="flex-1 flex items-start">
+                      {!isPositive && (
+                        <div
+                          className="w-full max-w-8 rounded-b-sm bg-amber-500"
+                          style={{ height: `${pct}%` }}
+                          title={`${m.name}: ${val.toFixed(1)} cm`}
+                        />
+                      )}
+                    </div>
+                  </div>
+                  <span className="mt-1 text-[10px] text-text-dim">{MONTH_NAMES[i]}</span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="mt-2 flex items-center gap-4 text-xs text-text-muted">
+            <span className="flex items-center gap-1">
+              <span className="inline-block h-2.5 w-2.5 rounded-sm bg-sky-500" /> Acima da media
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="inline-block h-2.5 w-2.5 rounded-sm bg-amber-500" /> Abaixo da media
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h3 className="text-sm font-semibold text-text-primary mb-3">
+          Tendencia anual (2002-2024)
+        </h3>
+        <div className="rounded-lg border border-border bg-bg-surface p-4">
+          <div className="flex items-end gap-[3px]" style={{ height: 160, minWidth: annualAvg.length * 20 }}>
+            {annualAvg.map((a) => {
+              const pct = ((a.avg - minY) / rangeY) * 100;
+              const color = a.avg >= 0 ? "#0ea5e9" : "#f59e0b";
+              return (
+                <div
+                  key={a.year}
+                  className="group relative flex-1"
+                  style={{ height: "100%" }}
+                >
+                  <div
+                    className="absolute bottom-0 w-full rounded-t-sm transition-opacity group-hover:opacity-80"
+                    style={{ height: `${Math.max(pct, 2)}%`, backgroundColor: color }}
+                  />
+                  <div className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-bg-base px-2 py-1 text-xs shadow-lg">
+                    {a.year}: {a.avg.toFixed(1)} cm
+                  </div>
+                  {a.year % 4 === 0 && (
+                    <span className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[9px] text-text-dim">{a.year}</span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <p className="text-[10px] text-text-dim border-t border-border pt-3">
+        Fonte: {grace.source} | {grace.period} | Unidade: {grace.unit}
+      </p>
+    </div>
+  );
+}
+
+function SmapSection() {
+  const clim = smap.monthly_climatology;
+  const trend = smap.yearly_trend;
+  const maxMoist = Math.max(...clim.map((m) => m.avg_soil_moisture));
+  const minTrend = Math.min(...trend.map((t) => t.avg));
+  const maxTrend = Math.max(...trend.map((t) => t.avg));
+  const rangeTrend = maxTrend - minTrend || 0.01;
+
+  const driestMonth = clim.reduce((a, b) => a.avg_soil_moisture < b.avg_soil_moisture ? a : b);
+  const wettestMonth = clim.reduce((a, b) => a.avg_soil_moisture > b.avg_soil_moisture ? a : b);
+
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-4 sm:grid-cols-3">
+        <StatCard
+          value={`${(maxMoist * 100).toFixed(0)}%`}
+          label={`Solo mais umido: ${wettestMonth.name}`}
+          sub={`${wettestMonth.avg_soil_moisture.toFixed(3)} cm3/cm3`}
+        />
+        <StatCard
+          value={`${(driestMonth.avg_soil_moisture * 100).toFixed(0)}%`}
+          label={`Solo mais seco: ${driestMonth.name}`}
+          sub={`${driestMonth.avg_soil_moisture.toFixed(3)} cm3/cm3`}
+        />
+        <StatCard
+          value={`${trend.length}`}
+          label="Anos com medicao SMAP"
+          sub="Satelite de microondas (2015-2025)"
+        />
+      </div>
+
+      <div className="rounded-xl border border-accent/30 bg-accent/5 p-5">
+        <p className="text-xs font-medium tracking-wider text-accent uppercase">
+          Interpretacao
+        </p>
+        <p className="mt-2 text-sm text-text-secondary">
+          O SMAP mede a umidade real do solo por microondas (9km de resolucao). Em Cruz Alta,
+          o solo fica mais seco em <strong>dezembro-janeiro</strong> — justamente quando a soja
+          mais precisa de agua. O inverno (junho-julho) e o periodo mais umido. Manter cobertura
+          no verao reduz a perda de umidade por evaporacao.
+        </p>
+      </div>
+
+      <div>
+        <h3 className="text-sm font-semibold text-text-primary mb-3">
+          Umidade do solo por mes (SMAP, media 2015-2025)
+        </h3>
+        <div className="rounded-lg border border-border bg-bg-surface p-4">
+          <div className="flex items-end gap-2" style={{ height: 160 }}>
+            {clim.map((m, i) => {
+              const pct = (m.avg_soil_moisture / maxMoist) * 100;
+              const color = m.avg_soil_moisture > 0.28 ? "#0ea5e9" : m.avg_soil_moisture > 0.22 ? "#f59e0b" : "#ef4444";
+              return (
+                <div key={m.month} className="group relative flex flex-1 flex-col items-center" style={{ height: "100%" }}>
+                  <div className="relative flex-1 w-full flex items-end justify-center">
+                    <div
+                      className="w-full max-w-8 rounded-t-sm transition-opacity group-hover:opacity-80"
+                      style={{ height: `${pct}%`, backgroundColor: color }}
+                    />
+                    <div className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-bg-base px-2 py-1 text-xs shadow-lg">
+                      {(m.avg_soil_moisture * 100).toFixed(1)}%
+                    </div>
+                  </div>
+                  <span className="mt-1 text-[10px] text-text-dim">{MONTH_NAMES[i]}</span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="mt-2 flex items-center gap-4 text-xs text-text-muted">
+            <span className="flex items-center gap-1">
+              <span className="inline-block h-2.5 w-2.5 rounded-sm bg-sky-500" /> Umido ({">"}28%)
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="inline-block h-2.5 w-2.5 rounded-sm bg-amber-500" /> Medio (22-28%)
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="inline-block h-2.5 w-2.5 rounded-sm bg-red-500" /> Seco ({"<"}22%)
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h3 className="text-sm font-semibold text-text-primary mb-3">
+          Tendencia anual (SMAP 2015-2025)
+        </h3>
+        <div className="rounded-lg border border-border bg-bg-surface p-4">
+          <div className="flex items-end gap-2" style={{ height: 140 }}>
+            {trend.map((t) => {
+              const pct = ((t.avg - minTrend) / rangeTrend) * 80 + 10;
+              return (
+                <div key={t.year} className="group relative flex flex-1 flex-col items-center" style={{ height: "100%" }}>
+                  <div className="relative flex-1 w-full flex items-end justify-center">
+                    <div
+                      className="w-full max-w-10 rounded-t-sm bg-sky-500 transition-opacity group-hover:opacity-80"
+                      style={{ height: `${pct}%` }}
+                    />
+                    <div className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-bg-base px-2 py-1 text-xs shadow-lg">
+                      {t.year}: {(t.avg * 100).toFixed(1)}%
+                    </div>
+                  </div>
+                  <span className="mt-1 text-[10px] text-text-dim">{t.year}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <p className="text-[10px] text-text-dim border-t border-border pt-3">
+        Fonte: {smap.source} | {smap.period} | Unidade: {smap.unit}
+      </p>
+    </div>
+  );
+}
+
+function GpmSection() {
+  const clim = gpm.monthly_climatology;
+  const annuals = gpm.annual_totals;
+  const maxMonth = Math.max(...clim.map((m) => m.avg_precip_mm));
+  const totalAvg = clim.reduce((s, m) => s + m.avg_precip_mm, 0);
+
+  const last5 = annuals.slice(-5);
+  const minAnn = Math.min(...annuals.map((a) => a.total_mm));
+  const maxAnn = Math.max(...annuals.map((a) => a.total_mm));
+  const rangeAnn = maxAnn - minAnn || 1;
+
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-4 sm:grid-cols-3">
+        <StatCard
+          value={`${totalAvg.toFixed(0)} mm`}
+          label="Chuva media anual (GPM)"
+          sub="Media de 28 anos de satelite"
+        />
+        <StatCard
+          value={`${last5[last5.length - 1]?.total_mm.toFixed(0)} mm`}
+          label={`Ultimo ano completo (${last5[last5.length - 1]?.year})`}
+          sub={last5[last5.length - 1]?.total_mm > totalAvg ? "Acima da media" : "Abaixo da media"}
+        />
+        <StatCard
+          value={`${annuals.length}`}
+          label="Anos medidos pelo GPM"
+          sub="Satelite IMERG V07 (1998-2025)"
+        />
+      </div>
+
+      <div>
+        <h3 className="text-sm font-semibold text-text-primary mb-3">
+          Chuva media mensal (GPM satelite, 1998-2025)
+        </h3>
+        <div className="rounded-lg border border-border bg-bg-surface p-4">
+          <div className="flex items-end gap-2" style={{ height: 160 }}>
+            {clim.map((m, i) => {
+              const pct = (m.avg_precip_mm / maxMonth) * 100;
+              const color = m.avg_precip_mm > 200 ? "#1e40af" : m.avg_precip_mm > 160 ? "#1E88E5" : "#42A5F5";
+              return (
+                <div key={m.month} className="group relative flex flex-1 flex-col items-center" style={{ height: "100%" }}>
+                  <div className="relative flex-1 w-full flex items-end justify-center">
+                    <div
+                      className="w-full max-w-8 rounded-t-sm transition-opacity group-hover:opacity-80"
+                      style={{ height: `${pct}%`, backgroundColor: color }}
+                    />
+                    <div className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-bg-base px-2 py-1 text-xs shadow-lg">
+                      {m.avg_precip_mm.toFixed(0)} mm
+                    </div>
+                  </div>
+                  <span className="mt-1 text-[10px] text-text-dim">{MONTH_NAMES[i]}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h3 className="text-sm font-semibold text-text-primary mb-3">
+          Chuva total por ano (GPM satelite)
+        </h3>
+        <div className="rounded-lg border border-border bg-bg-surface p-4 overflow-x-auto">
+          <div className="flex items-end gap-[2px]" style={{ height: 160, minWidth: annuals.length * 14 }}>
+            {annuals.map((a) => {
+              const pct = ((a.total_mm - minAnn) / rangeAnn) * 85 + 10;
+              const color = a.total_mm > 2000 ? "#1e40af" : a.total_mm > 1600 ? "#1E88E5" : a.total_mm > 1200 ? "#f59e0b" : "#ef4444";
+              return (
+                <div key={a.year} className="group relative flex-1" style={{ height: "100%" }}>
+                  <div
+                    className="absolute bottom-0 w-full rounded-t-sm transition-opacity group-hover:opacity-80"
+                    style={{ height: `${pct}%`, backgroundColor: color }}
+                  />
+                  <div className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-bg-base px-2 py-1 text-xs shadow-lg">
+                    {a.year}: {a.total_mm.toFixed(0)} mm
+                  </div>
+                  {a.year % 5 === 0 && (
+                    <span className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[9px] text-text-dim">{a.year}</span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <p className="text-[10px] text-text-dim border-t border-border pt-3">
+        Fonte: {gpm.source} | {gpm.period} | Unidade: {gpm.unit_monthly}
+      </p>
+    </div>
+  );
+}
+
+function ETSection() {
+  const et = evapotranspiration.evapotranspiration_monthly;
+  const land = evapotranspiration.land_evaporation_monthly;
+  const trend = evapotranspiration.et_yearly_trend;
+  const maxET = Math.max(...et.map((m) => m.value));
+  const minTrend = Math.min(...trend.map((t) => t.avg));
+  const maxTrend = Math.max(...trend.map((t) => t.avg));
+  const rangeTrend = maxTrend - minTrend || 0.1;
+
+  const annualAvg = et.reduce((s, m) => s + m.value, 0) / 12;
+  const summerAvg = [et[0], et[1], et[11]].reduce((s, m) => s + m.value, 0) / 3;
+  const winterAvg = [et[5], et[6], et[7]].reduce((s, m) => s + m.value, 0) / 3;
+
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-4 sm:grid-cols-3">
+        <StatCard
+          value={`${annualAvg.toFixed(1)} mm/dia`}
+          label="ET media anual"
+          sub="Evapotranspiracao total"
+        />
+        <StatCard
+          value={`${summerAvg.toFixed(1)} mm/dia`}
+          label="ET verao (Dez-Fev)"
+          sub="Demanda maxima de agua"
+        />
+        <StatCard
+          value={`${winterAvg.toFixed(1)} mm/dia`}
+          label="ET inverno (Jun-Ago)"
+          sub="Demanda minima"
+        />
+      </div>
+
+      <div className="rounded-xl border border-accent/30 bg-accent/5 p-5">
+        <p className="text-xs font-medium tracking-wider text-accent uppercase">
+          Por que isso importa
+        </p>
+        <p className="mt-2 text-sm text-text-secondary">
+          A evapotranspiracao mostra quanta agua a planta e o solo perdem por dia.
+          No verao, Cruz Alta perde <strong>{summerAvg.toFixed(1)} mm/dia</strong> — se nao chover
+          por 10 dias, sao {(summerAvg * 10).toFixed(0)} mm de deficit. Cobertura morta (palha) reduz
+          a evaporacao do solo em 30-50%, mantendo mais agua pra raiz da soja.
+        </p>
+      </div>
+
+      <div>
+        <h3 className="text-sm font-semibold text-text-primary mb-3">
+          Evapotranspiracao mensal (media 1981-2025)
+        </h3>
+        <div className="rounded-lg border border-border bg-bg-surface p-4">
+          <div className="flex items-end gap-2" style={{ height: 160 }}>
+            {et.map((m, i) => {
+              const pct = (m.value / maxET) * 100;
+              return (
+                <div key={m.month} className="group relative flex flex-1 flex-col items-center" style={{ height: "100%" }}>
+                  <div className="relative flex-1 w-full flex items-end justify-center">
+                    <div className="flex gap-0.5 items-end w-full max-w-8">
+                      <div
+                        className="flex-1 rounded-t-sm bg-orange-500 transition-opacity group-hover:opacity-80"
+                        style={{ height: `${pct}%` }}
+                        title={`ET: ${m.value.toFixed(1)} mm/dia`}
+                      />
+                      <div
+                        className="flex-1 rounded-t-sm bg-emerald-500 transition-opacity group-hover:opacity-80"
+                        style={{ height: `${(land[i].value / maxET) * 100}%` }}
+                        title={`Solo: ${land[i].value.toFixed(1)} mm/dia`}
+                      />
+                    </div>
+                    <div className="absolute -top-14 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-bg-base px-2 py-1 text-xs shadow-lg">
+                      <p>ET total: {m.value.toFixed(2)} mm/dia</p>
+                      <p>Solo: {land[i].value.toFixed(2)} mm/dia</p>
+                    </div>
+                  </div>
+                  <span className="mt-1 text-[10px] text-text-dim">{MONTH_NAMES[i]}</span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="mt-2 flex items-center gap-4 text-xs text-text-muted">
+            <span className="flex items-center gap-1">
+              <span className="inline-block h-2.5 w-2.5 rounded-sm bg-orange-500" /> Evapotranspiracao total
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="inline-block h-2.5 w-2.5 rounded-sm bg-emerald-500" /> Evaporacao do solo
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h3 className="text-sm font-semibold text-text-primary mb-3">
+          Tendencia anual da ET
+        </h3>
+        <div className="rounded-lg border border-border bg-bg-surface p-4 overflow-x-auto">
+          <div className="flex items-end gap-[2px]" style={{ height: 140, minWidth: trend.length * 12 }}>
+            {trend.map((t) => {
+              const pct = ((t.avg - minTrend) / rangeTrend) * 80 + 10;
+              return (
+                <div key={t.year} className="group relative flex-1" style={{ height: "100%" }}>
+                  <div
+                    className="absolute bottom-0 w-full rounded-t-sm bg-orange-500 transition-opacity group-hover:opacity-80"
+                    style={{ height: `${pct}%` }}
+                  />
+                  <div className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-bg-base px-2 py-1 text-xs shadow-lg">
+                    {t.year}: {t.avg.toFixed(2)} mm/dia
+                  </div>
+                  {t.year % 5 === 0 && (
+                    <span className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[9px] text-text-dim">{t.year}</span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <p className="text-[10px] text-text-dim border-t border-border pt-3">
+        Fonte: {evapotranspiration.source} | {evapotranspiration.period} | Unidade: {evapotranspiration.unit}
+      </p>
+    </div>
+  );
+}
+
+function ClimaExtSection() {
+  const params = climateExt.parameters;
+  const items = [
+    { key: "solar_radiation" as const, color: "#F9A825", label: "Radiacao Solar" },
+    { key: "temperature" as const, color: "#E65100", label: "Temperatura Media" },
+    { key: "relative_humidity" as const, color: "#1E88E5", label: "Umidade Relativa" },
+    { key: "wind_speed_2m" as const, color: "#6B7280", label: "Velocidade do Vento" },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-4 sm:grid-cols-2">
+        {items.map((item) => {
+          const p = params[item.key];
+          const maxVal = Math.max(...p.monthly.map((m) => m.value));
+          return (
+            <div key={item.key} className="rounded-lg border border-border bg-bg-surface p-4">
+              <div className="flex items-baseline justify-between mb-3">
+                <h3 className="text-sm font-semibold text-text-primary">{item.label}</h3>
+                <span className="text-xs text-text-dim">{p.unit}</span>
+              </div>
+              <div className="flex items-end gap-1.5" style={{ height: 100 }}>
+                {p.monthly.map((m, i) => {
+                  const pct = (m.value / maxVal) * 100;
+                  return (
+                    <div key={m.month} className="group relative flex flex-1 flex-col items-center" style={{ height: "100%" }}>
+                      <div className="relative flex-1 w-full flex items-end justify-center">
+                        <div
+                          className="w-full max-w-6 rounded-t-sm transition-opacity group-hover:opacity-80"
+                          style={{ height: `${pct}%`, backgroundColor: item.color }}
+                        />
+                        <div className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded border border-border bg-bg-base px-2 py-1 text-xs shadow-lg">
+                          {m.value.toFixed(1)} {p.unit}
+                        </div>
+                      </div>
+                      <span className="mt-0.5 text-[8px] text-text-dim">{MONTH_NAMES[i]}</span>
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="mt-2 text-xs text-text-muted">{p.description}</p>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="rounded-xl border border-primary/30 bg-primary/5 p-5">
+        <p className="text-xs font-medium tracking-wider text-primary-light uppercase">
+          Resumo climatico completo
+        </p>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <p className="text-sm text-text-secondary">
+            <strong className="text-text-primary">Radiacao solar:</strong> Pico em janeiro
+            ({params.solar_radiation.monthly[0].value.toFixed(1)} {params.solar_radiation.unit}),
+            minimo em junho ({params.solar_radiation.monthly[5].value.toFixed(1)}).
+            Alta radiacao no verao acelera evapotranspiracao.
+          </p>
+          <p className="text-sm text-text-secondary">
+            <strong className="text-text-primary">Umidade relativa:</strong> Fica entre{" "}
+            {Math.min(...params.relative_humidity.monthly.map((m) => m.value)).toFixed(0)}% e{" "}
+            {Math.max(...params.relative_humidity.monthly.map((m) => m.value)).toFixed(0)}%.
+            Umidade baixa + vento = mais perda de agua.
+          </p>
+          <p className="text-sm text-text-secondary">
+            <strong className="text-text-primary">Vento:</strong> Media de{" "}
+            {(params.wind_speed_2m.monthly.reduce((s, m) => s + m.value, 0) / 12).toFixed(1)} m/s.
+            Ventos mais fortes em setembro-outubro, quando o solo pode estar exposto.
+          </p>
+          <p className="text-sm text-text-secondary">
+            <strong className="text-text-primary">Temperatura:</strong> Media anual de{" "}
+            {(params.temperature.monthly.reduce((s, m) => s + m.value, 0) / 12).toFixed(1)} graus.
+            Janeiro mais quente ({params.temperature.monthly[0].value.toFixed(1)} graus), julho mais frio
+            ({params.temperature.monthly[6].value.toFixed(1)} graus).
+          </p>
+        </div>
+      </div>
+
+      <p className="text-[10px] text-text-dim border-t border-border pt-3">
+        Fonte: {climateExt.source} | {climateExt.period}
+      </p>
+    </div>
+  );
+}
+
 // ── Main page ────────────────────────────────────────────
 
 export default function DadosPage() {
@@ -1097,6 +1710,7 @@ export default function DadosPage() {
 
         {activeTab === "clima" && <ClimaTab />}
         {activeTab === "historico" && <HistoricoTab />}
+        {activeTab === "satelite" && <SateliteTab />}
         {activeTab === "solo" && <SoloTab />}
         {activeTab === "vegetacao" && <VegetacaoTab />}
         {activeTab === "uso-do-solo" && <UsoDoSoloTab />}

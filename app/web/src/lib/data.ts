@@ -9,6 +9,11 @@ import soilMoistureData from "../../data/soil_moisture.json";
 import ndviData from "../../data/ndvi.json";
 import mapbiomasData from "../../data/mapbiomas.json";
 import riskEngineData from "../../data/risk_engine.json";
+import evapotranspirationData from "../../data/evapotranspiration.json";
+import smapData from "../../data/smap_soil_moisture.json";
+import gpmData from "../../data/gpm_precipitation.json";
+import graceData from "../../data/grace_tws.json";
+import climateExtData from "../../data/climate_extended.json";
 
 
 export type MonthRisk = {
@@ -428,7 +433,132 @@ export type RiskEngineData = {
 
 export const riskEngine = riskEngineData as RiskEngineData;
 
+// ── Satellite data types ──────────────────────────────
 
+export type ETMonthly = {
+  month: number;
+  name: string;
+  value: number;
+  n_years: number;
+};
+
+export type ETYearlyTrend = {
+  year: number;
+  avg: number;
+};
+
+export type EvapotranspirationData = {
+  source: string;
+  period: string;
+  unit: string;
+  evapotranspiration_monthly: ETMonthly[];
+  land_evaporation_monthly: ETMonthly[];
+  et_yearly_trend: ETYearlyTrend[];
+};
+
+export type SmapMonthly = {
+  month: number;
+  name: string;
+  avg_soil_moisture: number;
+  n_years: number;
+};
+
+export type SmapYearlyTrend = {
+  year: number;
+  avg: number;
+};
+
+export type SmapData = {
+  source: string;
+  description: string;
+  unit: string;
+  period: string;
+  location: string;
+  band_used: string;
+  monthly_climatology: SmapMonthly[];
+  yearly_trend: SmapYearlyTrend[];
+};
+
+export type GpmMonthly = {
+  month: number;
+  name: string;
+  avg_precip_mm: number;
+  n_years: number;
+};
+
+export type GpmAnnual = {
+  year: number;
+  total_mm: number;
+  months_counted: number;
+};
+
+export type GpmData = {
+  source: string;
+  description: string;
+  unit_monthly: string;
+  unit_rate: string;
+  period: string;
+  location: string;
+  monthly_climatology: GpmMonthly[];
+  annual_totals: GpmAnnual[];
+};
+
+export type GraceMonthly = {
+  month: number;
+  name: string;
+  avg_tws_anomaly_cm: number;
+  n_years: number;
+};
+
+export type GraceTimeseries = {
+  year: number;
+  month: number;
+  date: string;
+  tws_anomaly_cm: number;
+};
+
+export type GraceTrend = {
+  first_half_avg: number;
+  second_half_avg: number;
+  period_split_year: number;
+  direction: string;
+  change_cm: number;
+};
+
+export type GraceData = {
+  source: string;
+  description: string;
+  unit: string;
+  period: string;
+  location: string;
+  monthly_climatology: GraceMonthly[];
+  trend: GraceTrend;
+  timeseries: GraceTimeseries[];
+};
+
+export type ClimateExtParam = {
+  param: string;
+  unit: string;
+  description: string;
+  monthly: { month: number; name: string; value: number; n_years: number }[];
+};
+
+export type ClimateExtData = {
+  source: string;
+  period: string;
+  parameters: {
+    solar_radiation: ClimateExtParam;
+    wind_speed_2m: ClimateExtParam;
+    relative_humidity: ClimateExtParam;
+    temperature: ClimateExtParam;
+  };
+};
+
+export const evapotranspiration = evapotranspirationData as EvapotranspirationData;
+export const smap = smapData as SmapData;
+export const gpm = gpmData as GpmData;
+export const grace = graceData as GraceData;
+export const climateExt = climateExtData as ClimateExtData;
 
 export const MONTH_NAMES = [
   "Jan",

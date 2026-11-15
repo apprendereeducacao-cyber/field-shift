@@ -624,3 +624,91 @@ export type LstData = {
   monthly_climatology: LstMonthly[];
   yearly_trend: LstYearly[];
 };
+
+// ── Pattern Engine (Year Analog Scoring) ──────────────────────────────────
+
+export type ClimateVector = {
+  year: number;
+  season_rain_mm: number;
+  critical_rain_mm: number;
+  hot_days: number;
+  frost_days: number;
+  avg_soil_moisture: number;
+  enso_code: number;
+  avg_tmax_summer: number;
+  winter_rain_mm: number;
+};
+
+export type AnalogYear = {
+  year: number;
+  similarity_pct: number;
+  distance: number;
+  matching_dimensions: string[];
+  diverging_dimensions: string[];
+  outcome: {
+    yield_sc_ha: number | null;
+    class: string;
+    season_rain_mm: number;
+    hot_days: number;
+    enso: string;
+  };
+};
+
+export type PatternProjection = {
+  expected_yield_range: [number, number];
+  confidence: "alta" | "media" | "baixa";
+  risk_factors: string[];
+  positive_factors: string[];
+  recommendation: string;
+};
+
+export type PatternAnalysis = {
+  site_id: string;
+  target_year: number;
+  target_vector: ClimateVector;
+  analog_years: AnalogYear[];
+  projection: PatternProjection;
+  all_vectors: ClimateVector[];
+  stats: {
+    total_years_analyzed: number;
+    years_with_yield: number;
+    vector_dimensions: number;
+  };
+};
+
+// ── Map Tiles (GEE raster layers) ──────────────────────────────────
+
+export type MapTileEntry = {
+  tile_url: string;
+  [key: string]: unknown;
+};
+
+export type MapTilesData = {
+  elevation: {
+    main: {
+      tile_url: string;
+      slope_tile_url: string;
+      hillshade_tile_url: string;
+      min_elevation: number;
+      max_elevation: number;
+      mean_elevation: number;
+    } | null;
+  };
+  lst: {
+    monthly: { month: number; name: string; tile_url: string; lst_mean: number }[];
+    annual: { tile_url: string } | null;
+  };
+  precipitation: {
+    monthly: { month: number; name: string; tile_url: string; precip_mean: number }[];
+  };
+  soil_moisture: {
+    monthly: { month: number; name: string; tile_url: string; sm_mean: number }[];
+  };
+  mapbiomas_raster: {
+    years: { year: number; tile_url: string }[];
+  };
+  ecostress: {
+    monthly: { month: number; name: string; tile_url: string; lst_mean: number; n_images: number }[];
+    annual: { tile_url: string; period: string; total_images: number } | null;
+  };
+};

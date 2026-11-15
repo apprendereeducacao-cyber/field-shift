@@ -6,6 +6,7 @@ import type {
   TimelineYear,
   RiskEngineData,
   Strategy,
+  PatternAnalysis,
 } from "@/lib/types";
 
 const ENSO_LABELS: Record<string, string> = {
@@ -37,21 +38,21 @@ const CLASS_LABELS: Record<string, string> = {
 };
 
 const CLASS_COLORS: Record<string, string> = {
-  safra_boa: "text-emerald-700",
-  safra_normal: "text-amber-700",
-  safra_ruim: "text-red-600",
+  safra_boa: "text-emerald-400",
+  safra_normal: "text-amber-400",
+  safra_ruim: "text-red-400",
 };
 
 const CLASS_BG: Record<string, string> = {
-  safra_boa: "bg-emerald-50 border-emerald-200",
-  safra_normal: "bg-amber-50 border-amber-200",
-  safra_ruim: "bg-red-50 border-red-200",
+  safra_boa: "bg-emerald-500/10 border-emerald-500/30",
+  safra_normal: "bg-amber-500/10 border-amber-500/30",
+  safra_ruim: "bg-red-500/10 border-red-500/30",
 };
 
 function riskLevel(score: number) {
-  if (score >= 65) return { label: "Alto", color: "text-red-600" };
-  if (score >= 40) return { label: "Medio", color: "text-amber-600" };
-  return { label: "Baixo", color: "text-emerald-600" };
+  if (score >= 65) return { label: "Alto", color: "text-red-400" };
+  if (score >= 40) return { label: "Medio", color: "text-amber-400" };
+  return { label: "Baixo", color: "text-emerald-400" };
 }
 
 const CALENDAR_ACTIONS: Record<string, { month: string; action: string }[]> = {
@@ -83,9 +84,10 @@ type Props = {
     data_end: number;
     [key: string]: any;
   };
+  patterns: PatternAnalysis | null;
 };
 
-export default function PainelClient({ timeline, riskEngine, rotations, keyFindings }: Props) {
+export default function PainelClient({ timeline, riskEngine, rotations, keyFindings, patterns }: Props) {
   const AVAILABLE_YEARS = timeline.timeline.map((y) => y.year).sort((a, b) => b - a);
   const [selectedYear, setSelectedYear] = useState(AVAILABLE_YEARS[0]);
 
@@ -135,7 +137,7 @@ export default function PainelClient({ timeline, riskEngine, rotations, keyFindi
     .slice(0, 5);
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto max-w-5xl space-y-6 px-4 py-6 sm:px-6">
       {/* Header + Filtro */}
       <div className="flex items-center justify-between gap-4">
         <div>
@@ -209,21 +211,21 @@ export default function PainelClient({ timeline, riskEngine, rotations, keyFindi
       <div className="grid grid-cols-3 gap-3">
         <div className="rounded-lg border border-border bg-bg-surface p-3 text-center">
           <p className="text-[10px] text-text-dim">Chuva safra</p>
-          <p className="text-lg font-bold text-text-primary">{tl.season_rain_mm ?? "—"} mm</p>
+          <p className="text-lg font-semibold tabular-nums text-data">{tl.season_rain_mm ?? "—"} mm</p>
           <p className={`text-[10px] ${rainDiff < 0 ? "text-red-400" : "text-emerald-400"}`}>
             {rainDiff > 0 ? "+" : ""}{Math.round(rainDiff)} vs media ({avgs.season_rain_mm} mm)
           </p>
         </div>
         <div className="rounded-lg border border-border bg-bg-surface p-3 text-center">
           <p className="text-[10px] text-text-dim">Dias quentes</p>
-          <p className="text-lg font-bold text-text-primary">{tl.hot_days}</p>
+          <p className="text-lg font-semibold tabular-nums text-data">{tl.hot_days}</p>
           <p className={`text-[10px] ${hotDiff > 0 ? "text-red-400" : "text-emerald-400"}`}>
             {hotDiff > 0 ? "+" : ""}{Math.round(hotDiff)} vs media ({avgs.hot_days.toFixed(0)})
           </p>
         </div>
         <div className="rounded-lg border border-border bg-bg-surface p-3 text-center">
           <p className="text-[10px] text-text-dim">Umidade solo</p>
-          <p className="text-lg font-bold text-text-primary">{moistPct}%</p>
+          <p className="text-lg font-semibold tabular-nums text-data">{moistPct}%</p>
           <p className="text-[10px] text-text-muted">Media: {avgMoistPct}%</p>
         </div>
       </div>
@@ -326,6 +328,116 @@ export default function PainelClient({ timeline, riskEngine, rotations, keyFindi
             </table>
           </div>
           <p className="mt-1 text-[10px] text-text-dim">Clique em um ano para ver os detalhes</p>
+        </div>
+      )}
+
+      {/* ── Padroes Climaticos (Year Analog Scoring) ── */}
+      {patterns && (
+        <div className="border border-border rounded-lg p-4 bg-bg-surface">
+          <h2 className="text-lg font-semibold tracking-tight text-text-primary mb-3">
+            Padroes Climaticos — {patterns.target_year}
+          </h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+            <div className="bg-bg-surface-alt rounded-lg p-3 text-center">
+              <p className="text-[11px] text-text-dim uppercase tracking-wide">Projecao</p>
+              <p className="text-2xl font-semibold tabular-nums text-data mt-1">
+                {patterns.projection.expected_yield_range[0]}-{patterns.projection.expected_yield_range[1]}
+              </p>
+              <p className="text-xs text-text-secondary">sc/ha</p>
+            </div>
+            <div className="bg-bg-surface-alt rounded-lg p-3 text-center">
+              <p className="text-[11px] text-text-dim uppercase tracking-wide">Confianca</p>
+              <p className={`text-2xl font-semibold mt-1 ${
+                patterns.projection.confidence === "alta" ? "text-emerald-500"
+                : patterns.projection.confidence === "media" ? "text-amber-500"
+                : "text-red-400"
+              }`}>
+                {patterns.projection.confidence.charAt(0).toUpperCase() + patterns.projection.confidence.slice(1)}
+              </p>
+            </div>
+            <div className="bg-bg-surface-alt rounded-lg p-3 text-center">
+              <p className="text-[11px] text-text-dim uppercase tracking-wide">Anos analisados</p>
+              <p className="text-2xl font-semibold tabular-nums text-data mt-1">
+                {patterns.stats.total_years_analyzed}
+              </p>
+              <p className="text-xs text-text-secondary">{patterns.stats.vector_dimensions} dimensoes</p>
+            </div>
+          </div>
+
+          <h3 className="text-sm font-semibold text-text-primary mb-2">
+            Anos mais parecidos com {patterns.target_year}
+          </h3>
+          <div className="space-y-2 mb-4">
+            {patterns.analog_years.map((a) => (
+              <div
+                key={a.year}
+                className="flex items-center gap-3 bg-bg-surface-alt rounded-lg px-3 py-2"
+              >
+                <span className="text-lg font-semibold text-primary-light tabular-nums w-12">
+                  {a.year}
+                </span>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="h-2 rounded-full bg-primary"
+                      style={{ width: `${a.similarity_pct}%`, maxWidth: "100%" }}
+                    />
+                    <span className="text-sm font-semibold tabular-nums text-data">
+                      {a.similarity_pct}%
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-text-dim mt-0.5">
+                    {a.matching_dimensions.slice(0, 3).join(", ")}
+                    {a.diverging_dimensions.length > 0 && (
+                      <span className="text-red-400 ml-1">
+                        (diverge: {a.diverging_dimensions.slice(0, 2).join(", ")})
+                      </span>
+                    )}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <span className={`text-sm font-semibold ${
+                    a.outcome.class === "safra_boa" ? "text-emerald-500"
+                    : a.outcome.class === "safra_ruim" ? "text-red-400"
+                    : "text-amber-400"
+                  }`}>
+                    {a.outcome.yield_sc_ha ?? "?"} sc/ha
+                  </span>
+                  <p className="text-[10px] text-text-dim">{a.outcome.enso}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {patterns.projection.recommendation && (
+            <div className="bg-bg-base rounded-lg p-3 border border-border">
+              <p className="text-xs text-text-secondary">
+                {patterns.projection.recommendation}
+              </p>
+              {patterns.projection.risk_factors.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {patterns.projection.risk_factors.map((r, i) => (
+                    <span key={i} className="text-[10px] bg-red-500/10 text-red-400 rounded px-1.5 py-0.5">
+                      {r}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {patterns.projection.positive_factors.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {patterns.projection.positive_factors.map((f, i) => (
+                    <span key={i} className="text-[10px] bg-emerald-500/10 text-emerald-400 rounded px-1.5 py-0.5">
+                      {f}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+          <p className="mt-2 text-[10px] text-text-dim">
+            Year Analog Scoring (YAS) — distancia euclidiana ponderada sobre 8 dimensoes climaticas normalizadas
+          </p>
         </div>
       )}
 

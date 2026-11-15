@@ -1,8 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { createAdminClient } from "@/lib/supabase";
 import {
-  classifyTopic,
-  assembleContext,
+  assembleFullContext,
   SYSTEM_PROMPT,
 } from "@/lib/chat-context";
 import { getDefaultSiteId } from "@/lib/supabase-data";
@@ -92,9 +91,7 @@ export async function POST(request: Request) {
     .order("created_at", { ascending: true })
     .limit(20);
 
-  const history = (existingMessages ?? []).map((m) => m.content);
-  const topics = classifyTopic(message, history);
-  const context = await assembleContext(resolvedSiteId, topics);
+  const context = await assembleFullContext(resolvedSiteId);
 
   const { data: sessionData } = await db
     .from("chat_sessions")
@@ -134,7 +131,7 @@ export async function POST(request: Request) {
 
         const messageStream = anthropic.messages.stream({
           model: "claude-sonnet-4-20250514",
-          max_tokens: 1024,
+          max_tokens: 4096,
           system: systemPrompt,
           messages: conversationMessages,
         });

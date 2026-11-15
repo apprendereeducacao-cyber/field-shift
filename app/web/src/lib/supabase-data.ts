@@ -25,6 +25,7 @@ import type {
   GraceData,
   ClimateExtData,
   LstData,
+  MapTilesData,
   RotationScores,
 } from "./types";
 
@@ -741,6 +742,62 @@ export async function getClimateExtended(siteId: string): Promise<ClimateExtData
     source: climExtMeta.source ?? "NASA POWER",
     period: climExtMeta.period ?? "",
     parameters: results as ClimateExtData["parameters"],
+  };
+}
+
+export async function getMapTiles(siteId: string): Promise<MapTilesData> {
+  const { data: rows } = await db()
+    .from("map_tiles")
+    .select("dataset, type, key, values")
+    .eq("site_id", siteId);
+
+  const all = rows ?? [];
+  const find = (ds: string, t: string, k: string) =>
+    all.find((r: any) => r.dataset === ds && r.type === t && r.key === k);
+  const filter = (ds: string, t: string) =>
+    all.filter((r: any) => r.dataset === ds && r.type === t);
+
+  const elevRow = find("srtm", "elevation", "main");
+
+  const lstMonthly = filter("lst", "monthly")
+    .map((r: any) => ({ month: Number(r.key), ...r.values }))
+    .sort((a: any, b: any) => a.month - b.month);
+
+  const lstAnnualRow = find("lst", "annual", "2020-2024");
+
+  const precipMonthly = filter("gpm", "monthly")
+    .map((r: any) => ({ month: Number(r.key), ...r.values }))
+    .sort((a: any, b: any) => a.month - b.month);
+
+  const smMonthly = filter("smap", "monthly")
+    .map((r: any) => ({ month: Number(r.key), ...r.values }))
+    .sort((a: any, b: any) => a.month - b.month);
+
+  const mbYears = filter("mapbiomas", "landuse")
+    .map((r: any) => ({ year: Number(r.key), ...r.values }))
+    .sort((a: any, b: any) => b.year - a.year);
+
+  const ecoMonthly = filter("ecostress", "monthly")
+    .map((r: any) => ({ month: Number(r.key), ...r.values }))
+    .sort((a: any, b: any) => a.month - b.month);
+
+  const ecoAnnualRow = find("ecostress", "annual", "all");
+
+  return {
+    elevation: {
+      main: elevRow ? (elevRow.values as any) : null,
+    },
+    lst: {
+      monthly: lstMonthly,
+      annual: lstAnnualRow ? (lstAnnualRow.values as any) : null,
+    },
+    precipitation: { monthly: precipMonthly },
+    soil_moisture: { monthly: smMonthly },
+    mapbiomas_raster: { years: mbYears },
+    ecostress: {
+      monthly: ecoMonthly,
+      annual: ecoAnnualRow ? (ecoAnnualRow.values as any) : null,
+    },
   };
 }
 

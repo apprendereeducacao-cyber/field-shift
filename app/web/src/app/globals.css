@@ -1,29 +1,35 @@
 @import "tailwindcss";
 
 :root {
-  --bg-base: #FAFAF8;
-  --bg-surface: #FFFFFF;
-  --bg-surface-alt: #F3F4F1;
-  --bg-surface-hover: #E8E9E4;
+  --bg-base: #0B1120;
+  --bg-surface: #111827;
+  --bg-surface-alt: #1F2937;
+  --bg-surface-hover: #374151;
 
   --primary: #2D6A4F;
+  --primary-hover: #357A5B;
   --primary-light: #40916C;
   --primary-dark: #1B4332;
 
-  --accent: #B45309;
-  --accent-light: #D97706;
-  --accent-dark: #92400E;
+  --data: #74C69D;
+  --data-dim: #52B788;
 
-  --warning: #DC2626;
-  --warning-light: #EF4444;
+  --accent: #42A5F5;
+  --accent-light: #64B5F6;
+  --accent-dark: #1E88E5;
 
-  --text-primary: #1A1A1A;
-  --text-secondary: #4B5563;
-  --text-muted: #6B7280;
-  --text-dim: #9CA3AF;
+  --warning: #FF8F00;
+  --warning-light: #FFA726;
+  --danger: #EF4444;
 
-  --border: #E5E7EB;
-  --border-light: #D1D5DB;
+  --text-primary: #F9FAFB;
+  --text-secondary: #D1D5DB;
+  --text-muted: #9CA3AF;
+  --text-dim: #8B95A3;
+
+  --border: #374151;
+  --border-light: #4B5563;
+  --border-control: #64707F;
 
   --font-sans: var(--font-inter);
 }
@@ -34,19 +40,24 @@
   --color-bg-surface-alt: var(--bg-surface-alt);
   --color-bg-surface-hover: var(--bg-surface-hover);
   --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
   --color-primary-light: var(--primary-light);
   --color-primary-dark: var(--primary-dark);
+  --color-data: var(--data);
+  --color-data-dim: var(--data-dim);
   --color-accent: var(--accent);
   --color-accent-light: var(--accent-light);
   --color-accent-dark: var(--accent-dark);
   --color-warning: var(--warning);
   --color-warning-light: var(--warning-light);
+  --color-danger: var(--danger);
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
   --color-text-muted: var(--text-muted);
   --color-text-dim: var(--text-dim);
   --color-border: var(--border);
   --color-border-light: var(--border-light);
+  --color-border-control: var(--border-control);
   --font-sans: var(--font-inter);
 }
 
@@ -59,4 +70,20 @@ body {
 ::selection {
   background: var(--primary);
   color: #fff;
+}
+
+/* Scrollbar dark */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-light);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-control);
 }

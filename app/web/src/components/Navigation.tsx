@@ -14,14 +14,19 @@ const NAV_ITEMS = [
 
 export default function Navigation() {
   const pathname = usePathname();
+  const isHome = pathname === "/";
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-border bg-bg-surface/90 backdrop-blur-md">
-      <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
+    <nav className={`sticky top-0 z-50 border-b transition-colors ${
+      isHome
+        ? "border-transparent bg-transparent"
+        : "border-border bg-bg-surface/90 backdrop-blur-md"
+    }`}>
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
         <Link href="/" className="flex items-center gap-1.5">
-          <span className="text-lg font-bold tracking-tight text-primary">Field</span>
-          <span className="text-lg font-bold tracking-tight text-text-primary">Shift</span>
+          <span className="text-lg font-semibold tracking-tight text-data">Field</span>
+          <span className="text-lg font-semibold tracking-tight text-text-primary">Shift</span>
         </Link>
 
         <div className="hidden items-center gap-0.5 md:flex">
@@ -33,7 +38,7 @@ export default function Navigation() {
                 href={item.href}
                 className={`rounded-md px-3 py-1.5 text-sm transition-colors ${
                   isActive
-                    ? "font-semibold text-primary"
+                    ? "font-semibold text-data"
                     : "text-text-muted hover:text-text-primary"
                 }`}
               >
@@ -70,7 +75,7 @@ export default function Navigation() {
                 href={item.href}
                 onClick={() => setMenuOpen(false)}
                 className={`block rounded-md px-3 py-2 text-sm transition-colors ${
-                  isActive ? "font-semibold text-primary" : "text-text-muted hover:text-text-primary"
+                  isActive ? "font-semibold text-data" : "text-text-muted hover:text-text-primary"
                 }`}
               >
                 {item.label}

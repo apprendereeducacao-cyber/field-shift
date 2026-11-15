@@ -6,6 +6,7 @@ import type {
   TopographyData,
   SiteData,
   MapBiomasData,
+  MapTilesData,
 } from "@/lib/types";
 
 type Props = {
@@ -13,6 +14,7 @@ type Props = {
   topography: TopographyData;
   site: SiteData;
   mapbiomas: MapBiomasData;
+  mapTiles: MapTilesData;
 };
 
 const LAND_USE_COLORS: Record<string, string> = {
@@ -41,7 +43,14 @@ const LAND_USE_LABELS: Record<string, string> = {
   agricultura_geral: "Agricultura geral",
 };
 
-type LayerKey = "relevo" | "temperatura" | "ndvi" | "uso-do-solo";
+type LayerKey =
+  | "relevo"
+  | "temperatura"
+  | "ndvi"
+  | "precipitacao"
+  | "umidade-solo"
+  | "uso-do-solo"
+  | "ecostress";
 
 type LayerConfig = {
   key: LayerKey;
@@ -55,14 +64,14 @@ const LAYER_CONFIGS: LayerConfig[] = [
   {
     key: "relevo",
     label: "Relevo",
-    description: "Elevacao SRTM 30m",
+    description: "SRTM 30m",
     icon: "M",
     zIndex: 400,
   },
   {
     key: "temperatura",
     label: "Temperatura",
-    description: "Tmax estimada",
+    description: "MODIS LST satelite",
     icon: "T",
     zIndex: 410,
   },
@@ -74,29 +83,40 @@ const LAYER_CONFIGS: LayerConfig[] = [
     zIndex: 420,
   },
   {
+    key: "precipitacao",
+    label: "Precipitacao",
+    description: "GPM IMERG satelite",
+    icon: "P",
+    zIndex: 430,
+  },
+  {
+    key: "umidade-solo",
+    label: "Umidade do Solo",
+    description: "SMAP L4 satelite",
+    icon: "U",
+    zIndex: 440,
+  },
+  {
     key: "uso-do-solo",
     label: "Uso do Solo",
     description: "MapBiomas Col. 9",
-    icon: "U",
-    zIndex: 430,
+    icon: "S",
+    zIndex: 450,
+  },
+  {
+    key: "ecostress",
+    label: "ECOSTRESS",
+    description: "NASA ECOSTRESS 70m",
+    icon: "E",
+    zIndex: 455,
   },
 ];
 
 type LayerState = { visible: boolean; opacity: number };
 
 const MONTH_NAMES_SHORT = [
-  "Jan",
-  "Fev",
-  "Mar",
-  "Abr",
-  "Mai",
-  "Jun",
-  "Jul",
-  "Ago",
-  "Set",
-  "Out",
-  "Nov",
-  "Dez",
+  "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
+  "Jul", "Ago", "Set", "Out", "Nov", "Dez",
 ];
 
 function elevationColor(ratio: number): string {
@@ -154,6 +174,7 @@ export default function MapaClient({
   topography,
   site,
   mapbiomas,
+  mapTiles,
 }: Props) {
   const avgTmax = site.q1?.temperature_c?.avg_tmax ?? 25.4;
   const meanElev = topography.summary.mean_elevation_m;
@@ -167,6 +188,13 @@ export default function MapaClient({
     .filter(([, val]) => val.pct > 0)
     .sort((a, b) => b[1].pct - a[1].pct);
 
+  const hasElevationTile = !!mapTiles.elevation.main?.tile_url;
+  const hasLstTiles = mapTiles.lst.monthly.length > 0;
+  const hasPrecipTiles = mapTiles.precipitation.monthly.length > 0;
+  const hasSmTiles = mapTiles.soil_moisture.monthly.length > 0;
+  const hasMbRaster = mapTiles.mapbiomas_raster.years.length > 0;
+  const hasEcoTiles = mapTiles.ecostress.monthly.length > 0;
+
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
   const mountedRef = useRef(true);
@@ -174,19 +202,41 @@ export default function MapaClient({
   const relevoLayerRef = useRef<any>(null);
   const tempLayerRef = useRef<any>(null);
   const ndviLayerRef = useRef<any>(null);
-  const siteMarkerRef = useRef<any>(null);
+  const precipLayerRef = useRef<any>(null);
+  const smLayerRef = useRef<any>(null);
   const landUseLayerRef = useRef<any>(null);
+  const ecoLayerRef = useRef<any>(null);
+  const siteMarkerRef = useRef<any>(null);
+  const boundaryRef = useRef<any>(null);
 
   const [layers, setLayers] = useState<Record<LayerKey, LayerState>>({
     relevo: { visible: true, opacity: 0.7 },
     temperatura: { visible: false, opacity: 0.7 },
     ndvi: { visible: false, opacity: 0.75 },
-    "uso-do-solo": { visible: false, opacity: 1 },
+    precipitacao: { visible: false, opacity: 0.7 },
+    "umidade-solo": { visible: false, opacity: 0.7 },
+    "uso-do-solo": { visible: false, opacity: 0.8 },
+    ecostress: { visible: false, opacity: 0.7 },
   });
   const [leafletReady, setLeafletReady] = useState(false);
+
+  // NDVI controls
   const [ndviMonth, setNdviMonth] = useState(1);
   const [ndviMode, setNdviMode] = useState<"monthly" | "yearly">("monthly");
   const [ndviYear, setNdviYear] = useState(0);
+
+  // Monthly layer controls
+  const [lstMonth, setLstMonth] = useState(1);
+  const [precipMonth, setPrecipMonth] = useState(1);
+  const [smMonth, setSmMonth] = useState(1);
+
+  // ECOSTRESS month control
+  const [ecoMonth, setEcoMonth] = useState(1);
+
+  // MapBiomas year control
+  const mbYears = mapTiles.mapbiomas_raster.years;
+  const [mbYearIdx, setMbYearIdx] = useState(0);
+
   const [panelOpen, setPanelOpen] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -243,7 +293,7 @@ export default function MapaClient({
       if (mapInstance.current) return;
 
       const L = (window as any).L;
-      if (!L || !L.heatLayer) return;
+      if (!L) return;
 
       const container = mapRef.current;
       if ((container as any)._leaflet_id) {
@@ -252,7 +302,7 @@ export default function MapaClient({
       }
 
       const map = L.map(container, {
-        center: [ndviTiles.center.lat, ndviTiles.center.lon],
+        center: [site.point.lat, site.point.lon],
         zoom: ndviTiles.zoom,
         zoomControl: false,
         attributionControl: false,
@@ -275,12 +325,64 @@ export default function MapaClient({
         { maxZoom: 19, opacity: 0.6 },
       ).addTo(map);
 
+      // Boundary mask pane (above basemap, below data layers)
+      if (!map.getPane("boundary-mask")) {
+        map.createPane("boundary-mask");
+        map.getPane("boundary-mask")!.style.zIndex = "390";
+        map.getPane("boundary-mask")!.style.pointerEvents = "none";
+      }
+      if (!map.getPane("boundary-border")) {
+        map.createPane("boundary-border");
+        map.getPane("boundary-border")!.style.zIndex = "460";
+        map.getPane("boundary-border")!.style.pointerEvents = "none";
+      }
+
       for (const cfg of LAYER_CONFIGS) {
         if (!map.getPane(cfg.key)) {
           map.createPane(cfg.key);
           map.getPane(cfg.key)!.style.zIndex = String(cfg.zIndex);
         }
       }
+
+      // ── Municipality boundary + mask ──
+      fetch("/data/cruz-alta-boundary.geojson")
+        .then((r) => r.json())
+        .then((geo: any) => {
+          if (!mountedRef.current || !mapInstance.current) return;
+          const coords = geo.features[0].geometry.coordinates[0];
+          const latlngs = coords.map((c: number[]) => [c[1], c[0]]);
+
+          // Inverted polygon: world exterior with municipality hole
+          const worldBounds: [number, number][] = [
+            [-90, -180], [-90, 180], [90, 180], [90, -180],
+          ];
+          const mask = L.polygon([worldBounds, latlngs], {
+            fillColor: "#0a1a0f",
+            fillOpacity: 0.55,
+            stroke: false,
+            interactive: false,
+            pane: "boundary-mask",
+          });
+          mask.addTo(map);
+
+          // Border of the municipality
+          const border = L.polyline(latlngs, {
+            color: "#2D6A4F",
+            weight: 2.5,
+            opacity: 0.9,
+            dashArray: "8,4",
+            interactive: false,
+            pane: "boundary-border",
+          });
+          border.addTo(map);
+
+          boundaryRef.current = { mask, border };
+
+          // Fit map to municipality bounds
+          const bounds = L.latLngBounds(latlngs);
+          map.fitBounds(bounds, { padding: [20, 20] });
+        })
+        .catch(() => {});
 
       // Site marker
       const siteIcon = L.divIcon({
@@ -302,17 +404,17 @@ export default function MapaClient({
       ).addTo(map);
 
       const popupContent = `
-        <div style="font-family:system-ui;font-size:13px;line-height:1.5;min-width:180px">
+        <div style="font-family:system-ui;font-size:13px;line-height:1.5;min-width:180px;background:#111827;color:#F9FAFB;padding:8px;border-radius:8px">
           <div style="font-weight:700;font-size:14px;margin-bottom:4px">${site.point.name}</div>
-          <div style="color:#666;font-size:11px;margin-bottom:8px">${site.point.state} | ${site.point.lat.toFixed(4)}, ${site.point.lon.toFixed(4)}</div>
+          <div style="color:#9CA3AF;font-size:11px;margin-bottom:8px">${site.point.state} | ${site.point.lat.toFixed(4)}, ${site.point.lon.toFixed(4)}</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-size:12px">
-            <span style="color:#888">Elevacao media</span>
+            <span style="color:#9CA3AF">Elevacao media</span>
             <span style="font-weight:600">${meanElev}m</span>
-            <span style="color:#888">Tmax media</span>
+            <span style="color:#9CA3AF">Tmax media</span>
             <span style="font-weight:600">${avgTmax.toFixed(1)}°C</span>
-            <span style="color:#888">Desnivel</span>
+            <span style="color:#9CA3AF">Desnivel</span>
             <span style="font-weight:600">${topography.summary.range_m}m</span>
-            <span style="color:#888">Pts topografia</span>
+            <span style="color:#9CA3AF">Pts topografia</span>
             <span style="font-weight:600">${topography.points.length}</span>
           </div>
         </div>
@@ -339,23 +441,22 @@ export default function MapaClient({
         const popup = L.popup()
           .setLatLng(e.latlng)
           .setContent(
-            `<div style="font-family:system-ui;font-size:12px;line-height:1.6;min-width:160px">
-              <div style="font-weight:700;font-size:13px;margin-bottom:4px;border-bottom:1px solid #eee;padding-bottom:4px">Dados do ponto</div>
+            `<div style="font-family:system-ui;font-size:12px;line-height:1.6;min-width:160px;background:#111827;color:#F9FAFB;padding:8px;border-radius:8px">
+              <div style="font-weight:700;font-size:13px;margin-bottom:4px;border-bottom:1px solid #374151;padding-bottom:4px">Dados do ponto</div>
               <div style="display:grid;grid-template-columns:auto 1fr;gap:2px 10px">
-                <span style="color:#888">Latitude</span><span>${lat.toFixed(5)}</span>
-                <span style="color:#888">Longitude</span><span>${lng.toFixed(5)}</span>
-                <span style="color:#888">Elevacao</span>
+                <span style="color:#9CA3AF">Latitude</span><span>${lat.toFixed(5)}</span>
+                <span style="color:#9CA3AF">Longitude</span><span>${lng.toFixed(5)}</span>
+                <span style="color:#9CA3AF">Elevacao</span>
                 <span style="font-weight:600">${elev.toFixed(0)}m
                   <span style="display:inline-block;width:10px;height:10px;border-radius:2px;vertical-align:middle;margin-left:4px;background:${elevationColor(elevRatio)}"></span>
                 </span>
-                <span style="color:#888">Temp. max est.</span>
+                <span style="color:#9CA3AF">Temp. max est.</span>
                 <span style="font-weight:600">${temp.toFixed(1)}°C</span>
               </div>
             </div>`,
           )
           .openOn(map);
 
-        // auto-close after 6s
         setTimeout(() => map.closePopup(popup), 6000);
       });
 
@@ -367,8 +468,7 @@ export default function MapaClient({
       let best = null;
       let bestDist = Infinity;
       for (const p of topography.points) {
-        const d =
-          (p.latitude - lat) ** 2 + (p.longitude - lon) ** 2;
+        const d = (p.latitude - lat) ** 2 + (p.longitude - lon) ** 2;
         if (d < bestDist) {
           bestDist = d;
           best = p;
@@ -377,12 +477,7 @@ export default function MapaClient({
       return best;
     }
 
-    function haversine(
-      lat1: number,
-      lon1: number,
-      lat2: number,
-      lon2: number,
-    ) {
+    function haversine(lat1: number, lon1: number, lat2: number, lon2: number) {
       const R = 6371;
       const dLat = ((lat2 - lat1) * Math.PI) / 180;
       const dLon = ((lon2 - lon1) * Math.PI) / 180;
@@ -399,7 +494,7 @@ export default function MapaClient({
         `script[src="${src}"]`,
       ) as HTMLScriptElement | null;
       if (existing) {
-        if ((window as any).L?.heatLayer || !src.includes("heat")) {
+        if ((window as any).L) {
           onLoad();
         } else {
           existing.addEventListener("load", onLoad);
@@ -420,16 +515,12 @@ export default function MapaClient({
       document.head.appendChild(link);
     }
 
-    if ((window as any).L?.heatLayer) {
+    if ((window as any).L) {
       initMap();
     } else {
       loadScript(
         "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js",
-        () =>
-          loadScript(
-            "https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js",
-            initMap,
-          ),
+        initMap,
       );
     }
 
@@ -442,22 +533,37 @@ export default function MapaClient({
       relevoLayerRef.current = null;
       tempLayerRef.current = null;
       ndviLayerRef.current = null;
-      siteMarkerRef.current = null;
+      precipLayerRef.current = null;
+      smLayerRef.current = null;
       landUseLayerRef.current = null;
+      ecoLayerRef.current = null;
+      siteMarkerRef.current = null;
+      boundaryRef.current = null;
       setLeafletReady(false);
     };
-  }, [ndviTiles.center.lat, ndviTiles.center.lon, ndviTiles.zoom, site.point.lat, site.point.lon, site.point.name, site.point.state, avgTmax, meanElev, topography]);
+  }, [ndviTiles.zoom, site.point.lat, site.point.lon, site.point.name, site.point.state, avgTmax, meanElev, topography]);
 
-  // ── Relevo + Temperatura layers (circle markers for visibility) ──
+  // ── Relevo layer ──
   useEffect(() => {
     if (!mapInstance.current || !leafletReady) return;
     const L = (window as any).L;
     const map = mapInstance.current;
 
-    // Relevo
-    if (layers.relevo.visible && !relevoLayerRef.current) {
-      const { min_elevation_m: min, max_elevation_m: max } =
-        topography.summary;
+    if (relevoLayerRef.current) {
+      map.removeLayer(relevoLayerRef.current);
+      relevoLayerRef.current = null;
+    }
+
+    if (!layers.relevo.visible) return;
+
+    if (hasElevationTile) {
+      relevoLayerRef.current = L.tileLayer(mapTiles.elevation.main!.tile_url, {
+        opacity: layers.relevo.opacity,
+        maxZoom: 15,
+        pane: "relevo",
+      }).addTo(map);
+    } else {
+      const { min_elevation_m: min, max_elevation_m: max } = topography.summary;
       const range = max - min || 1;
       const group = L.layerGroup([], { pane: "relevo" });
 
@@ -474,16 +580,33 @@ export default function MapaClient({
       }
       group.addTo(map);
       relevoLayerRef.current = group;
-    } else if (!layers.relevo.visible && relevoLayerRef.current) {
-      map.removeLayer(relevoLayerRef.current);
-      relevoLayerRef.current = null;
+    }
+  }, [layers.relevo.visible, layers.relevo.opacity, leafletReady, topography, mapTiles.elevation, hasElevationTile]);
+
+  // ── Temperatura (LST) layer ──
+  useEffect(() => {
+    if (!mapInstance.current || !leafletReady) return;
+    const L = (window as any).L;
+    const map = mapInstance.current;
+
+    if (tempLayerRef.current) {
+      map.removeLayer(tempLayerRef.current);
+      tempLayerRef.current = null;
     }
 
-    // Temperatura
-    if (layers.temperatura.visible && !tempLayerRef.current) {
-      const temps = topography.points.map((p) =>
-        tempFromElevation(p.elevation_m),
-      );
+    if (!layers.temperatura.visible) return;
+
+    if (hasLstTiles) {
+      const tile = mapTiles.lst.monthly.find((t) => t.month === lstMonth);
+      if (tile?.tile_url) {
+        tempLayerRef.current = L.tileLayer(tile.tile_url, {
+          opacity: layers.temperatura.opacity,
+          maxZoom: 15,
+          pane: "temperatura",
+        }).addTo(map);
+      }
+    } else {
+      const temps = topography.points.map((p) => tempFromElevation(p.elevation_m));
       const minT = Math.min(...temps);
       const maxT = Math.max(...temps);
       const rangeT = maxT - minT || 1;
@@ -502,17 +625,8 @@ export default function MapaClient({
       });
       group.addTo(map);
       tempLayerRef.current = group;
-    } else if (!layers.temperatura.visible && tempLayerRef.current) {
-      map.removeLayer(tempLayerRef.current);
-      tempLayerRef.current = null;
     }
-  }, [
-    layers.relevo.visible,
-    layers.temperatura.visible,
-    leafletReady,
-    topography,
-    tempFromElevation,
-  ]);
+  }, [layers.temperatura.visible, layers.temperatura.opacity, lstMonth, leafletReady, topography, tempFromElevation, mapTiles.lst, hasLstTiles]);
 
   // ── NDVI tile layer ──
   useEffect(() => {
@@ -539,18 +653,55 @@ export default function MapaClient({
         pane: "ndvi",
       }).addTo(map);
     }
-  }, [
-    layers.ndvi.visible,
-    layers.ndvi.opacity,
-    ndviMonth,
-    ndviMode,
-    ndviYear,
-    currentNdvi,
-    currentYearNdvi,
-    leafletReady,
-  ]);
+  }, [layers.ndvi.visible, layers.ndvi.opacity, ndviMonth, ndviMode, ndviYear, currentNdvi, currentYearNdvi, leafletReady]);
 
-  // ── Land use layer (circle markers from mapbiomas proportions) ──
+  // ── Precipitacao layer ──
+  useEffect(() => {
+    if (!mapInstance.current || !leafletReady) return;
+    const L = (window as any).L;
+    const map = mapInstance.current;
+
+    if (precipLayerRef.current) {
+      map.removeLayer(precipLayerRef.current);
+      precipLayerRef.current = null;
+    }
+
+    if (!layers.precipitacao.visible || !hasPrecipTiles) return;
+
+    const tile = mapTiles.precipitation.monthly.find((t) => t.month === precipMonth);
+    if (tile?.tile_url) {
+      precipLayerRef.current = L.tileLayer(tile.tile_url, {
+        opacity: layers.precipitacao.opacity,
+        maxZoom: 15,
+        pane: "precipitacao",
+      }).addTo(map);
+    }
+  }, [layers.precipitacao.visible, layers.precipitacao.opacity, precipMonth, leafletReady, mapTiles.precipitation, hasPrecipTiles]);
+
+  // ── Umidade do Solo layer ──
+  useEffect(() => {
+    if (!mapInstance.current || !leafletReady) return;
+    const L = (window as any).L;
+    const map = mapInstance.current;
+
+    if (smLayerRef.current) {
+      map.removeLayer(smLayerRef.current);
+      smLayerRef.current = null;
+    }
+
+    if (!layers["umidade-solo"].visible || !hasSmTiles) return;
+
+    const tile = mapTiles.soil_moisture.monthly.find((t) => t.month === smMonth);
+    if (tile?.tile_url) {
+      smLayerRef.current = L.tileLayer(tile.tile_url, {
+        opacity: layers["umidade-solo"].opacity,
+        maxZoom: 15,
+        pane: "umidade-solo",
+      }).addTo(map);
+    }
+  }, [layers["umidade-solo"].visible, layers["umidade-solo"].opacity, smMonth, leafletReady, mapTiles.soil_moisture, hasSmTiles]);
+
+  // ── Uso do Solo layer ──
   useEffect(() => {
     if (!mapInstance.current || !leafletReady) return;
     const L = (window as any).L;
@@ -563,80 +714,114 @@ export default function MapaClient({
 
     if (!layers["uso-do-solo"].visible) return;
 
-    const group = L.layerGroup([], { pane: "uso-do-solo" });
-    const center = { lat: site.point.lat, lon: site.point.lon };
-    const radius_km = (mapbiomas.buffer_radius_m || 20000) / 1000;
-
-    // Draw proportional sectors as a ring of colored circles around the site
-    const entries = LAND_USE.slice(0, 8);
-    const totalPct = entries.reduce((s, [, v]) => s + v.pct, 0);
-    let angleOffset = -Math.PI / 2;
-
-    for (const [key, val] of entries) {
-      const angleFraction = (val.pct / totalPct) * 2 * Math.PI;
-      const midAngle = angleOffset + angleFraction / 2;
-      const dist = radius_km * 0.4;
-
-      const lat =
-        center.lat + (dist / 111.32) * Math.cos(midAngle);
-      const lon =
-        center.lon +
-        (dist / (111.32 * Math.cos((center.lat * Math.PI) / 180))) *
-          Math.sin(midAngle);
-
-      const circleRadius = Math.max(
-        300,
-        Math.sqrt(val.pct / 100) * radius_km * 400,
-      );
-
-      L.circle([lat, lon], {
-        radius: circleRadius,
-        fillColor: LAND_USE_COLORS[key] ?? "#666",
-        fillOpacity: 0.55,
-        color: LAND_USE_COLORS[key] ?? "#666",
-        weight: 1.5,
+    if (hasMbRaster && mbYears[mbYearIdx]?.tile_url) {
+      landUseLayerRef.current = L.tileLayer(mbYears[mbYearIdx].tile_url, {
+        opacity: layers["uso-do-solo"].opacity,
+        maxZoom: 15,
         pane: "uso-do-solo",
-      })
-        .bindTooltip(
-          `<strong>${LAND_USE_LABELS[key] ?? key}</strong><br/>${val.pct}% — ${val.area_ha.toLocaleString("pt-BR")} ha`,
-          { sticky: true },
-        )
-        .addTo(group);
+      }).addTo(map);
+    } else {
+      // Fallback: proportional circles
+      const group = L.layerGroup([], { pane: "uso-do-solo" });
+      const center = { lat: site.point.lat, lon: site.point.lon };
+      const radius_km = (mapbiomas.buffer_radius_m || 20000) / 1000;
 
-      angleOffset += angleFraction;
+      const entries = LAND_USE.slice(0, 8);
+      const totalPct = entries.reduce((s, [, v]) => s + v.pct, 0);
+      let angleOffset = -Math.PI / 2;
+
+      for (const [key, val] of entries) {
+        const angleFraction = (val.pct / totalPct) * 2 * Math.PI;
+        const midAngle = angleOffset + angleFraction / 2;
+        const dist = radius_km * 0.4;
+
+        const lat = center.lat + (dist / 111.32) * Math.cos(midAngle);
+        const lon =
+          center.lon +
+          (dist / (111.32 * Math.cos((center.lat * Math.PI) / 180))) *
+            Math.sin(midAngle);
+
+        const circleRadius = Math.max(300, Math.sqrt(val.pct / 100) * radius_km * 400);
+
+        L.circle([lat, lon], {
+          radius: circleRadius,
+          fillColor: LAND_USE_COLORS[key] ?? "#666",
+          fillOpacity: 0.55,
+          color: LAND_USE_COLORS[key] ?? "#666",
+          weight: 1.5,
+          pane: "uso-do-solo",
+        })
+          .bindTooltip(
+            `<strong>${LAND_USE_LABELS[key] ?? key}</strong><br/>${val.pct}% — ${val.area_ha.toLocaleString("pt-BR")} ha`,
+            { sticky: true },
+          )
+          .addTo(group);
+
+        angleOffset += angleFraction;
+      }
+
+      L.circle([center.lat, center.lon], {
+        radius: mapbiomas.buffer_radius_m || 20000,
+        fillColor: "transparent",
+        fillOpacity: 0,
+        color: "#fff",
+        weight: 1.5,
+        dashArray: "6,4",
+        opacity: 0.6,
+        interactive: false,
+        pane: "uso-do-solo",
+      }).addTo(group);
+
+      group.addTo(map);
+      landUseLayerRef.current = group;
+    }
+  }, [layers["uso-do-solo"].visible, layers["uso-do-solo"].opacity, mbYearIdx, leafletReady, LAND_USE, site.point.lat, site.point.lon, mapbiomas.buffer_radius_m, mapTiles.mapbiomas_raster, hasMbRaster, mbYears]);
+
+  // ── ECOSTRESS layer ──
+  useEffect(() => {
+    if (!mapInstance.current || !leafletReady) return;
+    const L = (window as any).L;
+    const map = mapInstance.current;
+
+    if (ecoLayerRef.current) {
+      map.removeLayer(ecoLayerRef.current);
+      ecoLayerRef.current = null;
     }
 
-    // Buffer circle outline
-    L.circle([center.lat, center.lon], {
-      radius: mapbiomas.buffer_radius_m || 20000,
-      fillColor: "transparent",
-      fillOpacity: 0,
-      color: "#fff",
-      weight: 1.5,
-      dashArray: "6,4",
-      opacity: 0.6,
-      interactive: false,
-      pane: "uso-do-solo",
-    }).addTo(group);
+    if (!layers.ecostress.visible || !hasEcoTiles) return;
 
-    group.addTo(map);
-    landUseLayerRef.current = group;
-  }, [layers["uso-do-solo"].visible, leafletReady, LAND_USE, site.point.lat, site.point.lon, mapbiomas.buffer_radius_m]);
+    const tile = mapTiles.ecostress.monthly.find((t) => t.month === ecoMonth);
+    if (tile?.tile_url) {
+      ecoLayerRef.current = L.tileLayer(tile.tile_url, {
+        opacity: layers.ecostress.opacity,
+        maxZoom: 15,
+        pane: "ecostress",
+      }).addTo(map);
+    }
+  }, [layers.ecostress.visible, layers.ecostress.opacity, ecoMonth, leafletReady, mapTiles.ecostress, hasEcoTiles]);
 
-  // ── Opacity sync ──
+  // ── Opacity sync for raster layers ──
   useEffect(() => {
     if (relevoLayerRef.current && layers.relevo.visible) {
-      const pane = mapInstance.current?.getPane("relevo");
-      if (pane) pane.style.opacity = String(layers.relevo.opacity);
+      if (hasElevationTile) {
+        relevoLayerRef.current.setOpacity(layers.relevo.opacity);
+      } else {
+        const pane = mapInstance.current?.getPane("relevo");
+        if (pane) pane.style.opacity = String(layers.relevo.opacity);
+      }
     }
-  }, [layers.relevo.opacity, layers.relevo.visible]);
+  }, [layers.relevo.opacity, layers.relevo.visible, hasElevationTile]);
 
   useEffect(() => {
     if (tempLayerRef.current && layers.temperatura.visible) {
-      const pane = mapInstance.current?.getPane("temperatura");
-      if (pane) pane.style.opacity = String(layers.temperatura.opacity);
+      if (hasLstTiles) {
+        tempLayerRef.current.setOpacity(layers.temperatura.opacity);
+      } else {
+        const pane = mapInstance.current?.getPane("temperatura");
+        if (pane) pane.style.opacity = String(layers.temperatura.opacity);
+      }
     }
-  }, [layers.temperatura.opacity, layers.temperatura.visible]);
+  }, [layers.temperatura.opacity, layers.temperatura.visible, hasLstTiles]);
 
   useEffect(() => {
     if (ndviLayerRef.current) {
@@ -645,22 +830,40 @@ export default function MapaClient({
   }, [layers.ndvi.opacity]);
 
   useEffect(() => {
-    if (landUseLayerRef.current && layers["uso-do-solo"].visible) {
-      const pane = mapInstance.current?.getPane("uso-do-solo");
-      if (pane) pane.style.opacity = String(layers["uso-do-solo"].opacity);
+    if (precipLayerRef.current) {
+      precipLayerRef.current.setOpacity(layers.precipitacao.opacity);
     }
-  }, [layers["uso-do-solo"].opacity, layers["uso-do-solo"].visible]);
+  }, [layers.precipitacao.opacity]);
+
+  useEffect(() => {
+    if (smLayerRef.current) {
+      smLayerRef.current.setOpacity(layers["umidade-solo"].opacity);
+    }
+  }, [layers["umidade-solo"].opacity]);
+
+  useEffect(() => {
+    if (landUseLayerRef.current && layers["uso-do-solo"].visible) {
+      if (hasMbRaster && mbYears[mbYearIdx]?.tile_url) {
+        landUseLayerRef.current.setOpacity(layers["uso-do-solo"].opacity);
+      } else {
+        const pane = mapInstance.current?.getPane("uso-do-solo");
+        if (pane) pane.style.opacity = String(layers["uso-do-solo"].opacity);
+      }
+    }
+  }, [layers["uso-do-solo"].opacity, layers["uso-do-solo"].visible, hasMbRaster, mbYears, mbYearIdx]);
+
+  useEffect(() => {
+    if (ecoLayerRef.current) {
+      ecoLayerRef.current.setOpacity(layers.ecostress.opacity);
+    }
+  }, [layers.ecostress.opacity]);
 
   // ── Derived values ──
   const ndviColor =
     ndviMode === "yearly" && currentYearNdvi
-      ? ndviTiles.palette[
-          Math.min(Math.floor(currentYearNdvi.ndvi_mean * 10), 9)
-        ]
+      ? ndviTiles.palette[Math.min(Math.floor(currentYearNdvi.ndvi_mean * 10), 9)]
       : currentNdvi?.ndvi_mean
-        ? ndviTiles.palette[
-            Math.min(Math.floor(currentNdvi.ndvi_mean * 10), 9)
-          ]
+        ? ndviTiles.palette[Math.min(Math.floor(currentNdvi.ndvi_mean * 10), 9)]
         : "#666";
 
   const ndviValue =
@@ -672,6 +875,11 @@ export default function MapaClient({
     ndviMode === "yearly" && currentYearNdvi
       ? currentYearNdvi.label
       : currentNdvi?.name;
+
+  const currentLst = hasLstTiles ? mapTiles.lst.monthly.find((t) => t.month === lstMonth) : null;
+  const currentPrecip = hasPrecipTiles ? mapTiles.precipitation.monthly.find((t) => t.month === precipMonth) : null;
+  const currentSm = hasSmTiles ? mapTiles.soil_moisture.monthly.find((t) => t.month === smMonth) : null;
+  const currentEco = hasEcoTiles ? mapTiles.ecostress.monthly.find((t) => t.month === ecoMonth) : null;
 
   const visibleCount = Object.values(layers).filter((l) => l.visible).length;
 
@@ -686,20 +894,11 @@ export default function MapaClient({
 
       {/* ── Top bar ── */}
       <div className="pointer-events-none absolute left-0 right-0 top-0 z-[500] flex items-start justify-between p-3">
-        {/* Panel toggle */}
         <button
           onClick={() => setPanelOpen(!panelOpen)}
           className="pointer-events-auto flex items-center gap-2 rounded-lg bg-bg-surface/95 px-3 py-2 text-sm font-semibold text-text-primary shadow-lg backdrop-blur-sm transition-colors hover:bg-bg-surface"
         >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
             <path d="M2 4h12M2 8h12M2 12h12" />
           </svg>
           Camadas
@@ -710,28 +909,20 @@ export default function MapaClient({
           )}
         </button>
 
-        {/* Right controls */}
         <div className="pointer-events-auto flex items-center gap-2">
           <button
             onClick={() => {
-              if (mapInstance.current) {
-                mapInstance.current.setView(
-                  [ndviTiles.center.lat, ndviTiles.center.lon],
-                  ndviTiles.zoom,
-                );
+              if (mapInstance.current && boundaryRef.current) {
+                const bounds = boundaryRef.current.border.getBounds();
+                mapInstance.current.fitBounds(bounds, { padding: [20, 20] });
+              } else if (mapInstance.current) {
+                mapInstance.current.setView([site.point.lat, site.point.lon], ndviTiles.zoom);
               }
             }}
             className="flex h-9 w-9 items-center justify-center rounded-lg bg-bg-surface/95 text-text-muted shadow-lg backdrop-blur-sm hover:text-text-primary"
             title="Resetar vista"
           >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
               <circle cx="8" cy="8" r="3" />
               <path d="M8 2v2M8 12v2M2 8h2M12 8h2" />
             </svg>
@@ -742,27 +933,11 @@ export default function MapaClient({
             title={isFullscreen ? "Sair do fullscreen" : "Fullscreen"}
           >
             {isFullscreen ? (
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
                 <path d="M6 2v4H2M10 14v-4h4M6 14v-4H2M10 2v4h4" />
               </svg>
             ) : (
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
                 <path d="M2 6V2h4M14 6V2h-4M2 10v4h4M14 10v4h-4" />
               </svg>
             )}
@@ -785,19 +960,25 @@ export default function MapaClient({
             <div className="space-y-1.5">
               {LAYER_CONFIGS.map((cfg) => {
                 const state = layers[cfg.key];
+                const noData =
+                  (cfg.key === "precipitacao" && !hasPrecipTiles) ||
+                  (cfg.key === "umidade-solo" && !hasSmTiles) ||
+                  (cfg.key === "ecostress" && !hasEcoTiles);
                 return (
                   <div key={cfg.key}>
                     <button
-                      onClick={() => toggleLayer(cfg.key)}
+                      onClick={() => !noData && toggleLayer(cfg.key)}
                       className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors ${
-                        state.visible
-                          ? "bg-primary/10 text-primary"
-                          : "text-text-muted hover:bg-bg-surface-alt hover:text-text-primary"
+                        noData
+                          ? "cursor-not-allowed text-text-dim opacity-50"
+                          : state.visible
+                            ? "bg-primary/10 text-primary"
+                            : "text-text-muted hover:bg-bg-surface-alt hover:text-text-primary"
                       }`}
                     >
                       <span
                         className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-xs font-bold ${
-                          state.visible
+                          state.visible && !noData
                             ? "bg-primary text-white"
                             : "bg-bg-surface-alt text-text-dim"
                         }`}
@@ -809,33 +990,33 @@ export default function MapaClient({
                           {cfg.label}
                         </div>
                         <div className="text-[10px] leading-tight text-text-dim">
-                          {cfg.description}
+                          {noData ? "Sem dados (rode o script GEE)" : cfg.description}
                         </div>
                       </div>
-                      <div
-                        className={`h-3 w-6 rounded-full transition-colors ${
-                          state.visible ? "bg-primary" : "bg-border"
-                        }`}
-                      >
+                      {!noData && (
                         <div
-                          className={`h-3 w-3 rounded-full bg-white shadow transition-transform ${
-                            state.visible ? "translate-x-3" : "translate-x-0"
+                          className={`h-3 w-6 rounded-full transition-colors ${
+                            state.visible ? "bg-primary" : "bg-border"
                           }`}
-                        />
-                      </div>
+                        >
+                          <div
+                            className={`h-3 w-3 rounded-full bg-white shadow transition-transform ${
+                              state.visible ? "translate-x-3" : "translate-x-0"
+                            }`}
+                          />
+                        </div>
+                      )}
                     </button>
 
                     {/* Opacity slider */}
-                    {state.visible && (
+                    {state.visible && !noData && (
                       <div className="flex items-center gap-2 px-2.5 pb-1 pt-0.5 pl-12">
                         <input
                           type="range"
                           min={0}
                           max={100}
                           value={Math.round(state.opacity * 100)}
-                          onChange={(e) =>
-                            setOpacity(cfg.key, Number(e.target.value) / 100)
-                          }
+                          onChange={(e) => setOpacity(cfg.key, Number(e.target.value) / 100)}
                           className="h-1 flex-1 appearance-none rounded-full bg-border accent-primary [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3"
                         />
                         <span className="w-7 text-right font-mono text-[10px] text-text-dim">
@@ -847,6 +1028,37 @@ export default function MapaClient({
                 );
               })}
             </div>
+
+            {/* ── Temperatura (LST) timeline ── */}
+            {layers.temperatura.visible && hasLstTiles && (
+              <div className="mt-3 border-t border-border pt-3">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="text-xs font-semibold text-text-primary">
+                    LST — {MONTH_NAMES_SHORT[lstMonth - 1]}
+                  </span>
+                  {currentLst && (
+                    <span className="rounded-full bg-orange-500/20 px-2 py-0.5 text-[10px] font-bold text-orange-400">
+                      {currentLst.lst_mean.toFixed(1)}°C
+                    </span>
+                  )}
+                </div>
+                <input
+                  type="range"
+                  min={1}
+                  max={12}
+                  value={lstMonth}
+                  onChange={(e) => setLstMonth(Number(e.target.value))}
+                  className="w-full accent-primary"
+                />
+                <div className="flex justify-between text-[9px] text-text-dim">
+                  {MONTH_NAMES_SHORT.map((m, i) => (
+                    <span key={m} className={i + 1 === lstMonth ? "font-bold text-primary" : ""}>
+                      {m}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* ── NDVI timeline ── */}
             {layers.ndvi.visible && (
@@ -863,7 +1075,6 @@ export default function MapaClient({
                   </span>
                 </div>
 
-                {/* Mode toggle */}
                 {yearComparisons.length > 0 && (
                   <div className="mb-2 flex rounded-md bg-bg-surface-alt p-0.5">
                     <button
@@ -879,8 +1090,7 @@ export default function MapaClient({
                     <button
                       onClick={() => {
                         setNdviMode("yearly");
-                        if (ndviYear === 0 && yearComparisons.length > 0)
-                          setNdviYear(0);
+                        if (ndviYear === 0 && yearComparisons.length > 0) setNdviYear(0);
                       }}
                       className={`flex-1 rounded px-2 py-1 text-[10px] font-semibold transition-colors ${
                         ndviMode === "yearly"
@@ -905,14 +1115,7 @@ export default function MapaClient({
                     />
                     <div className="flex justify-between text-[9px] text-text-dim">
                       {MONTH_NAMES_SHORT.map((m, i) => (
-                        <span
-                          key={m}
-                          className={
-                            i + 1 === ndviMonth
-                              ? "font-bold text-primary"
-                              : ""
-                          }
-                        >
+                        <span key={m} className={i + 1 === ndviMonth ? "font-bold text-primary" : ""}>
                           {m}
                         </span>
                       ))}
@@ -926,33 +1129,21 @@ export default function MapaClient({
                         min={0}
                         max={yearComparisons.length - 1}
                         value={ndviYear}
-                        onChange={(e) =>
-                          setNdviYear(Number(e.target.value))
-                        }
+                        onChange={(e) => setNdviYear(Number(e.target.value))}
                         className="w-full accent-primary"
                       />
                       <div className="mt-1 flex justify-between text-[9px] text-text-dim">
                         <span>{yearComparisons[0]?.year}</span>
-                        <span>
-                          {
-                            yearComparisons[yearComparisons.length - 1]
-                              ?.year
-                          }
-                        </span>
+                        <span>{yearComparisons[yearComparisons.length - 1]?.year}</span>
                       </div>
                     </>
                   )
                 )}
 
-                {/* NDVI palette */}
                 <div className="mt-2">
                   <div className="flex h-2 overflow-hidden rounded-full">
                     {ndviTiles.palette.map((color, i) => (
-                      <div
-                        key={i}
-                        className="flex-1"
-                        style={{ backgroundColor: color }}
-                      />
+                      <div key={i} className="flex-1" style={{ backgroundColor: color }} />
                     ))}
                   </div>
                   <div className="mt-0.5 flex justify-between text-[8px] text-text-dim">
@@ -964,6 +1155,138 @@ export default function MapaClient({
               </div>
             )}
 
+            {/* ── Precipitacao timeline ── */}
+            {layers.precipitacao.visible && hasPrecipTiles && (
+              <div className="mt-3 border-t border-border pt-3">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="text-xs font-semibold text-text-primary">
+                    Precipitacao — {MONTH_NAMES_SHORT[precipMonth - 1]}
+                  </span>
+                  {currentPrecip && (
+                    <span className="rounded-full bg-blue-500/20 px-2 py-0.5 text-[10px] font-bold text-blue-400">
+                      {currentPrecip.precip_mean.toFixed(0)} mm
+                    </span>
+                  )}
+                </div>
+                <input
+                  type="range"
+                  min={1}
+                  max={12}
+                  value={precipMonth}
+                  onChange={(e) => setPrecipMonth(Number(e.target.value))}
+                  className="w-full accent-primary"
+                />
+                <div className="flex justify-between text-[9px] text-text-dim">
+                  {MONTH_NAMES_SHORT.map((m, i) => (
+                    <span key={m} className={i + 1 === precipMonth ? "font-bold text-primary" : ""}>
+                      {m}
+                    </span>
+                  ))}
+                </div>
+                <div className="mt-2">
+                  <div className="flex h-2 overflow-hidden rounded-full">
+                    {["#FFFDE7", "#FFF9C4", "#FFF176", "#64B5F6", "#1E88E5", "#0D47A1"].map((c) => (
+                      <div key={c} className="flex-1" style={{ backgroundColor: c }} />
+                    ))}
+                  </div>
+                  <div className="mt-0.5 flex justify-between text-[8px] text-text-dim">
+                    <span>Seco</span>
+                    <span>Chuvoso</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── Umidade do Solo timeline ── */}
+            {layers["umidade-solo"].visible && hasSmTiles && (
+              <div className="mt-3 border-t border-border pt-3">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="text-xs font-semibold text-text-primary">
+                    Umidade Solo — {MONTH_NAMES_SHORT[smMonth - 1]}
+                  </span>
+                  {currentSm && (
+                    <span className="rounded-full bg-teal-500/20 px-2 py-0.5 text-[10px] font-bold text-teal-400">
+                      {currentSm.sm_mean.toFixed(3)} m3/m3
+                    </span>
+                  )}
+                </div>
+                <input
+                  type="range"
+                  min={1}
+                  max={12}
+                  value={smMonth}
+                  onChange={(e) => setSmMonth(Number(e.target.value))}
+                  className="w-full accent-primary"
+                />
+                <div className="flex justify-between text-[9px] text-text-dim">
+                  {MONTH_NAMES_SHORT.map((m, i) => (
+                    <span key={m} className={i + 1 === smMonth ? "font-bold text-primary" : ""}>
+                      {m}
+                    </span>
+                  ))}
+                </div>
+                <div className="mt-2">
+                  <div className="flex h-2 overflow-hidden rounded-full">
+                    {["#EFEBE9", "#D7CCC8", "#A1887F", "#26A69A", "#00897B", "#004D40"].map((c) => (
+                      <div key={c} className="flex-1" style={{ backgroundColor: c }} />
+                    ))}
+                  </div>
+                  <div className="mt-0.5 flex justify-between text-[8px] text-text-dim">
+                    <span>Seco</span>
+                    <span>Umido</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── ECOSTRESS timeline ── */}
+            {layers.ecostress.visible && hasEcoTiles && (
+              <div className="mt-3 border-t border-border pt-3">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="text-xs font-semibold text-text-primary">
+                    ECOSTRESS — {MONTH_NAMES_SHORT[ecoMonth - 1]}
+                  </span>
+                  {currentEco && (
+                    <span className="rounded-full bg-red-500/20 px-2 py-0.5 text-[10px] font-bold text-red-400">
+                      {currentEco.lst_mean.toFixed(1)}°C
+                    </span>
+                  )}
+                </div>
+                <input
+                  type="range"
+                  min={1}
+                  max={12}
+                  value={ecoMonth}
+                  onChange={(e) => setEcoMonth(Number(e.target.value))}
+                  className="w-full accent-primary"
+                />
+                <div className="flex justify-between text-[9px] text-text-dim">
+                  {MONTH_NAMES_SHORT.map((m, i) => (
+                    <span key={m} className={i + 1 === ecoMonth ? "font-bold text-primary" : ""}>
+                      {m}
+                    </span>
+                  ))}
+                </div>
+                <div className="mt-2">
+                  <div className="flex h-2 overflow-hidden rounded-full">
+                    {["#1E88E5", "#42A5F5", "#81D4FA", "#FFF176", "#FDD835", "#FF9800", "#E65100", "#BF360C"].map((c) => (
+                      <div key={c} className="flex-1" style={{ backgroundColor: c }} />
+                    ))}
+                  </div>
+                  <div className="mt-0.5 flex justify-between text-[8px] text-text-dim">
+                    <span>5°C</span>
+                    <span>25°C</span>
+                    <span>45°C</span>
+                  </div>
+                </div>
+                {currentEco && (
+                  <p className="mt-1 text-[9px] text-text-dim">
+                    {currentEco.n_images} imagens | 70m resolucao
+                  </p>
+                )}
+              </div>
+            )}
+
             {/* ── Legends ── */}
             {layers.relevo.visible && (
               <div className="mt-3 border-t border-border pt-3">
@@ -972,21 +1295,19 @@ export default function MapaClient({
                 </p>
                 <div className="flex items-center gap-1">
                   <span className="text-[10px] text-text-muted">
-                    {topography.summary.min_elevation_m}m
+                    {hasElevationTile
+                      ? `${mapTiles.elevation.main!.min_elevation}m`
+                      : `${topography.summary.min_elevation_m}m`}
                   </span>
                   <div className="flex h-2 flex-1 overflow-hidden rounded-full">
-                    {["#1B5E20", "#388E3C", "#66BB6A", "#FDD835", "#E65100"].map(
-                      (c) => (
-                        <div
-                          key={c}
-                          className="flex-1"
-                          style={{ backgroundColor: c }}
-                        />
-                      ),
-                    )}
+                    {["#1B5E20", "#388E3C", "#66BB6A", "#FDD835", "#E65100"].map((c) => (
+                      <div key={c} className="flex-1" style={{ backgroundColor: c }} />
+                    ))}
                   </div>
                   <span className="text-[10px] text-text-muted">
-                    {topography.summary.max_elevation_m}m
+                    {hasElevationTile
+                      ? `${mapTiles.elevation.main!.max_elevation}m`
+                      : `${topography.summary.max_elevation_m}m`}
                   </span>
                 </div>
               </div>
@@ -995,20 +1316,14 @@ export default function MapaClient({
             {layers.temperatura.visible && (
               <div className="mt-3 border-t border-border pt-3">
                 <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-text-dim">
-                  Temperatura max.
+                  {hasLstTiles ? "Temperatura de superficie (LST)" : "Temperatura max. estimada"}
                 </p>
                 <div className="flex items-center gap-1">
                   <span className="text-[10px] text-text-muted">Frio</span>
                   <div className="flex h-2 flex-1 overflow-hidden rounded-full">
-                    {["#1E88E5", "#42A5F5", "#FDD835", "#FF9800", "#E65100"].map(
-                      (c) => (
-                        <div
-                          key={c}
-                          className="flex-1"
-                          style={{ backgroundColor: c }}
-                        />
-                      ),
-                    )}
+                    {["#1E88E5", "#42A5F5", "#FDD835", "#FF9800", "#E65100"].map((c) => (
+                      <div key={c} className="flex-1" style={{ backgroundColor: c }} />
+                    ))}
                   </div>
                   <span className="text-[10px] text-text-muted">Quente</span>
                 </div>
@@ -1017,17 +1332,38 @@ export default function MapaClient({
 
             {layers["uso-do-solo"].visible && (
               <div className="mt-3 border-t border-border pt-3">
-                <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-text-dim">
-                  Uso do solo — 2023
-                </p>
+                <div className="mb-1.5 flex items-center justify-between">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-text-dim">
+                    Uso do solo
+                    {hasMbRaster && mbYears.length > 0
+                      ? ` — ${mbYears[mbYearIdx]?.year}`
+                      : " — 2023"}
+                  </p>
+                </div>
+
+                {hasMbRaster && mbYears.length > 1 && (
+                  <div className="mb-2">
+                    <input
+                      type="range"
+                      min={0}
+                      max={mbYears.length - 1}
+                      value={mbYearIdx}
+                      onChange={(e) => setMbYearIdx(Number(e.target.value))}
+                      className="w-full accent-primary"
+                    />
+                    <div className="mt-0.5 flex justify-between text-[9px] text-text-dim">
+                      <span>{mbYears[mbYears.length - 1]?.year}</span>
+                      <span>{mbYears[0]?.year}</span>
+                    </div>
+                  </div>
+                )}
+
                 <div className="space-y-1">
                   {LAND_USE.slice(0, 6).map(([key, val]) => (
                     <div key={key} className="flex items-center gap-2">
                       <span
                         className="inline-block h-2.5 w-2.5 shrink-0 rounded-sm"
-                        style={{
-                          backgroundColor: LAND_USE_COLORS[key] ?? "#666",
-                        }}
+                        style={{ backgroundColor: LAND_USE_COLORS[key] ?? "#666" }}
                       />
                       <span className="flex-1 text-[11px] text-text-secondary">
                         {LAND_USE_LABELS[key] ?? key}
@@ -1044,8 +1380,7 @@ export default function MapaClient({
             {/* Info footer */}
             <div className="mt-3 border-t border-border pt-2">
               <p className="text-[9px] leading-relaxed text-text-dim">
-                Clique no mapa para ver dados do ponto. SRTM (elevacao) | NASA
-                POWER (temp) | Sentinel-2 (NDVI) | MapBiomas (uso do solo)
+                Clique no mapa para ver dados do ponto. SRTM (elevacao) | MODIS LST (temperatura) | Sentinel-2 (NDVI) | GPM (precipitacao) | SMAP (umidade) | MapBiomas (uso do solo) | NASA ECOSTRESS (LST 70m)
               </p>
             </div>
           </div>
@@ -1056,10 +1391,9 @@ export default function MapaClient({
       <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-[500] flex items-end justify-between p-3">
         <div className="pointer-events-auto rounded-lg bg-bg-surface/90 px-3 py-1.5 text-[11px] text-text-muted shadow-lg backdrop-blur-sm">
           <span className="font-semibold text-text-primary">
-            {site.point.name}
+            Municipio de {site.point.name}
           </span>{" "}
-          — {site.point.lat.toFixed(4)}, {site.point.lon.toFixed(4)} | Elev.
-          media {meanElev}m | {topography.points.length} pontos topograficos
+          — {site.point.state} | Elev. media {meanElev}m | {topography.points.length} pontos topograficos
         </div>
       </div>
 
@@ -1067,10 +1401,22 @@ export default function MapaClient({
       <style jsx global>{`
         .fs-popup .leaflet-popup-content-wrapper {
           border-radius: 10px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+          background: #111827;
+          color: #F9FAFB;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
         }
         .fs-popup .leaflet-popup-tip {
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          background: #111827;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+        .leaflet-popup-content-wrapper {
+          background: #111827;
+          color: #F9FAFB;
+          border-radius: 10px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+        .leaflet-popup-tip {
+          background: #111827;
         }
         .leaflet-control-zoom a {
           width: 32px !important;
@@ -1078,17 +1424,26 @@ export default function MapaClient({
           line-height: 32px !important;
           font-size: 16px !important;
           border-radius: 8px !important;
+          background: #111827 !important;
+          color: #F9FAFB !important;
+          border-color: #374151 !important;
+        }
+        .leaflet-control-zoom a:hover {
+          background: #1F2937 !important;
         }
         .leaflet-control-zoom {
           border-radius: 10px !important;
           overflow: hidden;
-          box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15) !important;
+          box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3) !important;
           border: none !important;
         }
         .leaflet-control-scale-line {
           border-radius: 4px;
           font-size: 10px;
           padding: 2px 8px;
+          background: rgba(17, 24, 39, 0.8);
+          color: #D1D5DB;
+          border-color: #374151;
         }
       `}</style>
     </div>

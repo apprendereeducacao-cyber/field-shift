@@ -177,9 +177,7 @@ function ProducerForm({ municipality, onComplete }: { municipality: string; onCo
   const thisYear = new Date().getFullYear();
   const labels = [`${thisYear - 1}/${thisYear}`, `${thisYear - 2}/${thisYear - 1}`];
   const [seasons, setSeasons] = useState<SeasonData[]>([{ ...EMPTY_SEASON }, { ...EMPTY_SEASON }]);
-  const [hasCattle, setHasCattle] = useState(false);
   const [soilCompacted, setSoilCompacted] = useState(false);
-  const [usedGreenManure, setUsedGreenManure] = useState(false);
 
   useEffect(() => {
     try {
@@ -187,9 +185,7 @@ function ProducerForm({ municipality, onComplete }: { municipality: string; onCo
       if (raw) {
         const data = JSON.parse(raw);
         if (data.seasons?.length === 2) setSeasons(data.seasons);
-        setHasCattle(data.has_cattle ?? false);
         setSoilCompacted(data.soil_compacted ?? false);
-        setUsedGreenManure(data.used_green_manure ?? false);
       }
     } catch { /* ignore */ }
   }, []);
@@ -199,7 +195,7 @@ function ProducerForm({ municipality, onComplete }: { municipality: string; onCo
   }
 
   function handleSubmit() {
-    const data = { seasons, has_cattle: hasCattle, soil_compacted: soilCompacted, used_green_manure: usedGreenManure, saved_at: new Date().toISOString() };
+    const data = { seasons, soil_compacted: soilCompacted, saved_at: new Date().toISOString() };
     try { localStorage.setItem("fieldshift_produtor", JSON.stringify(data)); } catch { /* ignore */ }
     onComplete();
   }
@@ -254,24 +250,15 @@ function ProducerForm({ municipality, onComplete }: { municipality: string; onCo
         </div>
       ))}
 
-      <div className="space-y-3">
-        <h3 className="text-base font-semibold text-foreground">Sobre a propriedade</h3>
-        {[
-          { id: "cattle", label: "Tem gado na propriedade?", desc: "Culturas que servem de pasto no inverno ganham prioridade", checked: hasCattle, set: setHasCattle },
-          { id: "compact", label: "O solo esta compactado?", desc: "Se a agua empoca ou a raiz nao desce, pode estar compactado", checked: soilCompacted, set: setSoilCompacted },
-          { id: "green", label: "Ja usou adubo verde?", desc: "Ervilhaca, crotalaria, nabo — qualquer planta pra melhorar o solo", checked: usedGreenManure, set: setUsedGreenManure },
-        ].map((t) => (
-          <div key={t.id} className="flex cursor-pointer items-center justify-between rounded-[24px] border border-border bg-card p-4" onClick={() => t.set(!t.checked)}>
-            <div>
-              <p className="text-sm font-medium text-foreground">{t.label}</p>
-              <p className="mt-0.5 text-xs text-muted-foreground">{t.desc}</p>
-            </div>
-            <button role="switch" aria-checked={t.checked} onClick={(e) => { e.stopPropagation(); t.set(!t.checked); }}
-              className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${t.checked ? "bg-primary" : "bg-muted"}`}>
-              <span className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow-xs transition-transform ${t.checked ? "translate-x-5" : "translate-x-0"}`} />
-            </button>
-          </div>
-        ))}
+      <div className="flex cursor-pointer items-center justify-between rounded-[24px] border border-border bg-card p-4" onClick={() => setSoilCompacted(!soilCompacted)}>
+        <div>
+          <p className="text-sm font-medium text-foreground">O solo esta compactado?</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">Se a agua empoca ou a raiz nao desce, pode estar compactado. Isso muda a recomendacao de cobertura.</p>
+        </div>
+        <button role="switch" aria-checked={soilCompacted} onClick={(e) => { e.stopPropagation(); setSoilCompacted(!soilCompacted); }}
+          className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${soilCompacted ? "bg-primary" : "bg-muted"}`}>
+          <span className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow-xs transition-transform ${soilCompacted ? "translate-x-5" : "translate-x-0"}`} />
+        </button>
       </div>
 
       <div className="flex flex-col items-center gap-3 pt-2">
@@ -781,14 +768,14 @@ export default function HomeClient() {
       {/* ── HERO ORBIT ── */}
       <section
         data-theme="orbit"
-        className="relative flex min-h-[56vh] flex-col items-center justify-center overflow-hidden"
+        className="relative flex min-h-[62vh] flex-col items-center justify-center overflow-hidden"
         style={{ background: "radial-gradient(120% 90% at 0% 0%, rgba(70,154,92,0.55) 0%, rgba(11,26,16,0) 60%), #0B1A10" }}
       >
         <div className="absolute inset-0 opacity-50" style={{ backgroundImage: "radial-gradient(rgba(150,225,142,0.16) 1px, transparent 1px)", backgroundSize: "16px 16px" }} />
 
         {/* Satellite image inside globe — circular clip with radial fade */}
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <div className="relative h-[min(55vw,380px)] w-[min(55vw,380px)]">
+          <div className="relative h-[min(60vw,440px)] w-[min(60vw,440px)]">
             <div className="absolute inset-0 overflow-hidden rounded-full" style={{ maskImage: "radial-gradient(circle, rgba(0,0,0,1) 30%, rgba(0,0,0,0.6) 55%, transparent 72%)", WebkitMaskImage: "radial-gradient(circle, rgba(0,0,0,1) 30%, rgba(0,0,0,0.6) 55%, transparent 72%)" }}>
               <Image
                 src="/hero-satellite.jpg"

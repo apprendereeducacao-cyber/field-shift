@@ -258,10 +258,10 @@ function riskText(value: number): string {
 }
 
 function riskColor(value: number): string {
-  if (value <= 0.2) return "bg-emerald-900/60 text-emerald-300";
-  if (value <= 0.5) return "bg-yellow-900/60 text-yellow-300";
-  if (value <= 0.75) return "bg-orange-900/60 text-orange-300";
-  return "bg-red-900/60 text-red-300";
+  if (value <= 0.2) return "bg-emerald-50 text-emerald-700";
+  if (value <= 0.5) return "bg-yellow-50 text-yellow-700";
+  if (value <= 0.75) return "bg-orange-50 text-orange-700";
+  return "bg-red-50 text-red-700";
 }
 
 function ClimaTab() {
@@ -317,19 +317,19 @@ function ClimaTab() {
         </div>
         <div className="flex flex-wrap gap-4 mt-4 text-xs text-text-dim">
           <span className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded bg-emerald-900/60" /> Raro (até 2
+            <span className="w-3 h-3 rounded bg-emerald-50 border border-emerald-200" /> Raro (até 2
             em 10)
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded bg-yellow-900/60" /> Às vezes (3 a
+            <span className="w-3 h-3 rounded bg-yellow-50 border border-yellow-200" /> Às vezes (3 a
             5 em 10)
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded bg-orange-900/60" /> Frequente (6
+            <span className="w-3 h-3 rounded bg-orange-50 border border-orange-200" /> Frequente (6
             a 7 em 10)
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded bg-red-900/60" /> Quase todo ano
+            <span className="w-3 h-3 rounded bg-red-50 border border-red-200" /> Quase todo ano
             (8+ em 10)
           </span>
         </div>
@@ -713,7 +713,7 @@ function SoloTab() {
                   {item.value}%
                 </span>
               </div>
-              <div className="h-3 bg-gray-800 rounded-full overflow-hidden">
+              <div className="h-3 bg-bg-surface-alt rounded-full overflow-hidden">
                 <div
                   className="h-full rounded-full"
                   style={{

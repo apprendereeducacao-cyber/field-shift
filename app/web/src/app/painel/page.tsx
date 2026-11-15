@@ -38,21 +38,21 @@ const CLASS_LABELS: Record<string, string> = {
 };
 
 const CLASS_COLORS: Record<string, string> = {
-  safra_boa: "text-emerald-400",
-  safra_normal: "text-amber-400",
-  safra_ruim: "text-red-400",
+  safra_boa: "text-emerald-700",
+  safra_normal: "text-amber-700",
+  safra_ruim: "text-red-600",
 };
 
 const CLASS_BG: Record<string, string> = {
-  safra_boa: "bg-emerald-900/30 border-emerald-800/40",
-  safra_normal: "bg-amber-900/30 border-amber-800/40",
-  safra_ruim: "bg-red-900/30 border-red-800/40",
+  safra_boa: "bg-emerald-50 border-emerald-200",
+  safra_normal: "bg-amber-50 border-amber-200",
+  safra_ruim: "bg-red-50 border-red-200",
 };
 
 function riskLevel(score: number) {
-  if (score >= 65) return { label: "Alto", color: "text-red-400" };
-  if (score >= 40) return { label: "Medio", color: "text-amber-400" };
-  return { label: "Baixo", color: "text-emerald-400" };
+  if (score >= 65) return { label: "Alto", color: "text-red-600" };
+  if (score >= 40) return { label: "Medio", color: "text-amber-600" };
+  return { label: "Baixo", color: "text-emerald-600" };
 }
 
 function computeRiskScore(tl: TimelineYear): number {

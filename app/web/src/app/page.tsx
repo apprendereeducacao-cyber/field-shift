@@ -25,20 +25,16 @@ const ENSO_LABELS: Record<string, string> = {
   neutro: "Neutro",
 };
 
-const ENSO_COLORS: Record<string, string> = {
-  el_nino: "text-amber-400",
-  el_nino_fraco: "text-amber-300",
-  el_nino_forte: "text-amber-500",
-  la_nina: "text-sky-400",
-  la_nina_fraca: "text-sky-300",
-  la_nina_forte: "text-sky-500",
-  neutro: "text-text-muted",
-};
+function riskColor(score: number) {
+  if (score >= 65) return "#EF4444";
+  if (score >= 40) return "#F59E0B";
+  return "#10B981";
+}
 
-function riskLevel(score: number) {
-  if (score >= 65) return { label: "Alto", color: "text-red-400" };
-  if (score >= 40) return { label: "Medio", color: "text-amber-400" };
-  return { label: "Baixo", color: "text-emerald-400" };
+function riskLabel(score: number) {
+  if (score >= 65) return "Alto";
+  if (score >= 40) return "Medio";
+  return "Baixo";
 }
 
 const AVAILABLE_YEARS = timeline.timeline.map((y) => y.year).sort((a, b) => b - a);
@@ -74,10 +70,10 @@ export default function Home() {
   if (!tl) return null;
 
   const rec: Recommendation = getSmartRecommendation(selectedYear, profile);
-  const risk = riskLevel(rec.riskScore);
   const avgs = riskEngine.historical_averages;
   const rainDiff = (tl.season_rain_mm ?? 0) - avgs.season_rain_mm;
   const hotDiff = tl.hot_days - avgs.hot_days;
+  const color = riskColor(rec.riskScore);
 
   function applyProfile() {
     setProfile(localProfile);
@@ -93,155 +89,146 @@ export default function Home() {
   }
 
   return (
-    <div className="space-y-5">
-      {/* Header */}
-      <header className="text-center">
-        <h1 className="text-2xl font-bold text-text-primary sm:text-3xl">Field Shift</h1>
-        <p className="mt-1 text-sm text-text-secondary">
-          {site.point.name}-{site.point.state} — {KEY_FINDINGS.data_years} anos de dados NASA
+    <div className="mx-auto max-w-2xl space-y-8">
+      {/* Hero */}
+      <header className="pt-2 text-center">
+        <p className="text-xs font-medium tracking-widest text-primary uppercase">
+          {site.point.name}-{site.point.state}
+        </p>
+        <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-text-primary sm:text-4xl">
+          Qual planta de cobertura usar?
+        </h1>
+        <p className="mt-2 text-sm text-text-muted">
+          Selecione a safra e descubra a melhor estrategia para o seu solo
         </p>
       </header>
 
-      {/* Seletor */}
-      <div className="mx-auto max-w-sm">
+      {/* Seletor de ano */}
+      <div className="flex items-center justify-center gap-3">
+        <label htmlFor="year-select" className="text-sm font-medium text-text-secondary">
+          Safra
+        </label>
         <select
+          id="year-select"
           value={selectedYear}
           onChange={(e) => setSelectedYear(Number(e.target.value))}
-          className="w-full rounded-xl border border-border bg-bg-surface px-4 py-3 text-center text-lg font-bold text-text-primary outline-none focus:border-primary-light"
+          className="rounded-lg border border-border bg-bg-surface px-4 py-2.5 text-base font-bold text-text-primary shadow-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
         >
           {AVAILABLE_YEARS.map((y) => (
-            <option key={y} value={y}>Safra {y}/{y + 1}</option>
+            <option key={y} value={y}>{y}/{y + 1}</option>
           ))}
         </select>
       </div>
 
-      {/* Risco + Clima */}
-      <div className="rounded-xl border border-border bg-bg-surface p-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs text-text-dim">Risco climatico</p>
-            <p className={`text-3xl font-bold ${risk.color}`}>
-              {rec.riskScore.toFixed(0)}<span className="text-sm font-normal text-text-muted">/100</span>
-            </p>
-          </div>
-          <div className="text-right">
-            <p className={`text-sm font-bold ${ENSO_COLORS[tl.enso] ?? "text-text-muted"}`}>
-              {ENSO_LABELS[tl.enso] ?? tl.enso.replace(/_/g, " ")}
-            </p>
-            {tl.yield_sc_ha !== null && (
-              <p className="text-xs text-text-muted">{tl.yield_sc_ha} sc/ha</p>
-            )}
-          </div>
+      {/* Clima resumo — uma linha, sem caixa */}
+      <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm">
+        <span className="flex items-center gap-1.5">
+          <span className="inline-block h-2 w-2 rounded-full" style={{ background: color }} />
+          <span className="font-semibold" style={{ color }}>Risco {riskLabel(rec.riskScore)}</span>
+          <span className="text-text-dim">({rec.riskScore.toFixed(0)}/100)</span>
+        </span>
+        <span className="text-text-muted">
+          {ENSO_LABELS[tl.enso] ?? tl.enso.replace(/_/g, " ")}
+        </span>
+        <span className={rainDiff < 0 ? "text-amber-600" : "text-primary-light"}>
+          {rainDiff > 0 ? "+" : ""}{Math.round(rainDiff)} mm chuva
+        </span>
+        <span className={hotDiff > 5 ? "text-red-500" : "text-text-muted"}>
+          {tl.hot_days} dias quentes
+        </span>
+      </div>
+
+      {/* Indicadores compactos */}
+      <div className="grid grid-cols-3 divide-x divide-border text-center">
+        <div className="py-2">
+          <p className="text-2xl font-bold text-text-primary">{tl.season_rain_mm ?? "--"}</p>
+          <p className="text-[11px] text-text-muted">mm de chuva</p>
         </div>
-        <div className="mt-3 h-2.5 rounded-full bg-bg-surface-alt overflow-hidden">
-          <div
-            className="h-full rounded-full transition-all duration-500"
-            style={{
-              width: `${Math.min(100, Math.max(0, rec.riskScore))}%`,
-              background: rec.riskScore >= 65
-                ? "linear-gradient(90deg, #F97316, #EF4444)"
-                : rec.riskScore >= 40
-                  ? "linear-gradient(90deg, #F9A825, #F97316)"
-                  : "linear-gradient(90deg, #10B981, #F9A825)",
-            }}
-          />
+        <div className="py-2">
+          <p className="text-2xl font-bold text-text-primary">{tl.hot_days}</p>
+          <p className="text-[11px] text-text-muted">dias acima de 32C</p>
         </div>
-        <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-          <div>
-            <p className="text-xs text-text-dim">Chuva</p>
-            <p className="text-sm font-bold text-text-primary">{tl.season_rain_mm ?? "—"} mm</p>
-            <p className={`text-[10px] ${rainDiff < 0 ? "text-red-400" : "text-emerald-400"}`}>
-              {rainDiff > 0 ? "+" : ""}{Math.round(rainDiff)} vs media
-            </p>
-          </div>
-          <div>
-            <p className="text-xs text-text-dim">Calor</p>
-            <p className="text-sm font-bold text-text-primary">{tl.hot_days} dias</p>
-            <p className={`text-[10px] ${hotDiff > 0 ? "text-red-400" : "text-emerald-400"}`}>
-              {hotDiff > 0 ? "+" : ""}{Math.round(hotDiff)} vs media
-            </p>
-          </div>
-          <div>
-            <p className="text-xs text-text-dim">Solo</p>
-            <p className="text-sm font-bold text-text-primary">
-              {tl.avg_soil_moisture !== null ? `${(tl.avg_soil_moisture * 100).toFixed(0)}%` : "—"}
-            </p>
-            <p className="text-[10px] text-text-muted">media: {(avgs.avg_soil_moisture * 100).toFixed(0)}%</p>
-          </div>
+        <div className="py-2">
+          <p className="text-2xl font-bold text-text-primary">
+            {tl.avg_soil_moisture !== null ? `${(tl.avg_soil_moisture * 100).toFixed(0)}%` : "--"}
+          </p>
+          <p className="text-[11px] text-text-muted">umidade do solo</p>
         </div>
       </div>
 
       {/* Necessidade detectada */}
-      <div className="rounded-lg bg-bg-surface-alt px-4 py-2">
-        <p className="text-xs text-text-muted">
-          Prioridade detectada: <span className="font-semibold text-text-primary">{rec.primaryNeed}</span>
-          {profile && <span className="ml-1 text-primary-light">(personalizado)</span>}
-        </p>
-      </div>
+      <p className="text-center text-sm text-text-secondary">
+        Prioridade para esta safra:{" "}
+        <span className="font-semibold text-primary">{rec.primaryNeed}</span>
+        {profile && <span className="ml-1 text-accent">(personalizado)</span>}
+      </p>
 
-      {/* Recomendacao Principal */}
-      <div className="rounded-xl border-2 border-primary bg-primary/5 p-5">
-        <p className="text-xs font-medium tracking-wider text-primary-light uppercase">
-          Planta de cobertura recomendada
+      {/* Recomendacao principal */}
+      <section className="rounded-2xl border border-primary/20 bg-primary/[0.03] px-6 py-6">
+        <p className="text-[11px] font-semibold tracking-widest text-primary uppercase">
+          Recomendacao
         </p>
-        <h2 className="mt-1 text-xl font-bold text-text-primary">{rec.bestCombo.name}</h2>
-        <p className="mt-2 text-sm text-text-secondary">{rec.bestCombo.why}</p>
+        <h2 className="mt-1 text-2xl font-bold text-text-primary">{rec.bestCombo.name}</h2>
+        <p className="mt-2 text-[15px] leading-relaxed text-text-secondary">{rec.bestCombo.why}</p>
 
-        {/* Reasons */}
-        <div className="mt-3 space-y-1.5">
+        <ul className="mt-4 space-y-2">
           {rec.bestCombo.crops.map((sc) =>
             sc.reasons.slice(0, 2).map((r, i) => (
-              <div key={`${sc.crop.id}-${i}`} className="flex items-start gap-2 text-sm text-text-secondary">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary-light" />
+              <li key={`${sc.crop.id}-${i}`} className="flex items-start gap-2.5 text-sm text-text-secondary">
+                <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
                 {r}
-              </div>
+              </li>
             ))
           )}
-        </div>
+        </ul>
 
-        {/* Calendar */}
-        <div className="mt-4 space-y-1">
-          {rec.bestCombo.calendar.map((item, i) => (
-            <div key={i} className="flex gap-2 text-sm">
-              <span className="w-14 shrink-0 font-semibold text-text-primary">{item.month}</span>
-              <span className="text-text-secondary">{item.action}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Alternativas */}
-      {rec.alternatives.length > 0 && (
-        <div>
-          <h3 className="mb-2 text-sm font-semibold text-text-primary">Alternativas</h3>
-          <div className="space-y-2">
-            {rec.alternatives.map((alt, i) => (
-              <div key={i} className="rounded-lg border border-border bg-bg-surface p-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-text-primary">{alt.name}</span>
-                  <span className="text-xs text-text-muted">{alt.comboScore.toFixed(0)} pts</span>
-                </div>
-                <p className="mt-1 text-xs text-text-secondary">{alt.why}</p>
+        <div className="mt-5 border-t border-primary/10 pt-4">
+          <p className="mb-2 text-[11px] font-semibold tracking-widest text-primary uppercase">
+            Calendario
+          </p>
+          <div className="space-y-1.5">
+            {rec.bestCombo.calendar.map((item, i) => (
+              <div key={i} className="flex gap-3 text-sm">
+                <span className="w-16 shrink-0 font-semibold text-text-primary">{item.month}</span>
+                <span className="text-text-secondary">{item.action}</span>
               </div>
             ))}
           </div>
         </div>
+      </section>
+
+      {/* Alternativas */}
+      {rec.alternatives.length > 0 && (
+        <section>
+          <h3 className="mb-3 text-sm font-semibold text-text-primary">Outras opcoes</h3>
+          <div className="space-y-2">
+            {rec.alternatives.map((alt, i) => (
+              <div key={i} className="flex items-start justify-between gap-4 rounded-xl border border-border px-4 py-3">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-text-primary">{alt.name}</p>
+                  <p className="mt-0.5 text-xs leading-snug text-text-muted">{alt.why}</p>
+                </div>
+                <span className="shrink-0 text-xs font-medium text-text-dim">{alt.comboScore.toFixed(0)} pts</span>
+              </div>
+            ))}
+          </div>
+        </section>
       )}
 
       {/* Personalizar */}
-      <div className="rounded-xl border border-border bg-bg-surface p-4">
+      <section className="rounded-2xl border border-border px-5 py-4">
         <button
           onClick={() => setShowProfile(!showProfile)}
           className="flex w-full items-center justify-between"
         >
-          <div>
-            <p className="text-sm font-semibold text-text-primary text-left">Personalizar recomendacao</p>
-            <p className="text-xs text-text-muted text-left">
-              {profile ? "Seus dados estao sendo usados" : "Responda 3 perguntas para recomendacao sob medida"}
+          <div className="text-left">
+            <p className="text-sm font-semibold text-text-primary">Personalizar recomendacao</p>
+            <p className="text-xs text-text-muted">
+              {profile ? "Seus dados estao sendo usados" : "3 perguntas para recomendacao sob medida"}
             </p>
           </div>
           <svg
-            className={`h-5 w-5 text-text-muted transition-transform ${showProfile ? "rotate-180" : ""}`}
+            className={`h-4 w-4 text-text-dim transition-transform ${showProfile ? "rotate-180" : ""}`}
             fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
@@ -249,37 +236,25 @@ export default function Home() {
         </button>
 
         {showProfile && (
-          <div className="mt-4 space-y-3 border-t border-border pt-4">
-            <label className="flex items-center justify-between">
-              <span className="text-sm text-text-secondary">Tem gado na propriedade?</span>
-              <button
-                onClick={() => setLocalProfile((p) => ({ ...p, has_cattle: !p.has_cattle }))}
-                className={`relative h-6 w-11 rounded-full transition-colors ${localProfile.has_cattle ? "bg-primary-light" : "bg-bg-surface-alt"}`}
-              >
-                <span className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-text-primary transition-transform ${localProfile.has_cattle ? "translate-x-5" : ""}`} />
-              </button>
-            </label>
-            <label className="flex items-center justify-between">
-              <span className="text-sm text-text-secondary">Solo compactado?</span>
-              <button
-                onClick={() => setLocalProfile((p) => ({ ...p, soil_compacted: !p.soil_compacted }))}
-                className={`relative h-6 w-11 rounded-full transition-colors ${localProfile.soil_compacted ? "bg-primary-light" : "bg-bg-surface-alt"}`}
-              >
-                <span className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-text-primary transition-transform ${localProfile.soil_compacted ? "translate-x-5" : ""}`} />
-              </button>
-            </label>
-            <label className="flex items-center justify-between">
-              <span className="text-sm text-text-secondary">Ja usou adubo verde?</span>
-              <button
-                onClick={() => setLocalProfile((p) => ({ ...p, used_green_manure: !p.used_green_manure }))}
-                className={`relative h-6 w-11 rounded-full transition-colors ${localProfile.used_green_manure ? "bg-primary-light" : "bg-bg-surface-alt"}`}
-              >
-                <span className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-text-primary transition-transform ${localProfile.used_green_manure ? "translate-x-5" : ""}`} />
-              </button>
-            </label>
+          <div className="mt-4 space-y-4 border-t border-border pt-4">
+            {[
+              { label: "Tem gado na propriedade?", key: "has_cattle" as const },
+              { label: "Solo compactado?", key: "soil_compacted" as const },
+              { label: "Ja usou adubo verde?", key: "used_green_manure" as const },
+            ].map(({ label, key }) => (
+              <label key={key} className="flex items-center justify-between">
+                <span className="text-sm text-text-secondary">{label}</span>
+                <button
+                  onClick={() => setLocalProfile((p) => ({ ...p, [key]: !p[key] }))}
+                  className={`relative h-6 w-11 rounded-full transition-colors ${localProfile[key] ? "bg-primary" : "bg-border"}`}
+                >
+                  <span className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${localProfile[key] ? "translate-x-5" : ""}`} />
+                </button>
+              </label>
+            ))}
 
             <div>
-              <p className="mb-1 text-sm text-text-secondary">Maior problema recente</p>
+              <p className="mb-1.5 text-sm text-text-secondary">Maior problema recente</p>
               <select
                 value={localProfile.main_problems[0] ?? "nenhum"}
                 onChange={(e) => {
@@ -289,7 +264,7 @@ export default function Home() {
                     main_problems: v === "nenhum" ? [] : [v],
                   }));
                 }}
-                className="w-full rounded-lg border border-border bg-bg-surface-alt px-3 py-2 text-sm text-text-primary outline-none focus:border-primary-light"
+                className="w-full rounded-lg border border-border bg-bg-surface px-3 py-2.5 text-sm text-text-primary outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
               >
                 <option value="nenhum">Nenhum problema grave</option>
                 <option value="seca">Seca</option>
@@ -302,34 +277,34 @@ export default function Home() {
 
             <button
               onClick={applyProfile}
-              className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-light"
+              className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-dark"
             >
               Aplicar e ver recomendacao
             </button>
           </div>
         )}
-      </div>
+      </section>
 
-      {/* Links */}
+      {/* Links de navegacao */}
       <div className="grid grid-cols-2 gap-3">
         <Link
           href="/painel"
-          className="rounded-xl border border-border bg-bg-surface p-3 text-center transition-colors hover:border-primary/40"
+          className="group rounded-xl border border-border px-4 py-3 transition-colors hover:border-primary/30 hover:bg-primary/[0.02]"
         >
-          <p className="text-sm font-semibold text-text-primary">Painel climatico</p>
+          <p className="text-sm font-semibold text-text-primary group-hover:text-primary">Painel climatico</p>
           <p className="text-xs text-text-muted">Analise detalhada por ano</p>
         </Link>
         <Link
           href="/mapa"
-          className="rounded-xl border border-border bg-bg-surface p-3 text-center transition-colors hover:border-primary/40"
+          className="group rounded-xl border border-border px-4 py-3 transition-colors hover:border-primary/30 hover:bg-primary/[0.02]"
         >
-          <p className="text-sm font-semibold text-text-primary">Mapa da regiao</p>
+          <p className="text-sm font-semibold text-text-primary group-hover:text-primary">Mapa da regiao</p>
           <p className="text-xs text-text-muted">Relevo, temperatura, NDVI</p>
         </Link>
       </div>
 
-      <p className="text-[10px] text-text-dim text-center">
-        {rec.climateContext}
+      <p className="pb-2 text-center text-[10px] text-text-dim">
+        {rec.climateContext} | Dados: NASA POWER + IBGE | {KEY_FINDINGS.data_years} anos
       </p>
     </div>
   );

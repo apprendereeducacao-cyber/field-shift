@@ -157,7 +157,7 @@ function ScoreBar({
       <div className="flex gap-1">
         {scores.map((s) => (
           <div key={s.id} className="flex-1">
-            <div className="h-2 rounded-full bg-gray-800 overflow-hidden">
+            <div className="h-2 rounded-full bg-bg-surface-alt overflow-hidden">
               <div
                 className="h-full rounded-full"
                 style={{
@@ -247,7 +247,7 @@ function StrategyCard({ strategy }: { strategy: Strategy }) {
 
       <div className="grid grid-cols-2 gap-4 mt-4">
         <div>
-          <h4 className="text-xs font-semibold text-red-400 mb-2">
+          <h4 className="text-xs font-semibold text-red-600 mb-2">
             Pontos fracos
           </h4>
           <ul className="space-y-1">
@@ -259,7 +259,7 @@ function StrategyCard({ strategy }: { strategy: Strategy }) {
           </ul>
         </div>
         <div>
-          <h4 className="text-xs font-semibold text-green-400 mb-2">
+          <h4 className="text-xs font-semibold text-emerald-600 mb-2">
             Pontos fortes
           </h4>
           <ul className="space-y-1">
@@ -285,12 +285,12 @@ const FUNCTION_LABELS: Record<string, string> = {
 };
 
 const FUNCTION_TAG_STYLES: Record<string, string> = {
-  palha_duradoura: "bg-amber-900/30 text-amber-400 border-amber-800/40",
-  cobertura_rapida: "bg-emerald-900/30 text-emerald-400 border-emerald-800/40",
-  fixa_nitrogenio: "bg-sky-900/30 text-sky-400 border-sky-800/40",
-  descompactação: "bg-orange-900/30 text-orange-400 border-orange-800/40",
-  libera_fosforo: "bg-violet-900/30 text-violet-400 border-violet-800/40",
-  renda_grao: "bg-yellow-900/30 text-yellow-400 border-yellow-800/40",
+  palha_duradoura: "bg-amber-50 text-amber-700 border-amber-200",
+  cobertura_rapida: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  fixa_nitrogenio: "bg-sky-50 text-sky-700 border-sky-200",
+  descompactação: "bg-orange-50 text-orange-700 border-orange-200",
+  libera_fosforo: "bg-violet-50 text-violet-700 border-violet-200",
+  renda_grao: "bg-yellow-50 text-yellow-700 border-yellow-200",
 };
 
 const GROUP_LABELS: Record<string, string> = {
@@ -300,9 +300,9 @@ const GROUP_LABELS: Record<string, string> = {
 };
 
 const GROUP_TAG_STYLES: Record<string, string> = {
-  graminea: "text-emerald-400",
-  leguminosa: "text-sky-400",
-  crucifera: "text-orange-400",
+  graminea: "text-emerald-700",
+  leguminosa: "text-sky-700",
+  crucifera: "text-orange-700",
 };
 
 const STRATEGY_COVER_CROPS: Record<string, string[]> = {

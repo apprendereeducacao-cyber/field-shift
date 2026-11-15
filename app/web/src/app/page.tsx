@@ -19,81 +19,6 @@ const STATS = [
   },
 ];
 
-const FEATURES = [
-  {
-    title: "Painel de Decisão",
-    description:
-      "Motor de risco com 44 anos de dados. Veja o cenário atual, o risco calculado, quais anos foram parecidos e qual manejo tem mais chance de dar certo.",
-    href: "/painel",
-    cta: "Ver o painel",
-  },
-  {
-    title: "Sua Lavoura",
-    description:
-      "Conte o que plantou nos últimos 2 anos e receba uma recomendação de inverno baseada no seu histórico, no clima e no solo da região.",
-    href: "/produtor",
-    cta: "Receber recomendação",
-  },
-  {
-    title: "Dados Científicos",
-    description:
-      "44 anos de clima, solo, NDVI, uso do solo e produtividade — tudo reunido em abas interativas com dados de satélite.",
-    href: "/dados",
-    cta: "Explorar os dados",
-  },
-  {
-    title: "Mapa de Cruz Alta",
-    description:
-      "Relevo, temperatura, vegetação e uso do solo em camadas interativas sobre o mapa da região.",
-    href: "/mapa",
-    cta: "Ver o mapa",
-  },
-  {
-    title: "A Ciência por Trás",
-    description:
-      "Metodologia, fontes de dados, validação satélite vs estação local, equipe e estratégias de manejo comparadas.",
-    href: "/sobre",
-    cta: "Ver a metodologia",
-  },
-];
-
-const DATA_SOURCES = [
-  {
-    label: "NASA",
-    name: "Satélite da NASA",
-    description: "Chuva e temperatura medidas do espaço, todo dia, por 44 anos.",
-  },
-  {
-    label: "IBGE",
-    name: "Produção agrícola (IBGE)",
-    description:
-      "Quanto de soja Cruz Alta produziu por hectare, ano a ano, desde 1974.",
-  },
-  {
-    label: "SOLO",
-    name: "Análise do solo",
-    description:
-      "Tipo de terra, acidez, matéria orgânica e capacidade de guardar água.",
-  },
-  {
-    label: "INMET",
-    name: "Estação do tempo local",
-    description:
-      "Estação meteorológica automática de Cruz Alta, medindo desde 2007.",
-  },
-  {
-    label: "MODIS",
-    name: "Vegetação por satélite (NDVI)",
-    description:
-      "Índice de vegetação MODIS a cada 16 dias, 250m de resolução, desde 2000. Via Google Earth Engine.",
-  },
-  {
-    label: "MAP",
-    name: "MapBiomas",
-    description:
-      "Uso e cobertura do solo mapeados com Landsat (30m) de 1985 a 2023. Projeto INPE + universidades.",
-  },
-];
 
 export default function Home() {
   return (
@@ -152,33 +77,6 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="px-4 py-16">
-        <div className="mx-auto max-w-5xl">
-          <h2 className="text-center text-2xl font-bold text-text-primary">
-            O que você vai encontrar aqui
-          </h2>
-          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {FEATURES.map((f) => (
-              <Link
-                key={f.href}
-                href={f.href}
-                className="group rounded-xl border border-border bg-bg-surface p-6 transition-colors hover:border-primary/40"
-              >
-                <h3 className="text-lg font-semibold text-primary-light">
-                  {f.title}
-                </h3>
-                <p className="mt-2 text-sm text-text-secondary">
-                  {f.description}
-                </p>
-                <p className="mt-3 text-xs font-medium text-accent-light group-hover:underline">
-                  {f.cta}
-                </p>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <section className="border-t border-border px-4 py-12">
         <div className="mx-auto max-w-5xl">
           <div className="grid gap-6 text-center sm:grid-cols-3">
@@ -214,50 +112,6 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="border-t border-border bg-bg-surface px-4 py-16">
-        <div className="mx-auto max-w-5xl">
-          <h2 className="text-center text-2xl font-bold text-text-primary">
-            De onde vêm os dados
-          </h2>
-          <p className="mt-2 text-center text-sm text-text-muted">
-            Tudo o que mostramos aqui vem de fontes públicas e verificáveis
-          </p>
-          <div className="mt-10 grid gap-4 sm:grid-cols-2">
-            {DATA_SOURCES.map((source) => (
-              <div
-                key={source.name}
-                className="flex items-start gap-4 rounded-lg border border-border bg-bg-base p-5"
-              >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-xs font-bold text-accent-light">
-                  {source.label}
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-text-primary">
-                    {source.name}
-                  </p>
-                  <p className="mt-1 text-xs text-text-muted">
-                    {source.description}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="px-4 py-8">
-        <div className="mx-auto max-w-5xl">
-          <div className="rounded-xl border border-accent/20 bg-accent/5 p-6 text-center">
-            <p className="text-xs font-medium tracking-wider text-accent-light uppercase">
-              NASA Space Apps Challenge 2026
-            </p>
-            <p className="mt-2 text-sm text-text-muted">
-              Field Shift: Adapting Farms with NASA Data. Uma ferramenta para
-              ajudar o agricultor a tomar decisões usando dados de satélite.
-            </p>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

@@ -187,42 +187,6 @@ function RiskGauge({ score }: { score: number }) {
   );
 }
 
-function EquationSection() {
-  const { correlations, equation } = riskEngine.model;
-  const corrs = [
-    { key: "Chuva dez–fev", ...correlations.season_rain_vs_yield },
-    { key: "Dias quentes (>32°C)", ...correlations.hot_days_vs_yield },
-    { key: "Umidade do solo", ...correlations.soil_moisture_vs_yield },
-  ];
-
-  return (
-    <div className="rounded-xl border border-border bg-bg-surface p-6">
-      <h3 className="text-sm font-semibold text-text-primary mb-4">
-        Como calculamos o risco
-      </h3>
-      <div className="rounded-lg bg-bg-surface-alt p-4 mb-4 font-mono text-sm text-accent-light">
-        {equation}
-      </div>
-      <div className="grid gap-3 sm:grid-cols-3">
-        {corrs.map((c) => (
-          <div key={c.key} className="rounded-lg bg-bg-base p-3">
-            <p className="text-xs text-text-dim">{c.key}</p>
-            <p className="text-lg font-bold text-text-primary mt-1">
-              r = {c.r.toFixed(2)}
-            </p>
-            <p className="text-[10px] text-text-muted mt-1">
-              Peso: {(c.weight * 100).toFixed(0)}% — {c.meaning}
-            </p>
-          </div>
-        ))}
-      </div>
-      <p className="mt-3 text-xs text-text-dim">
-        Correlação de Pearson com detrending tecnológico (remoção da tendência de melhoria genética).
-        Baseado em 44 anos de dados NASA POWER × produtividade IBGE.
-      </p>
-    </div>
-  );
-}
 
 function SimilarYearsTable() {
   const { similar_years } = riskEngine.current_scenario;
@@ -473,7 +437,6 @@ export default function PainelPage() {
           <SimilarYearsTable />
         </div>
         <div className="mt-4">
-          <EquationSection />
         </div>
         <div className="mt-4">
           <ScenarioDistribution />

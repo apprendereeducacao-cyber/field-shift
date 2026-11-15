@@ -109,17 +109,37 @@ A primeira estrategia deve ser a mais adequada (maior score). Ordene da melhor p
 
 Responda APENAS com JSON valido, sem markdown, sem explicacao fora do JSON.`;
 
+const ALLOWED_CROPS = ["soja", "milho", "milho_safrinha", "trigo", "aveia", "centeio", "canola", "cevada", "girassol", "sorgo", "feijao", "nenhuma"];
+const ALLOWED_WINTERS = ["trigo", "aveia", "centeio", "canola", "cevada", "nabo_forrageiro", "ervilhaca", "azevem", "pousio", "nenhuma"];
+const ALLOWED_RESULTS = ["bom", "normal", "ruim"];
+const ALLOWED_PROBLEMS = ["nenhum", "seca", "excesso_chuva", "geada", "pragas", "doencas", "preco_baixo"];
+const ALLOWED_RISK_LABELS = ["baixo", "medio", "alto", "muito_alto"];
+
+function sanitize(val: unknown, allowed: string[], fallback: string): string {
+  const s = String(val ?? fallback).toLowerCase().trim();
+  return allowed.includes(s) ? s : fallback;
+}
+
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const {
-      municipality,
-      climate,
-      producer,
-      riskScore,
-      riskLabel,
-      analogData,
-    } = body;
+    const raw = await request.text();
+    if (raw.length > 5000) return NextResponse.json({ error: "Payload too large" }, { status: 413 });
+    const body = JSON.parse(raw);
+
+    const municipality = typeof body.municipality === "string" && body.municipality.length < 100
+      ? body.municipality.replace(/[^\w\s,\-áéíóúãõâêîôûçÁÉÍÓÚÃÕÂÊÎÔÛÇ]/g, "")
+      : "Cruz Alta, RS";
+    const climate = body.climate;
+    const producer = body.producer ?? {};
+    const riskScore = typeof body.riskScore === "number" ? Math.min(100, Math.max(0, body.riskScore)) : null;
+    const riskLabel = sanitize(body.riskLabel, ALLOWED_RISK_LABELS, "medio");
+    const analogData = body.analogData;
+
+    producer.summer = sanitize(producer.summer, ALLOWED_CROPS, "soja");
+    producer.safrinha = sanitize(producer.safrinha, ALLOWED_CROPS, "nenhuma");
+    producer.winter = sanitize(producer.winter, ALLOWED_WINTERS, "pousio");
+    producer.yield_result = sanitize(producer.yield_result, ALLOWED_RESULTS, "normal");
+    producer.problem = sanitize(producer.problem, ALLOWED_PROBLEMS, "nenhum");
 
     const userPrompt = `Gere 3 estrategias de rotacao para um produtor em ${municipality || "Cruz Alta, RS"}.
 

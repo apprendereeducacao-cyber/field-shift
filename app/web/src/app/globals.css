@@ -1,89 +1,157 @@
 @import "tailwindcss";
 
-:root {
-  --bg-base: #0B1120;
-  --bg-surface: #111827;
-  --bg-surface-alt: #1F2937;
-  --bg-surface-hover: #374151;
+@theme inline {
+  --font-sans: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 
-  --primary: #2D6A4F;
-  --primary-hover: #357A5B;
-  --primary-light: #40916C;
-  --primary-dark: #1B4332;
+  --color-background: #DCE8DD;
+  --color-foreground: #151A17;
+  --color-card: #FFFFFF;
+  --color-card-foreground: #151A17;
+  --color-shell: #102914;
+  --color-shell-foreground: #F7F8F5;
 
-  --data: #74C69D;
-  --data-dim: #52B788;
+  --color-primary: #165337;
+  --color-primary-foreground: #FFFFFF;
+  --color-primary-hover: #17412D;
+  --color-primary-active: #133524;
 
-  --accent: #42A5F5;
-  --accent-light: #64B5F6;
-  --accent-dark: #1E88E5;
+  --color-accent: #E1F031;
+  --color-accent-foreground: #0B1A10;
 
-  --warning: #FF8F00;
-  --warning-light: #FFA726;
-  --danger: #EF4444;
+  --color-muted: #E4EFE5;
+  --color-muted-foreground: #4B5C50;
 
-  --text-primary: #F9FAFB;
-  --text-secondary: #D1D5DB;
-  --text-muted: #9CA3AF;
-  --text-dim: #8B95A3;
+  --color-border: #D6E5D8;
+  --color-input: #8E9283;
+  --color-ring: #165337;
 
-  --border: #374151;
-  --border-light: #4B5563;
-  --border-control: #64707F;
+  --color-destructive: #A8443D;
+  --color-destructive-foreground: #FFFFFF;
 
-  --font-sans: var(--font-inter);
+  --color-forest-50: #EFF6F1;
+  --color-forest-100: #D2E3D9;
+  --color-forest-200: #A8C7B4;
+  --color-forest-400: #53906D;
+  --color-forest-500: #21754C;
+  --color-forest-600: #165337;
+  --color-forest-700: #17412D;
+  --color-forest-800: #133524;
+  --color-forest-900: #102914;
+  --color-forest-950: #0B1A10;
+
+  --color-mint-50: #F3F8F2;
+  --color-mint-100: #E4EFE5;
+  --color-mint-200: #D6E5D8;
+  --color-mint-300: #C7DCCB;
+  --color-mint-400: #B9D3BE;
+
+  --color-lime-signal: #E1F031;
+  --color-lime-100: #DFF1B7;
+  --color-lime-200: #C8E384;
+
+  --color-leaf-500: #34C424;
+  --color-leaf-600: #2D9E1E;
+  --color-leaf-700: #267A17;
+
+  --color-stone-50: #F0F1EC;
+  --color-stone-100: #E4E6DD;
+  --color-stone-200: #CDCFBE;
+  --color-stone-300: #B0B4A5;
+  --color-stone-400: #8E9283;
+  --color-stone-500: #6E7263;
+  --color-stone-600: #595D51;
+  --color-stone-700: #44493F;
+  --color-stone-800: #30352E;
+  --color-stone-900: #1E231F;
+  --color-stone-950: #151A17;
+
+  --color-rain-400: #53ACFE;
+  --color-rain-600: #396EE4;
+  --color-rain-700: #2B57B4;
+
+  --color-ember-500: #ED7A3B;
+  --color-ember-600: #D0621F;
+  --color-ember-700: #A44A14;
+
+  --color-sun-300: #FCCA56;
+  --color-sun-600: #A88400;
+  --color-sun-700: #7F6200;
+
+  --color-moisture-600: #008C82;
+
+  --color-data-vegetation: #2D9E1E;
+  --color-data-precipitation: #396EE4;
+  --color-data-temperature: #D0621F;
+  --color-data-et: #A88400;
+  --color-data-soil-moisture: #008C82;
+  --color-data-baseline: #8E9283;
+  --color-data-grid: #E4E6DD;
+
+  --color-status-success: #267A17;
+  --color-status-success-bg: #EEF8EA;
+  --color-status-warning: #7F6200;
+  --color-status-warning-bg: #FEF7E2;
+  --color-status-serious: #A44A14;
+  --color-status-serious-bg: #FDF0E8;
+  --color-status-critical: #8E2F28;
+  --color-status-critical-bg: #FBEDEC;
+  --color-status-info: #2B57B4;
+  --color-status-info-bg: #EAF4FF;
+
+  --radius-card: 24px;
+  --radius-tile: 16px;
+  --radius-button: 9999px;
+  --radius-input: 9999px;
+  --radius-chip: 9999px;
+  --radius-dialog: 32px;
+  --radius-tooltip: 10px;
+
+  --shadow-xs: 0 1px 2px rgba(21,26,23,0.06);
+  --shadow-sm: 0 2px 8px rgba(21,26,23,0.06);
+  --shadow-md: 0 8px 24px rgba(21,26,23,0.08);
+  --shadow-lg: 0 16px 40px rgba(21,26,23,0.12);
+  --shadow-xl: 0 24px 64px rgba(11,26,16,0.18);
 }
 
-@theme inline {
-  --color-bg-base: var(--bg-base);
-  --color-bg-surface: var(--bg-surface);
-  --color-bg-surface-alt: var(--bg-surface-alt);
-  --color-bg-surface-hover: var(--bg-surface-hover);
-  --color-primary: var(--primary);
-  --color-primary-hover: var(--primary-hover);
-  --color-primary-light: var(--primary-light);
-  --color-primary-dark: var(--primary-dark);
-  --color-data: var(--data);
-  --color-data-dim: var(--data-dim);
-  --color-accent: var(--accent);
-  --color-accent-light: var(--accent-light);
-  --color-accent-dark: var(--accent-dark);
-  --color-warning: var(--warning);
-  --color-warning-light: var(--warning-light);
-  --color-danger: var(--danger);
-  --color-text-primary: var(--text-primary);
-  --color-text-secondary: var(--text-secondary);
-  --color-text-muted: var(--text-muted);
-  --color-text-dim: var(--text-dim);
-  --color-border: var(--border);
-  --color-border-light: var(--border-light);
-  --color-border-control: var(--border-control);
-  --font-sans: var(--font-inter);
+[data-theme="orbit"] {
+  --color-background: #0B1A10;
+  --color-foreground: #F7F8F5;
+  --color-card: #102914;
+  --color-card-foreground: #F7F8F5;
+  --color-primary: #E1F031;
+  --color-primary-foreground: #0B1A10;
+  --color-muted: #133524;
+  --color-muted-foreground: #B0B4A5;
+  --color-accent: #96E18E;
+  --color-accent-foreground: #0B1A10;
+  --color-border: #283629;
+  --color-input: #6E7263;
+  --color-ring: #E1F031;
 }
 
 body {
-  background: var(--bg-base);
-  color: var(--text-primary);
+  background: var(--color-background);
+  color: var(--color-foreground);
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
 }
 
 ::selection {
-  background: var(--primary);
-  color: #fff;
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
 }
 
-/* Scrollbar dark */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--color-muted); }
+::-webkit-scrollbar-thumb { background: var(--color-stone-300); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-stone-400); }
+
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
-::-webkit-scrollbar-track {
-  background: var(--bg-surface);
+.animate-scroll {
+  animation: scroll 25s linear infinite;
 }
-::-webkit-scrollbar-thumb {
-  background: var(--border-light);
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--border-control);
+.animate-scroll:hover {
+  animation-play-state: paused;
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import { getAnonymousId } from "@/lib/anon-id";
 
 type Message = {
   id: string;
@@ -13,18 +14,6 @@ type Session = {
   title: string;
   updated_at: string;
 };
-
-function getAnonymousId(): string {
-  try {
-    const stored = localStorage.getItem("field_shift_anon_id");
-    if (stored) return stored;
-    const id = crypto.randomUUID();
-    localStorage.setItem("field_shift_anon_id", id);
-    return id;
-  } catch {
-    return crypto.randomUUID();
-  }
-}
 
 export default function Chat() {
   const [isOpen, setIsOpen] = useState(false);

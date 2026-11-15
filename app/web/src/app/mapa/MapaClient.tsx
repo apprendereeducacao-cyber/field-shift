@@ -46,7 +46,7 @@ type LayerConfig = {
 const LAYER_CONFIGS: LayerConfig[] = [
   { key: "relevo", label: "Relevo", description: "Elevacao SRTM/Copernicus DEM", zIndex: 400 },
   { key: "temperatura", label: "Temperatura", description: "Tmax estimada por lapse rate", zIndex: 410 },
-  { key: "ndvi", label: "NDVI", description: "Vegetacao MODIS MOD13Q1 250m", zIndex: 420 },
+  { key: "ndvi", label: "NDVI", description: "Vegetacao Sentinel-2 10m", zIndex: 420 },
   { key: "uso-do-solo", label: "Uso do Solo", description: "MapBiomas Collection 9", zIndex: 430 },
 ];
 
@@ -442,7 +442,7 @@ export default function MapaClient({ ndviTiles, topography, site, mapbiomas }: P
             <span>0.9 — Maximo</span>
           </div>
           <p className="mt-2 text-xs text-text-dim">
-            Media de 5 anos (2020-2024). MODIS MOD13Q1 250m via Google Earth Engine.
+            Media de 5 anos (2020-2024). Sentinel-2 L2A 10m via Google Earth Engine.
           </p>
         </div>
       )}
@@ -494,7 +494,7 @@ export default function MapaClient({ ndviTiles, topography, site, mapbiomas }: P
 
       <div className="rounded-lg border border-border bg-bg-surface p-4 text-xs text-text-dim">
         <strong>Fontes:</strong> SRTM/Copernicus DEM (elevacao) | NASA POWER
-        1981-2025 (temperatura) | MODIS MOD13Q1 via Google Earth Engine (NDVI) |
+        1981-2025 (temperatura) | Sentinel-2 L2A via Google Earth Engine (NDVI) |
         MapBiomas Collection 9 (uso do solo) | Imagem: Esri World Imagery
       </div>
     </div>

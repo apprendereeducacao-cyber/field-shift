@@ -2559,9 +2559,9 @@ function GlossarioTab() {
           <div className="space-y-2">
             {[
               {
-                name: "MODIS (NDVI)",
-                res: "250m",
-                note: "Enxerga um quadrado de 6 ha — menor que um pivô",
+                name: "Sentinel-2 (NDVI)",
+                res: "10m",
+                note: "Enxerga detalhes de 0,01 ha — resolucao por talhao",
                 pct: 100,
                 color: "#2D6A4F",
               },
@@ -2642,7 +2642,7 @@ function GlossarioTab() {
             </p>
             <p>
               Ao mesmo tempo, o POWER nao enxerga a saude da planta, o uso real
-              do solo nem a agua subterranea. Ai entram MODIS (NDVI), MapBiomas
+              do solo nem a agua subterranea. Ai entram Sentinel-2 (NDVI), MapBiomas
               e GRACE — dados que so existem por satelite.
             </p>
             <p>

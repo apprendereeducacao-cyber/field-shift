@@ -349,8 +349,8 @@ export async function getNdvi(siteId: string): Promise<NdviData> {
   const sv = summaryRow?.values ?? {};
 
   return {
-    source: sv.source ?? "MODIS",
-    resolution: sv.resolution ?? "250m",
+    source: sv.source ?? "Sentinel-2",
+    resolution: sv.resolution ?? "10m",
     location: sv.location ?? { name: "Cruz Alta", state: "RS", lat: -28.6033, lon: -53.6733 },
     period: sv.period ?? "",
     summary: {
@@ -403,10 +403,10 @@ export async function getNdviTiles(siteId: string): Promise<NdviTilesData> {
   const mv = metaRow?.values ?? {};
 
   return {
-    source: mv.source ?? "Google Earth Engine - MODIS MOD13Q1 v061",
-    resolution: mv.resolution ?? "250m",
+    source: mv.source ?? "Copernicus Sentinel-2 L2A (Harmonized)",
+    resolution: mv.resolution ?? "10m",
     center: mv.center ?? { lat: -28.6033, lon: -53.6733 },
-    zoom: mv.zoom ?? 11,
+    zoom: mv.zoom ?? 13,
     palette: mv.palette ?? [],
     palette_labels: mv.palette_labels ?? [],
     monthly_tiles: (tileRows ?? []).map((r: any) => ({

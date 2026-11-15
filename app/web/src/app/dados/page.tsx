@@ -40,7 +40,7 @@ const ENSO_LABELS: Record<string, string> = {
   neutro: "Neutro",
 };
 
-type TabKey = "clima" | "historico" | "solo" | "vegetacao" | "uso-do-solo" | "satelite";
+type TabKey = "clima" | "historico" | "solo" | "vegetacao" | "uso-do-solo" | "satelite" | "glossario";
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: "clima", label: "Riscos Climaticos" },
@@ -49,6 +49,7 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: "solo", label: "Solo e Terreno" },
   { key: "vegetacao", label: "NDVI" },
   { key: "uso-do-solo", label: "Uso do Solo" },
+  { key: "glossario", label: "Entenda os Termos" },
 ];
 
 // ── Shared chart components ──────────────────────────────
@@ -1673,6 +1674,525 @@ function ClimaExtSection() {
 
 // ── Main page ────────────────────────────────────────────
 
+// ── TAB: Glossario — Entenda os Termos ──────────────────
+
+type GlossaryEntry = {
+  term: string;
+  simple: string;
+  detail: string;
+  example: string;
+  where: string;
+};
+
+const GLOSSARY_SECTIONS: {
+  title: string;
+  color: string;
+  entries: GlossaryEntry[];
+}[] = [
+  {
+    title: "Agua e Chuva",
+    color: "#1E88E5",
+    entries: [
+      {
+        term: "Evapotranspiracao",
+        simple:
+          "A quantidade de agua que a planta e o solo perdem juntos para o ar.",
+        detail:
+          "E a soma de duas coisas: a agua que evapora direto do solo (como uma poca secando ao sol) mais a agua que a planta puxa pelas raizes e solta pelas folhas (transpiracao). Quando a evapotranspiracao e alta, a lavoura precisa de mais chuva ou irrigacao para nao secar.",
+        example:
+          "No verao de Cruz Alta, a planta e o solo perdem cerca de 4mm de agua por dia. Se nao chover pelo menos isso, a soja comeca a sofrer.",
+        where: "Aba Satelite NASA > Evapotranspiracao",
+      },
+      {
+        term: "Balanco hidrico",
+        simple:
+          "A conta de quanta agua entra (chuva) e quanta sai (evapotranspiracao).",
+        detail:
+          "Se chove 100mm no mes e a planta + solo perdem 95mm, o saldo e de apenas 5mm — quase no zero. Quando o saldo fica negativo por muitos dias seguidos, a planta entra em estresse hidrico. E como a conta bancaria da agua: se gasta mais do que entra, da problema.",
+        example:
+          "Na safra de soja (outubro a marco) em Cruz Alta, o balanco hidrico acumula apenas +38mm em 6 meses — muito apertado para uma cultura que precisa de 450-800mm.",
+        where: "Aba Satelite NASA > Evapotranspiracao e Chuva Satelite",
+      },
+      {
+        term: "Precipitacao por satelite (GPM)",
+        simple:
+          "Medicao de chuva feita por radar no espaco, sem depender de estacoes no chao.",
+        detail:
+          "O satelite GPM usa radar e microondas para medir quanta chuva esta caindo em qualquer ponto da Terra. A vantagem e que cobre areas onde nao existem pluviometros. A resolucao e de 10km — cada ponto representa um quadrado de 10x10km.",
+        example:
+          "Em Cruz Alta, o GPM mostra uma media de 1.740mm de chuva por ano, bem proximo do que a estacao do INMET registra no chao.",
+        where: "Aba Satelite NASA > Chuva Satelite (GPM)",
+      },
+    ],
+  },
+  {
+    title: "Solo e Umidade",
+    color: "#8B5E3C",
+    entries: [
+      {
+        term: "Umidade do solo (SMAP)",
+        simple: "Quanta agua tem na camada superficial do solo, medido por satelite.",
+        detail:
+          "O satelite SMAP usa microondas para 'enxergar' a quantidade de agua nos primeiros centimetros do solo. Ele mede em cm3 de agua por cm3 de solo — se der 0.30, significa que 30% daquele pedaco de terra e agua. Quanto mais alta a umidade, melhor para a planta nascer e crescer.",
+        example:
+          "Em Cruz Alta, a umidade do solo fica acima de 28% no inverno (solo encharcado) e cai para menos de 22% em janeiro-fevereiro (solo mais seco, justamente quando a soja mais precisa de agua).",
+        where: "Aba Satelite NASA > Umidade Solo (SMAP)",
+      },
+      {
+        term: "Anomalia de umidade do solo",
+        simple:
+          "Quanto a umidade esta acima ou abaixo do normal para aquela epoca do ano.",
+        detail:
+          "Se em janeiro o normal e 24% de umidade e estamos com 18%, a anomalia e negativa (-6 pontos). Anomalias negativas no verao sao um sinal de alerta: o solo esta mais seco do que deveria, e a soja pode sofrer. Ja anomalias positivas significam solo mais umido que o habitual.",
+        example:
+          "Na seca de 2022 (La Nina forte), a anomalia de umidade chegou a -8 pontos em janeiro — o solo estava muito mais seco que o normal, e a produtividade caiu para 22 sc/ha.",
+        where: "Aba Satelite NASA > Umidade Solo (SMAP)",
+      },
+      {
+        term: "Agua subterranea (GRACE)",
+        simple:
+          "Quanta agua esta guardada no subsolo — nos lencois freaticos e aquiferos.",
+        detail:
+          "O satelite GRACE mede a variacao de gravidade da Terra para detectar mudancas na quantidade total de agua armazenada (chuva acumulada, rios, lencois freaticos). Quando o valor sobe, a regiao esta acumulando agua. Quando cai, esta perdendo. Mede em centimetros equivalentes de agua.",
+        example:
+          "Em Cruz Alta, o GRACE mostra que entre 2002 e 2024, a regiao ganhou +3.7cm de agua subterranea — sinal positivo de que os aquiferos estao se recarregando.",
+        where: "Aba Satelite NASA > Agua Subterranea (GRACE)",
+      },
+    ],
+  },
+  {
+    title: "Vegetacao e Saude da Planta",
+    color: "#2D6A4F",
+    entries: [
+      {
+        term: "NDVI (Indice de Vegetacao)",
+        simple:
+          "Um numero que mostra se a planta esta verde e saudavel ou amarelada e sofrendo.",
+        detail:
+          "O NDVI varia de -1 a +1. Plantas verdes e saudaveis refletem muita luz infravermelha e pouca luz vermelha, o que da um NDVI alto (acima de 0.6). Solo nu, agua ou planta morta dao NDVI baixo (abaixo de 0.3). E como um 'exame de sangue' da lavoura visto do espaco — quanto mais alto, mais saudavel a planta.",
+        example:
+          "O NDVI medio de Cruz Alta na safra e de 0.56. Nos piores anos (como 2020, com 82 dias quentes), caiu para 0.51 — a planta estava sofrendo com o calor.",
+        where: "Aba NDVI",
+      },
+      {
+        term: "Estresse da vegetacao",
+        simple: "Quando a planta esta sofrendo por falta de agua, calor demais ou solo pobre.",
+        detail:
+          "A planta mostra estresse quando nao consegue fazer fotossintese normalmente. Isso aparece no NDVI mais baixo, nas folhas enrolando, e na producao caindo. Os maiores causadores em Cruz Alta sao: falta de chuva no verao, calor acima de 35C e solo compactado que nao deixa a raiz crescer.",
+        example:
+          "Quando o NDVI cai abaixo de 0.52 na safra, historicamente a produtividade da soja fica abaixo de 35 sc/ha.",
+        where: "Aba NDVI",
+      },
+    ],
+  },
+  {
+    title: "Clima e Riscos",
+    color: "#E65100",
+    entries: [
+      {
+        term: "Risco de geada",
+        simple:
+          "A chance de a temperatura cair abaixo de 2C e queimar a planta.",
+        detail:
+          "Geada acontece quando a temperatura no nivel do solo cai perto de 0C. A planta congela, as celulas estouram e ela morre ou perde folhas. Em Cruz Alta, geada e muito comum em junho, julho e agosto — por isso a soja e plantada so em outubro, quando o risco praticamente zera.",
+        example:
+          "Em Cruz Alta, julho tem geada em 76% dos anos e agosto em 80%. A partir de outubro, o risco cai para menos de 5%.",
+        where: "Aba Riscos Climaticos",
+      },
+      {
+        term: "Dias quentes (acima de 35C)",
+        simple: "Quantos dias no ano a temperatura passou de 35C.",
+        detail:
+          "A soja sofre muito quando a temperatura passa de 35C. O polen morre, a flor cai e os graos nao se formam direito. Quanto mais dias quentes, pior para a produtividade. E um dos maiores inimigos da safra em Cruz Alta, e esta piorando: eram 26 dias/ano nos anos 80 e agora sao 37.",
+        example:
+          "Nos anos com mais de 50 dias quentes, a produtividade media da soja caiu para 28 sc/ha — contra 45 sc/ha nos anos com menos de 25 dias quentes.",
+        where: "Aba Historico 44 anos e Painel de Decisao",
+      },
+      {
+        term: "El Nino e La Nina (ENSO)",
+        simple:
+          "Padroes de aquecimento e resfriamento do oceano Pacifico que mudam o clima do RS.",
+        detail:
+          "El Nino aquece o Pacifico e traz mais chuva para o sul do Brasil — geralmente bom para a soja. La Nina resfria o Pacifico e traz menos chuva — perigo de seca. Esses ciclos duram de 1 a 2 anos e sao o maior fator de previsibilidade da safra. Quando aparece La Nina no painel, e hora de redobrar a atencao.",
+        example:
+          "Em anos de La Nina, a produtividade media em Cruz Alta cai para 36 sc/ha. Em El Nino, sobe para 46 sc/ha. Uma diferenca de 10 sacas por hectare.",
+        where: "Aba Historico 44 anos e Painel de Decisao",
+      },
+    ],
+  },
+];
+
+function GlossarioTab() {
+  const [expanded, setExpanded] = useState<string | null>(null);
+
+  return (
+    <div className="space-y-8">
+      <div>
+        <p className="text-sm text-text-secondary">
+          Termos cientificos explicados de forma simples. Clique em qualquer
+          termo para ver a explicacao completa com exemplos de Cruz Alta.
+        </p>
+      </div>
+
+      {GLOSSARY_SECTIONS.map((section) => (
+        <div key={section.title}>
+          <div className="mb-3 flex items-center gap-2">
+            <div
+              className="h-3 w-3 rounded-full"
+              style={{ backgroundColor: section.color }}
+            />
+            <h3 className="text-sm font-semibold text-text-primary">
+              {section.title}
+            </h3>
+          </div>
+
+          <div className="space-y-2">
+            {section.entries.map((entry) => {
+              const isOpen = expanded === entry.term;
+              return (
+                <div
+                  key={entry.term}
+                  className="rounded-xl border border-border bg-bg-surface overflow-hidden"
+                >
+                  <button
+                    onClick={() =>
+                      setExpanded(isOpen ? null : entry.term)
+                    }
+                    className="flex w-full items-start gap-3 p-4 text-left"
+                  >
+                    <span
+                      className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+                      style={{ backgroundColor: section.color }}
+                    >
+                      {isOpen ? "-" : "+"}
+                    </span>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-text-primary">
+                        {entry.term}
+                      </p>
+                      <p className="mt-0.5 text-sm text-text-secondary">
+                        {entry.simple}
+                      </p>
+                    </div>
+                  </button>
+
+                  {isOpen && (
+                    <div className="border-t border-border bg-bg-base px-4 pb-4 pt-3 space-y-3">
+                      <div>
+                        <p className="text-xs font-medium text-text-dim uppercase tracking-wider">
+                          Como funciona
+                        </p>
+                        <p className="mt-1 text-sm text-text-secondary leading-relaxed">
+                          {entry.detail}
+                        </p>
+                      </div>
+                      <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
+                        <p className="text-xs font-medium text-primary-light uppercase tracking-wider">
+                          Exemplo em Cruz Alta
+                        </p>
+                        <p className="mt-1 text-sm text-text-primary leading-relaxed">
+                          {entry.example}
+                        </p>
+                      </div>
+                      <p className="text-[11px] text-text-dim">
+                        Veja os dados: {entry.where}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+
+      {/* ── Satelite vs Solo ── */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <div className="h-3 w-3 rounded-full bg-text-primary" />
+          <h3 className="text-sm font-semibold text-text-primary">
+            Satelite vs Medicao no Chao — qual e melhor?
+          </h3>
+        </div>
+
+        <div className="rounded-xl border border-border bg-bg-surface p-5 space-y-4">
+          <p className="text-sm text-text-secondary leading-relaxed">
+            Nenhum dos dois e perfeito sozinho. A estacao meteorologica (INMET)
+            mede com precisao, mas so enxerga o ponto onde esta instalada. O
+            satelite enxerga a regiao inteira, mas de longe — como olhar a
+            lavoura do aviao em vez de pisar no barro. Quando juntamos os dois,
+            a foto fica mais completa.
+          </p>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="py-2 px-3 text-left text-xs font-medium text-text-dim" />
+                  <th className="py-2 px-3 text-left text-xs font-medium text-text-dim">
+                    Estacao no chao
+                  </th>
+                  <th className="py-2 px-3 text-left text-xs font-medium text-text-dim">
+                    Satelite
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="text-text-secondary">
+                <tr className="border-b border-border/50">
+                  <td className="py-2 px-3 font-medium text-text-primary">
+                    Area coberta
+                  </td>
+                  <td className="py-2 px-3">
+                    Um ponto so (onde o aparelho esta)
+                  </td>
+                  <td className="py-2 px-3">
+                    Quadrados de 250m a 55km, a regiao inteira
+                  </td>
+                </tr>
+                <tr className="border-b border-border/50">
+                  <td className="py-2 px-3 font-medium text-text-primary">
+                    Precisao local
+                  </td>
+                  <td className="py-2 px-3">
+                    Alta — mede exatamente aquele ponto
+                  </td>
+                  <td className="py-2 px-3">
+                    Media — e uma media da area toda
+                  </td>
+                </tr>
+                <tr className="border-b border-border/50">
+                  <td className="py-2 px-3 font-medium text-text-primary">
+                    Historico
+                  </td>
+                  <td className="py-2 px-3">
+                    INMET Cruz Alta: desde 2007 (18 anos)
+                  </td>
+                  <td className="py-2 px-3">
+                    POWER: 45 anos / GPM: 28 anos / GRACE: 22 anos
+                  </td>
+                </tr>
+                <tr className="border-b border-border/50">
+                  <td className="py-2 px-3 font-medium text-text-primary">
+                    Falhas
+                  </td>
+                  <td className="py-2 px-3">
+                    Quebra, falta manutencao, dias sem dado
+                  </td>
+                  <td className="py-2 px-3">
+                    Nuvem atrapalha (optico), mas microondas funciona com chuva
+                  </td>
+                </tr>
+                <tr>
+                  <td className="py-2 px-3 font-medium text-text-primary">
+                    O que mede
+                  </td>
+                  <td className="py-2 px-3">
+                    Chuva, temperatura, umidade do ar
+                  </td>
+                  <td className="py-2 px-3">
+                    Tudo isso + saude da planta, agua subterranea, uso do solo
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Validacao cruzada real */}
+        <div className="rounded-xl border border-border bg-bg-surface p-5 space-y-4">
+          <p className="text-xs font-medium text-text-dim uppercase tracking-wider">
+            Como conferimos — validacao cruzada em Cruz Alta
+          </p>
+          <p className="text-sm text-text-secondary leading-relaxed">
+            Comparamos os dados do satelite com os da estacao do INMET em Cruz
+            Alta para verificar se batem. Quanto mais proximo de 1.0 a
+            correlacao, mais os dois concordam.
+          </p>
+
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="rounded-lg border border-border bg-bg-base p-3 text-center">
+              <p className="text-xs text-text-dim">
+                POWER vs INMET (chuva safra)
+              </p>
+              <p className="text-2xl font-bold text-emerald-600">0.886</p>
+              <p className="text-xs text-text-muted">
+                Correlacao alta — confiavel
+              </p>
+              <div className="mt-2 h-1.5 rounded-full bg-bg-surface-alt overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-emerald-500"
+                  style={{ width: "88.6%" }}
+                />
+              </div>
+            </div>
+            <div className="rounded-lg border border-border bg-bg-base p-3 text-center">
+              <p className="text-xs text-text-dim">
+                Vies do modelo POWER
+              </p>
+              <p className="text-2xl font-bold text-emerald-600">+1.8%</p>
+              <p className="text-xs text-text-muted">
+                Quase igual a estacao
+              </p>
+              <div className="mt-2 h-1.5 rounded-full bg-bg-surface-alt overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-emerald-500"
+                  style={{ width: "98.2%" }}
+                />
+              </div>
+            </div>
+            <div className="rounded-lg border border-border bg-bg-base p-3 text-center">
+              <p className="text-xs text-text-dim">
+                GPM vs POWER (chuva anual)
+              </p>
+              <p className="text-2xl font-bold text-amber-600">+13.6%</p>
+              <p className="text-xs text-text-muted">
+                GPM mede um pouco mais — normal
+              </p>
+              <div className="mt-2 h-1.5 rounded-full bg-bg-surface-alt overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-amber-500"
+                  style={{ width: "86.4%" }}
+                />
+              </div>
+            </div>
+          </div>
+
+          <p className="text-sm text-text-secondary leading-relaxed">
+            O modelo NASA POWER e a estacao do INMET concordam em 88.6% nas
+            chuvas da safra, com apenas 1.8% de diferenca. Ja o satelite GPM
+            registra 13.6% a mais de chuva que o POWER — isso acontece porque o
+            radar no espaco capta chuvas leves que o modelo de chao pode
+            subestimar. Nenhuma fonte mente; cada uma ve a chuva de um angulo
+            diferente.
+          </p>
+        </div>
+
+        {/* Resolucao dos satelites */}
+        <div className="rounded-xl border border-border bg-bg-surface p-5 space-y-3">
+          <p className="text-xs font-medium text-text-dim uppercase tracking-wider">
+            Resolucao — o tamanho do pixel de cada satelite
+          </p>
+          <p className="text-sm text-text-secondary leading-relaxed">
+            Cada satelite tem um &quot;tamanho de quadradinho&quot; diferente.
+            Quanto menor o quadrado, mais detalhe ele enxerga. Para comparar:
+            uma propriedade pequena em Cruz Alta tem cerca de 50 hectares (700m
+            x 700m).
+          </p>
+
+          <div className="space-y-2">
+            {[
+              {
+                name: "MODIS (NDVI)",
+                res: "250m",
+                note: "Enxerga um quadrado de 6 ha — menor que um pivô",
+                pct: 100,
+                color: "#2D6A4F",
+              },
+              {
+                name: "SMAP (umidade solo)",
+                res: "9 km",
+                note: "Quadrado de 8.100 ha — media da vizinhanca",
+                pct: 55,
+                color: "#1E88E5",
+              },
+              {
+                name: "GPM (chuva)",
+                res: "10 km",
+                note: "Quadrado de 10.000 ha — media regional",
+                pct: 50,
+                color: "#7CB342",
+              },
+              {
+                name: "POWER (clima)",
+                res: "~55 km",
+                note: "Quadrado de ~300.000 ha — media do municipio inteiro",
+                pct: 15,
+                color: "#F9A825",
+              },
+              {
+                name: "GRACE (agua subterranea)",
+                res: "~300 km",
+                note: "Quadrado enorme — tendencia regional de longo prazo",
+                pct: 5,
+                color: "#8B5E3C",
+              },
+            ].map((sat) => (
+              <div
+                key={sat.name}
+                className="flex items-center gap-3 rounded-lg border border-border/50 bg-bg-base p-2.5"
+              >
+                <div className="w-28 shrink-0">
+                  <p className="text-xs font-semibold text-text-primary">
+                    {sat.name}
+                  </p>
+                  <p className="text-[11px] font-bold" style={{ color: sat.color }}>
+                    {sat.res}
+                  </p>
+                </div>
+                <div className="flex-1">
+                  <div className="h-2 rounded-full bg-bg-surface-alt overflow-hidden">
+                    <div
+                      className="h-full rounded-full"
+                      style={{
+                        width: `${sat.pct}%`,
+                        backgroundColor: sat.color,
+                      }}
+                    />
+                  </div>
+                  <p className="mt-0.5 text-[11px] text-text-muted">
+                    {sat.note}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-[11px] text-text-dim">
+            Barra maior = mais detalhe espacial. Satelites com pixel grande
+            compensam com historico longo e cobertura continua.
+          </p>
+        </div>
+
+        {/* Por que combinar */}
+        <div className="rounded-xl border-2 border-primary bg-primary/5 p-5 space-y-3">
+          <p className="text-xs font-medium text-primary-light uppercase tracking-wider">
+            Por que o Field Shift combina os dois
+          </p>
+          <div className="space-y-2 text-sm text-text-secondary leading-relaxed">
+            <p>
+              A estacao do INMET em Cruz Alta so existe desde 2007. Para
+              entender padroes de clima que levam decadas para aparecer (como o
+              aumento de dias quentes), precisamos dos 45 anos do NASA POWER.
+            </p>
+            <p>
+              Ao mesmo tempo, o POWER nao enxerga a saude da planta, o uso real
+              do solo nem a agua subterranea. Ai entram MODIS (NDVI), MapBiomas
+              e GRACE — dados que so existem por satelite.
+            </p>
+            <p>
+              A combinacao funciona assim: usamos a estacao do INMET como
+              referencia de verdade (r=0.886 com o POWER), e a partir dessa
+              confianca, estendemos a analise com satelites que cobrem o que a
+              estacao nao alcanca — 14 fontes de dados no total, cada uma
+              complementando a outra.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-border bg-bg-surface p-4">
+        <p className="text-xs font-medium text-text-dim uppercase tracking-wider">
+          Dica
+        </p>
+        <p className="mt-1 text-sm text-text-secondary">
+          Estes termos aparecem nos graficos e tabelas das outras abas. Quando
+          tiver duvida sobre algum numero, volte aqui para relembrar o que ele
+          significa na pratica para a sua lavoura.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default function DadosPage() {
   const [activeTab, setActiveTab] = useState<TabKey>("clima");
 
@@ -1714,6 +2234,7 @@ export default function DadosPage() {
         {activeTab === "solo" && <SoloTab />}
         {activeTab === "vegetacao" && <VegetacaoTab />}
         {activeTab === "uso-do-solo" && <UsoDoSoloTab />}
+        {activeTab === "glossario" && <GlossarioTab />}
 
       </div>
     </div>

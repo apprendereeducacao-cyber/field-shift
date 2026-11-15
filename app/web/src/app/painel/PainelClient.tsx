@@ -8,6 +8,8 @@ import type {
   Strategy,
   PatternAnalysis,
 } from "@/lib/types";
+import { useLang } from "@/lib/i18n";
+import { strategyName, translatePattern } from "@/lib/i18n-terms";
 
 const ENSO_LABELS: Record<string, string> = {
   el_nino: "El Nino",
@@ -19,10 +21,26 @@ const ENSO_LABELS: Record<string, string> = {
   neutro: "Neutro",
 };
 
+const ENSO_LABELS_EN: Record<string, string> = {
+  el_nino: "El Niño",
+  el_nino_fraco: "Weak El Niño",
+  el_nino_forte: "Strong El Niño",
+  la_nina: "La Niña",
+  la_nina_fraca: "Weak La Niña",
+  la_nina_forte: "Strong La Niña",
+  neutro: "Neutral",
+};
+
 const STRATEGY_NAMES: Record<string, string> = {
   baseline: "Pousio (terra parada)",
   conservative: "Aveia + Ervilhaca",
   adaptive: "Trigo + Nabo Forrageiro",
+};
+
+const STRATEGY_NAMES_EN: Record<string, string> = {
+  baseline: "Fallow (idle land)",
+  conservative: "Black oat + vetch",
+  adaptive: "Wheat + forage radish",
 };
 
 const STRATEGY_COLORS: Record<string, string> = {
@@ -37,6 +55,14 @@ const CLASS_LABELS: Record<string, string> = {
   safra_ruim: "Ruim",
 };
 
+const CLASS_LABELS_EN: Record<string, string> = {
+  safra_boa: "Good",
+  safra_normal: "Normal",
+  safra_ruim: "Poor",
+};
+
+const CONFIDENCE_EN: Record<string, string> = { alta: "High", media: "Medium", baixa: "Low" };
+
 const CLASS_COLORS: Record<string, string> = {
   safra_boa: "text-leaf-600",
   safra_normal: "text-status-warning",
@@ -50,27 +76,29 @@ const CLASS_BG: Record<string, string> = {
 };
 
 function riskLevel(score: number) {
-  if (score >= 65) return { label: "Alto", color: "text-destructive" };
-  if (score >= 40) return { label: "Medio", color: "text-status-warning" };
-  return { label: "Baixo", color: "text-leaf-600" };
+  if (score >= 65) return { label: "Alto", en: "High", color: "text-destructive" };
+  if (score >= 40) return { label: "Medio", en: "Medium", color: "text-status-warning" };
+  return { label: "Baixo", en: "Low", color: "text-leaf-600" };
 }
 
-const CALENDAR_ACTIONS: Record<string, { month: string; action: string }[]> = {
+type CalendarAction = { month: string; monthEn: string; action: string; actionEn: string };
+
+const CALENDAR_ACTIONS: Record<string, CalendarAction[]> = {
   conservative: [
-    { month: "Abril", action: "Plantar aveia-preta + ervilhaca" },
-    { month: "Mai-Ago", action: "Cobertura crescendo. Ervilhaca fixa nitrogenio. Raiz da aveia estrutura o solo" },
-    { month: "Setembro", action: "Avaliar dessecacao. Aveia no florescimento = maxima biomassa" },
-    { month: "Outubro", action: "Dessecar e plantar soja sobre a palha" },
+    { month: "Abril", monthEn: "April", action: "Plantar aveia-preta + ervilhaca", actionEn: "Sow black oat + vetch" },
+    { month: "Mai-Ago", monthEn: "May-Aug", action: "Cobertura crescendo. Ervilhaca fixa nitrogenio. Raiz da aveia estrutura o solo", actionEn: "Cover crop growing. Vetch fixes nitrogen. Oat roots build soil structure" },
+    { month: "Setembro", monthEn: "September", action: "Avaliar dessecacao. Aveia no florescimento = maxima biomassa", actionEn: "Plan desiccation. Oat at flowering = maximum biomass" },
+    { month: "Outubro", monthEn: "October", action: "Dessecar e plantar soja sobre a palha", actionEn: "Desiccate and sow soybean no-till into the straw" },
   ],
   adaptive: [
-    { month: "Mai-Jun", action: "Plantar trigo (12-15C ideal)" },
-    { month: "Set", action: "Plantar nabo nas entrelinhas ou apos colheita do trigo" },
-    { month: "Outubro", action: "Colher trigo (renda extra). Nabo quebrando compactacao" },
-    { month: "Novembro", action: "Dessecar nabo. Plantar soja sobre palha" },
+    { month: "Mai-Jun", monthEn: "May-Jun", action: "Plantar trigo (12-15C ideal)", actionEn: "Sow wheat (12-15C ideal)" },
+    { month: "Set", monthEn: "Sep", action: "Plantar nabo nas entrelinhas ou apos colheita do trigo", actionEn: "Sow forage radish between rows or after the wheat harvest" },
+    { month: "Outubro", monthEn: "October", action: "Colher trigo (renda extra). Nabo quebrando compactacao", actionEn: "Harvest wheat (extra income). Radish breaking up compaction" },
+    { month: "Novembro", monthEn: "November", action: "Dessecar nabo. Plantar soja sobre palha", actionEn: "Desiccate the radish. Sow soybean no-till into the straw" },
   ],
   baseline: [
-    { month: "Abr-Set", action: "Solo exposto. Erosao. Umidade evaporando" },
-    { month: "Outubro", action: "Plantio da soja em solo degradado" },
+    { month: "Abr-Set", monthEn: "Apr-Sep", action: "Solo exposto. Erosao. Umidade evaporando", actionEn: "Bare soil. Erosion. Moisture evaporating" },
+    { month: "Outubro", monthEn: "October", action: "Plantio da soja em solo degradado", actionEn: "Soybean sown on degraded soil" },
   ],
 };
 
@@ -90,6 +118,7 @@ type Props = {
 export default function PainelClient({ timeline, riskEngine, rotations, keyFindings, patterns }: Props) {
   const AVAILABLE_YEARS = timeline.timeline.map((y) => y.year).sort((a, b) => b - a);
   const [selectedYear, setSelectedYear] = useState(AVAILABLE_YEARS[0]);
+  const { lang, t } = useLang();
 
   function computeRiskScore(tl: TimelineYear): number {
     const avgs = riskEngine.historical_averages;
@@ -142,15 +171,16 @@ export default function PainelClient({ timeline, riskEngine, rotations, keyFindi
       <div className="flex items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-foreground sm:text-2xl">
-            Painel de Decisao
+            {t("Decision Dashboard", "Painel de Decisão")}
           </h1>
           <p className="text-xs text-muted-foreground">
-            {keyFindings.data_years} anos de dados NASA + IBGE
+            {keyFindings.data_years} {t("years of NASA + IBGE data", "anos de dados NASA + IBGE")}
           </p>
         </div>
         <select
           value={selectedYear}
           onChange={(e) => setSelectedYear(Number(e.target.value))}
+          aria-label={t("Season", "Safra")}
           className="rounded-full border border-border bg-card px-3 py-2 text-sm font-bold text-foreground outline-none focus:border-primary"
         >
           {AVAILABLE_YEARS.map((y) => (
@@ -164,7 +194,7 @@ export default function PainelClient({ timeline, riskEngine, rotations, keyFindi
       {/* Risco + ENSO */}
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="rounded-[24px] border border-border bg-card p-5">
-          <p className="text-[11px] font-semibold tracking-[0.12em] text-stone-400 uppercase">Risco climatico</p>
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-stone-400 uppercase">{t("Climate risk", "Risco climático")}</p>
           <p className={`text-4xl font-light tabular-nums ${risk.color}`}>
             {riskScore.toFixed(0)}
             <span className="ml-1 text-sm font-normal text-muted-foreground">/100</span>
@@ -183,25 +213,25 @@ export default function PainelClient({ timeline, riskEngine, rotations, keyFindi
             />
           </div>
           <div className="mt-1 flex justify-between text-[10px] text-stone-400">
-            <span>Baixo</span><span>Medio</span><span>Alto</span>
+            <span>{t("Low", "Baixo")}</span><span>{t("Medium", "Médio")}</span><span>{t("High", "Alto")}</span>
           </div>
         </div>
 
         <div className="rounded-[24px] border border-border bg-card p-5">
           <p className="text-[11px] font-semibold tracking-[0.12em] text-stone-400 uppercase">ENSO</p>
           <p className="text-2xl font-bold text-foreground">
-            {ENSO_LABELS[tl.enso] ?? tl.enso.replace(/_/g, " ")}
+            {(lang === "pt" ? ENSO_LABELS : ENSO_LABELS_EN)[tl.enso] ?? tl.enso.replace(/_/g, " ")}
           </p>
           <p className="mt-2 text-xs text-muted-foreground">
             {tl.enso.includes("el_nino")
-              ? "El Nino traz mais chuva para o RS"
+              ? t("El Niño brings more rain to Rio Grande do Sul", "El Nino traz mais chuva para o RS")
               : tl.enso.includes("la_nina")
-                ? "La Nina traz menos chuva — mais risco de seca"
-                : "Sem padrao definido de chuva"}
+                ? t("La Niña brings less rain — higher drought risk", "La Nina traz menos chuva — mais risco de seca")
+                : t("No clear rainfall pattern", "Sem padrao definido de chuva")}
           </p>
           {tl.yield_sc_ha !== null && (
             <p className="mt-2 text-xs text-muted-foreground">
-              Produtividade: {tl.yield_sc_ha} sc/ha
+              {t("Yield", "Produtividade")}: {tl.yield_sc_ha} {t("bags/ha", "sc/ha")}
             </p>
           )}
         </div>
@@ -210,35 +240,35 @@ export default function PainelClient({ timeline, riskEngine, rotations, keyFindi
       {/* Indicadores */}
       <div className="grid grid-cols-3 gap-3">
         <div className="rounded-[16px] border border-border bg-card p-3 text-center">
-          <p className="text-[11px] font-semibold tracking-[0.12em] text-stone-400 uppercase">Chuva safra</p>
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-stone-400 uppercase">{t("Season rain", "Chuva safra")}</p>
           <p className="text-lg font-light tabular-nums text-primary">{tl.season_rain_mm ?? "—"} mm</p>
           <p className={`text-[10px] ${rainDiff < 0 ? "text-destructive" : "text-leaf-600"}`}>
-            {rainDiff > 0 ? "+" : ""}{Math.round(rainDiff)} vs media ({avgs.season_rain_mm} mm)
+            {rainDiff > 0 ? "+" : ""}{Math.round(rainDiff)} {t("vs average", "vs media")} ({avgs.season_rain_mm} mm)
           </p>
         </div>
         <div className="rounded-[16px] border border-border bg-card p-3 text-center">
-          <p className="text-[11px] font-semibold tracking-[0.12em] text-stone-400 uppercase">Dias quentes</p>
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-stone-400 uppercase">{t("Hot days", "Dias quentes")}</p>
           <p className="text-lg font-light tabular-nums text-primary">{tl.hot_days}</p>
           <p className={`text-[10px] ${hotDiff > 0 ? "text-destructive" : "text-leaf-600"}`}>
-            {hotDiff > 0 ? "+" : ""}{Math.round(hotDiff)} vs media ({avgs.hot_days.toFixed(0)})
+            {hotDiff > 0 ? "+" : ""}{Math.round(hotDiff)} {t("vs average", "vs media")} ({avgs.hot_days.toFixed(0)})
           </p>
         </div>
         <div className="rounded-[16px] border border-border bg-card p-3 text-center">
-          <p className="text-[11px] font-semibold tracking-[0.12em] text-stone-400 uppercase">Umidade solo</p>
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-stone-400 uppercase">{t("Soil moisture", "Umidade solo")}</p>
           <p className="text-lg font-light tabular-nums text-primary">{moistPct}%</p>
-          <p className="text-[10px] text-muted-foreground">Media: {avgMoistPct}%</p>
+          <p className="text-[10px] text-muted-foreground">{t("Average", "Media")}: {avgMoistPct}%</p>
         </div>
       </div>
 
       {/* Recomendacao */}
       <div className="rounded-[24px] border-2 border-primary bg-forest-50 p-5">
         <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">
-          Acao recomendada para {selectedYear}
+          {t("Recommended action for", "Acao recomendada para")} {selectedYear}
         </p>
         <h2 className="mt-1 text-lg font-bold text-foreground">
-          {best.strategy.name}
+          {strategyName(best.strategy.id, best.strategy.name, lang)}
           <span className="ml-2 text-sm font-normal" style={{ color: STRATEGY_COLORS[best.strategy.id] }}>
-            {best.finalScore} pts
+            {best.finalScore} {t("pts", "pts")}
           </span>
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">{best.reasoning}</p>
@@ -247,8 +277,8 @@ export default function PainelClient({ timeline, riskEngine, rotations, keyFindi
         <div className="mt-4 space-y-1.5">
           {calendarActions.map((item, i) => (
             <div key={i} className="flex gap-2 text-sm">
-              <span className="w-16 shrink-0 font-semibold text-foreground">{item.month}</span>
-              <span className="text-muted-foreground">{item.action}</span>
+              <span className="w-16 shrink-0 font-semibold text-foreground">{t(item.monthEn, item.month)}</span>
+              <span className="text-muted-foreground">{t(item.actionEn, item.action)}</span>
             </div>
           ))}
         </div>
@@ -256,12 +286,12 @@ export default function PainelClient({ timeline, riskEngine, rotations, keyFindi
 
       {/* Ranking das 3 estrategias */}
       <div>
-        <h3 className="mb-2 text-sm font-semibold text-foreground">3 opcoes comparadas</h3>
+        <h3 className="mb-2 text-sm font-semibold text-foreground">{t("3 options compared", "3 opcoes comparadas")}</h3>
         <div className="space-y-2">
           {ranked.map((s, i) => {
             const isBest = i === 0;
             const color = STRATEGY_COLORS[s.strategy.id] ?? "#6B7280";
-            const name = STRATEGY_NAMES[s.strategy.id] ?? s.strategy.name;
+            const name = (lang === "pt" ? STRATEGY_NAMES : STRATEGY_NAMES_EN)[s.strategy.id] ?? s.strategy.name;
             const pct = (s.finalScore / ranked[0].finalScore) * 100;
 
             return (
@@ -274,7 +304,7 @@ export default function PainelClient({ timeline, riskEngine, rotations, keyFindi
                     <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color }} />
                     <span className="text-sm font-medium text-foreground">{name}</span>
                     {isBest && (
-                      <span className="rounded-full bg-forest-100 px-1.5 py-0.5 text-[10px] text-primary">Recomendado</span>
+                      <span className="rounded-full bg-forest-100 px-1.5 py-0.5 text-[10px] text-primary">{t("Recommended", "Recomendado")}</span>
                     )}
                   </div>
                   <div className="text-right">
@@ -295,16 +325,16 @@ export default function PainelClient({ timeline, riskEngine, rotations, keyFindi
       {similarYears.length > 0 && (
         <div>
           <h3 className="mb-2 text-sm font-semibold text-foreground">
-            Safras com cenario parecido
+            {t("Seasons with a similar scenario", "Safras com cenario parecido")}
           </h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-[11px] font-semibold tracking-[0.12em] text-stone-400 uppercase">
-                  <th className="text-left py-1.5 px-2">Ano</th>
-                  <th className="text-center py-1.5 px-2">Risco</th>
-                  <th className="text-center py-1.5 px-2">Produtividade</th>
-                  <th className="text-center py-1.5 px-2">Resultado</th>
+                  <th className="text-left py-1.5 px-2">{t("Year", "Ano")}</th>
+                  <th className="text-center py-1.5 px-2">{t("Risk", "Risco")}</th>
+                  <th className="text-center py-1.5 px-2">{t("Yield", "Produtividade")}</th>
+                  <th className="text-center py-1.5 px-2">{t("Outcome", "Resultado")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -316,10 +346,10 @@ export default function PainelClient({ timeline, riskEngine, rotations, keyFindi
                   >
                     <td className="py-1.5 px-2 font-medium text-primary">{y.year}</td>
                     <td className="py-1.5 px-2 text-center">{y.risk_score.toFixed(0)}</td>
-                    <td className="py-1.5 px-2 text-center text-muted-foreground">{y.yield_sc_ha} sc/ha</td>
+                    <td className="py-1.5 px-2 text-center text-muted-foreground">{y.yield_sc_ha} {t("bags/ha", "sc/ha")}</td>
                     <td className="py-1.5 px-2 text-center">
                       <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-medium border ${CLASS_BG[y.class]} ${CLASS_COLORS[y.class]}`}>
-                        {CLASS_LABELS[y.class] ?? y.class}
+                        {(lang === "pt" ? CLASS_LABELS : CLASS_LABELS_EN)[y.class] ?? y.class}
                       </span>
                     </td>
                   </tr>
@@ -327,7 +357,7 @@ export default function PainelClient({ timeline, riskEngine, rotations, keyFindi
               </tbody>
             </table>
           </div>
-          <p className="mt-1 text-[10px] text-stone-400">Clique em um ano para ver os detalhes</p>
+          <p className="mt-1 text-[10px] text-stone-400">{t("Click a year to see the details", "Clique em um ano para ver os detalhes")}</p>
         </div>
       )}
 
@@ -335,38 +365,40 @@ export default function PainelClient({ timeline, riskEngine, rotations, keyFindi
       {patterns && (
         <div className="rounded-[24px] border border-border bg-card p-5">
           <h2 className="text-lg font-semibold tracking-tight text-foreground mb-3">
-            Padroes Climaticos — {patterns.target_year}
+            {t("Climate Patterns", "Padroes Climaticos")} — {patterns.target_year}
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
             <div className="bg-muted rounded-[16px] p-3 text-center">
-              <p className="text-[11px] font-semibold tracking-[0.12em] text-stone-400 uppercase">Projecao</p>
+              <p className="text-[11px] font-semibold tracking-[0.12em] text-stone-400 uppercase">{t("Projection", "Projecao")}</p>
               <p className="text-2xl font-light tabular-nums text-primary mt-1">
                 {patterns.projection.expected_yield_range[0]}-{patterns.projection.expected_yield_range[1]}
               </p>
-              <p className="text-xs text-muted-foreground">sc/ha</p>
+              <p className="text-xs text-muted-foreground">{t("bags/ha", "sc/ha")}</p>
             </div>
             <div className="bg-muted rounded-[16px] p-3 text-center">
-              <p className="text-[11px] font-semibold tracking-[0.12em] text-stone-400 uppercase">Confianca</p>
+              <p className="text-[11px] font-semibold tracking-[0.12em] text-stone-400 uppercase">{t("Confidence", "Confianca")}</p>
               <p className={`text-2xl font-light mt-1 ${
                 patterns.projection.confidence === "alta" ? "text-leaf-600"
                 : patterns.projection.confidence === "media" ? "text-status-warning"
                 : "text-destructive"
               }`}>
-                {patterns.projection.confidence.charAt(0).toUpperCase() + patterns.projection.confidence.slice(1)}
+                {lang === "pt"
+                  ? patterns.projection.confidence.charAt(0).toUpperCase() + patterns.projection.confidence.slice(1)
+                  : CONFIDENCE_EN[patterns.projection.confidence] ?? patterns.projection.confidence}
               </p>
             </div>
             <div className="bg-muted rounded-[16px] p-3 text-center">
-              <p className="text-[11px] font-semibold tracking-[0.12em] text-stone-400 uppercase">Anos analisados</p>
+              <p className="text-[11px] font-semibold tracking-[0.12em] text-stone-400 uppercase">{t("Years analyzed", "Anos analisados")}</p>
               <p className="text-2xl font-light tabular-nums text-primary mt-1">
                 {patterns.stats.total_years_analyzed}
               </p>
-              <p className="text-xs text-muted-foreground">{patterns.stats.vector_dimensions} dimensoes</p>
+              <p className="text-xs text-muted-foreground">{patterns.stats.vector_dimensions} {t("dimensions", "dimensoes")}</p>
             </div>
           </div>
 
           <h3 className="text-sm font-semibold text-foreground mb-2">
-            Anos mais parecidos com {patterns.target_year}
+            {t("Years most similar to", "Anos mais parecidos com")} {patterns.target_year}
           </h3>
           <div className="space-y-2 mb-4">
             {patterns.analog_years.map((a) => (
@@ -388,10 +420,10 @@ export default function PainelClient({ timeline, riskEngine, rotations, keyFindi
                     </span>
                   </div>
                   <p className="text-[11px] text-stone-400 mt-0.5">
-                    {a.matching_dimensions.slice(0, 3).join(", ")}
+                    {translatePattern(a.matching_dimensions.slice(0, 3).join(", "), lang)}
                     {a.diverging_dimensions.length > 0 && (
                       <span className="text-destructive ml-1">
-                        (diverge: {a.diverging_dimensions.slice(0, 2).join(", ")})
+                        ({t("differs", "diverge")}: {translatePattern(a.diverging_dimensions.slice(0, 2).join(", "), lang)})
                       </span>
                     )}
                   </p>
@@ -402,9 +434,9 @@ export default function PainelClient({ timeline, riskEngine, rotations, keyFindi
                     : a.outcome.class === "safra_ruim" ? "text-destructive"
                     : "text-status-warning"
                   }`}>
-                    {a.outcome.yield_sc_ha ?? "?"} sc/ha
+                    {a.outcome.yield_sc_ha ?? "?"} {t("bags/ha", "sc/ha")}
                   </span>
-                  <p className="text-[10px] text-stone-400">{a.outcome.enso}</p>
+                  <p className="text-[10px] text-stone-400">{translatePattern(a.outcome.enso, lang)}</p>
                 </div>
               </div>
             ))}
@@ -413,13 +445,13 @@ export default function PainelClient({ timeline, riskEngine, rotations, keyFindi
           {patterns.projection.recommendation && (
             <div className="bg-background rounded-[16px] p-3 border border-border">
               <p className="text-xs text-muted-foreground">
-                {patterns.projection.recommendation}
+                {translatePattern(patterns.projection.recommendation, lang)}
               </p>
               {patterns.projection.risk_factors.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-1">
                   {patterns.projection.risk_factors.map((r, i) => (
                     <span key={i} className="text-[10px] bg-status-critical-bg text-destructive rounded-full px-1.5 py-0.5">
-                      {r}
+                      {translatePattern(r, lang)}
                     </span>
                   ))}
                 </div>
@@ -428,7 +460,7 @@ export default function PainelClient({ timeline, riskEngine, rotations, keyFindi
                 <div className="mt-2 flex flex-wrap gap-1">
                   {patterns.projection.positive_factors.map((f, i) => (
                     <span key={i} className="text-[10px] bg-status-success-bg text-leaf-600 rounded-full px-1.5 py-0.5">
-                      {f}
+                      {translatePattern(f, lang)}
                     </span>
                   ))}
                 </div>
@@ -436,13 +468,13 @@ export default function PainelClient({ timeline, riskEngine, rotations, keyFindi
             </div>
           )}
           <p className="mt-2 text-[10px] text-stone-400">
-            Year Analog Scoring (YAS) — distancia euclidiana ponderada sobre 8 dimensoes climaticas normalizadas
+            {t("Year Analog Scoring (YAS) — weighted Euclidean distance over 8 normalized climate dimensions", "Year Analog Scoring (YAS) — distancia euclidiana ponderada sobre 8 dimensoes climaticas normalizadas")}
           </p>
         </div>
       )}
 
       <p className="text-[10px] text-stone-400 border-t border-border pt-3">
-        Risco = 36% falta de chuva + 37% calor extremo + 27% solo seco | Dados: NASA POWER + IBGE SIDRA | {keyFindings.data_start}-{keyFindings.data_end}
+        {t("Risk = 36% rain shortfall + 37% extreme heat + 27% dry soil | Data: NASA POWER + IBGE SIDRA", "Risco = 36% falta de chuva + 37% calor extremo + 27% solo seco | Dados: NASA POWER + IBGE SIDRA")} | {keyFindings.data_start}-{keyFindings.data_end}
       </p>
     </div>
   );

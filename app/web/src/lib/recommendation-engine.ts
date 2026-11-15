@@ -1,11 +1,10 @@
-import {
-  coverCrops,
-  timeline,
-  riskEngine,
-  rotations,
-  type CoverCrop,
-  type TimelineYear,
-} from "./data";
+import type {
+  CoverCrop,
+  CoverCropsData,
+  TimelineYear,
+  TimelineData,
+  RiskEngineData,
+} from "./types";
 
 // --- Types ---
 
@@ -13,9 +12,9 @@ export type ProducerProfile = {
   has_cattle: boolean;
   soil_compacted: boolean;
   used_green_manure: boolean;
-  main_problems: string[]; // "seca", "chuva_demais", "praga_doenca", "solo_compactado", "geada", "nenhum"
-  recent_yield: string; // "boa", "normal", "ruim", "perda_total"
-  winter_crop_used: string; // "pousio", "aveia_preta", "ervilhaca", etc.
+  main_problems: string[];
+  recent_yield: string;
+  winter_crop_used: string;
 };
 
 export type ScoredCrop = {
@@ -44,18 +43,16 @@ export type Recommendation = {
 
 // --- Helpers ---
 
-const CROP_MAP = new Map(coverCrops.crops.map((c) => [c.id, c]));
-
-function getRiskScore(year: number): number {
-  const yr = riskEngine.year_risks.find((y) => y.year === year);
+function getRiskScore(year: number, riskEngineData: RiskEngineData, timelineData: TimelineData): number {
+  const yr = riskEngineData.year_risks.find((y) => y.year === year);
   if (yr) return yr.risk_score;
-  const tl = timeline.timeline.find((y) => y.year === year);
+  const tl = timelineData.timeline.find((y) => y.year === year);
   if (!tl) return 50;
-  return computeRiskFromTimeline(tl);
+  return computeRiskFromTimeline(tl, riskEngineData);
 }
 
-function computeRiskFromTimeline(tl: TimelineYear): number {
-  const avgs = riskEngine.historical_averages;
+function computeRiskFromTimeline(tl: TimelineYear, riskEngineData: RiskEngineData): number {
+  const avgs = riskEngineData.historical_averages;
   const rainDef = Math.max(0, (avgs.season_rain_mm - (tl.season_rain_mm ?? avgs.season_rain_mm)) / avgs.season_rain_mm) * 100;
   const heatExcess = Math.max(0, (tl.hot_days - avgs.hot_days) / avgs.hot_days) * 100;
   const moistDef = Math.max(0, (avgs.avg_soil_moisture - (tl.avg_soil_moisture ?? avgs.avg_soil_moisture)) / avgs.avg_soil_moisture) * 100;
@@ -73,14 +70,13 @@ function riskLabel(score: number): string {
 function detectPrimaryNeed(
   riskScore: number,
   tl: TimelineYear,
-  profile: ProducerProfile | null
+  profile: ProducerProfile | null,
+  riskEngineData: RiskEngineData
 ): string {
-  const avgs = riskEngine.historical_averages;
+  const avgs = riskEngineData.historical_averages;
   const problems = profile?.main_problems ?? [];
 
-  if (profile?.soil_compacted || problems.includes("solo_compactado")) {
-    return "descompactacao";
-  }
+  if (profile?.soil_compacted || problems.includes("solo_compactado")) return "descompactacao";
 
   const rainDef = (tl.season_rain_mm ?? avgs.season_rain_mm) < avgs.season_rain_mm * 0.85;
   const soilDry = (tl.avg_soil_moisture ?? avgs.avg_soil_moisture) < avgs.avg_soil_moisture * 0.9;
@@ -370,22 +366,29 @@ const NEED_LABELS: Record<string, string> = {
 
 // --- Main API ---
 
+export type RecommendationInput = {
+  coverCropsData: CoverCropsData;
+  timelineData: TimelineData;
+  riskEngineData: RiskEngineData;
+};
+
 export function getSmartRecommendation(
   year: number,
+  input: RecommendationInput,
   profile: ProducerProfile | null = null
 ): Recommendation {
-  const tl = timeline.timeline.find((y) => y.year === year);
+  const { coverCropsData, timelineData, riskEngineData } = input;
+  const tl = timelineData.timeline.find((y) => y.year === year);
   if (!tl) {
     throw new Error(`Ano ${year} nao encontrado na timeline`);
   }
 
-  const riskScore = getRiskScore(year);
+  const riskScore = getRiskScore(year, riskEngineData, timelineData);
   const rLabel = riskLabel(riskScore);
-  const need = detectPrimaryNeed(riskScore, tl, profile);
-  const avgs = riskEngine.historical_averages;
+  const need = detectPrimaryNeed(riskScore, tl, profile, riskEngineData);
+  const avgs = riskEngineData.historical_averages;
 
-  // Score all crops
-  const scored = coverCrops.crops
+  const scored = coverCropsData.crops
     .map((crop) => scoreCrop(crop, need, riskScore, tl, profile))
     .sort((a, b) => b.score - a.score);
 

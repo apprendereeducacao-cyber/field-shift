@@ -1101,21 +1101,6 @@ export default function DadosPage() {
         {activeTab === "vegetacao" && <VegetacaoTab />}
         {activeTab === "uso-do-solo" && <UsoDoSoloTab />}
 
-        <div className="mt-12 rounded-xl border border-accent/20 bg-accent/5 p-5">
-          <h3 className="text-sm font-semibold text-accent-light">
-            Fontes de dados
-          </h3>
-          <div className="mt-2 grid gap-2 text-xs text-text-muted sm:grid-cols-2">
-            <p>Clima: NASA POWER v2.0 (1981-2025)</p>
-            <p>Umidade: NASA POWER GWETROOT (1981-2025)</p>
-            <p>Produtividade: IBGE SIDRA tabela 1612</p>
-            <p>El Niño/La Niña: NOAA ONI</p>
-            <p>Solo: SoilGrids v2.0 ISRIC (250m)</p>
-            <p>Topografia: SRTM/Copernicus DEM (30m)</p>
-            <p>NDVI: MODIS MOD13Q1 via Earth Engine</p>
-            <p>Uso do solo: MapBiomas Collection 9</p>
-          </div>
-        </div>
       </div>
     </div>
   );

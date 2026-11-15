@@ -318,17 +318,6 @@ export default function ProdutorPage() {
           </div>
         </div>
 
-        <div className="mt-12 rounded-xl border border-accent/20 bg-accent/5 p-5">
-          <h3 className="text-sm font-semibold text-accent-light">
-            Por que essas perguntas?
-          </h3>
-          <p className="mt-2 text-sm text-text-muted">
-            Saber o que você plantou, o que deu certo e o que deu errado nos
-            ajuda a cruzar com os dados do satélite da NASA (44 anos de clima),
-            as condições do solo e o histórico de El Niño/La Niña. Assim a
-            recomendação e feita pra sua realidade, não uma sugestao generica.
-          </p>
-        </div>
       </div>
     </div>
   );

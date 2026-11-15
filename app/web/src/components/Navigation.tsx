@@ -10,7 +10,6 @@ const NAV_ITEMS = [
   { href: "/produtor", label: "Sua Lavoura" },
   { href: "/dados", label: "Dados" },
   { href: "/mapa", label: "Mapa" },
-  { href: "/sobre", label: "Sobre" },
 ];
 
 export default function Navigation() {
@@ -29,9 +28,6 @@ export default function Navigation() {
               Shift
             </span>
           </Link>
-          <span className="hidden rounded border border-accent/30 bg-accent/10 px-2 py-0.5 text-[10px] font-medium tracking-wider text-accent-light uppercase sm:inline-block">
-            NASA Space Apps 2026
-          </span>
         </div>
 
         <div className="hidden items-center gap-1 md:flex">
@@ -111,9 +107,6 @@ export default function Navigation() {
               </Link>
             );
           })}
-          <span className="mt-3 inline-block rounded border border-accent/30 bg-accent/10 px-2 py-0.5 text-[10px] font-medium tracking-wider text-accent-light uppercase">
-            NASA Space Apps 2026
-          </span>
         </div>
       )}
     </nav>

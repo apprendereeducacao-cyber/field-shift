@@ -34,12 +34,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <div className="mx-auto max-w-7xl">{children}</div>
         </main>
         <footer className="border-t border-border bg-bg-surface px-4 py-6 text-center text-xs text-text-dim">
-          <p>
-            Field Shift — NASA Space Apps Challenge 2026 — Cruz Alta-RS, Brasil
-          </p>
-          <p className="mt-1">
-            Dados: NASA POWER, IBGE SIDRA, SoilGrids (ISRIC), INMET, MODIS/GEE, MapBiomas, Embrapa
-          </p>
+          <p>Field Shift — Cruz Alta-RS, Brasil</p>
         </footer>
       </body>
     </html>

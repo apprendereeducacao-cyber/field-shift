@@ -203,7 +203,7 @@ export default function MapaClient({ ndviTiles, topography, site, mapbiomas }: P
         p.latitude, p.longitude, (p.elevation_m - min) / range,
       ]);
       relevoLayerRef.current = L.heatLayer(heatData, {
-        radius: 10, blur: 8, maxZoom: 14, max: 1.0,
+        radius: 18, blur: 15, maxZoom: 16, max: 1.0,
         gradient: { 0.0: "#1B5E20", 0.25: "#388E3C", 0.5: "#66BB6A", 0.75: "#FDD835", 1.0: "#E65100" },
         pane: "relevo",
       }).addTo(map);
@@ -221,7 +221,7 @@ export default function MapaClient({ ndviTiles, topography, site, mapbiomas }: P
         p.latitude, p.longitude, (temps[i] - minT) / rangeT,
       ]);
       tempLayerRef.current = L.heatLayer(heatData, {
-        radius: 10, blur: 8, maxZoom: 14, max: 1.0,
+        radius: 18, blur: 15, maxZoom: 16, max: 1.0,
         gradient: { 0.0: "#1E88E5", 0.3: "#42A5F5", 0.5: "#FDD835", 0.7: "#FF9800", 1.0: "#E65100" },
         pane: "temperatura",
       }).addTo(map);

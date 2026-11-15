@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Sphere, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
+import { getAnonymousId } from "@/lib/anon-id";
 
 const DATA_PARTNERS = [
   "NASA POWER",
@@ -291,7 +292,7 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          anonymous_id: "home-report",
+          anonymous_id: getAnonymousId(),
           message: `Contexto: ${report.municipality}, ${report.uf}, safra ${report.selectedYear}. ${aiQuestion}`,
         }),
       });

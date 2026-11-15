@@ -5,10 +5,20 @@ import {
   SYSTEM_PROMPT,
 } from "@/lib/chat-context";
 import { getDefaultSiteId } from "@/lib/supabase-data";
+import { clientIp, rateLimit } from "@/lib/rate-limit";
 
 const anthropic = new Anthropic();
 
 export async function POST(request: Request) {
+  // Public endpoint that calls a paid API: limit each client before doing any work.
+  const retryAfter = rateLimit(clientIp(request));
+  if (retryAfter > 0) {
+    return Response.json(
+      { error: "Too many messages. Please wait a few minutes." },
+      { status: 429, headers: { "Retry-After": String(retryAfter) } }
+    );
+  }
+
   const body = await request.json();
   const {
     session_id,
@@ -131,7 +141,7 @@ export async function POST(request: Request) {
 
         const messageStream = anthropic.messages.stream({
           model: process.env.CHAT_MODEL ?? "claude-haiku-5-5",
-          max_tokens: 4096,
+          max_tokens: 800,
           system: systemPrompt,
           messages: conversationMessages,
         });

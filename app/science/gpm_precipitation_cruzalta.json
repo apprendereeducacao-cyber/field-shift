@@ -1,0 +1,2557 @@
+{
+  "source": "GPM IMERG via Earth Engine (NASA/GPM_L3/IMERG_MONTHLY_V07)",
+  "description": "Precipitacao por satelite GPM IMERG - resolucao 10km",
+  "unit_monthly": "mm/mes",
+  "unit_rate": "mm/hr",
+  "period": "1998-01 a 2025-09",
+  "location": "Cruz Alta-RS (buffer 10km)",
+  "monthly_climatology": [
+    {
+      "month": 1,
+      "name": "Jan",
+      "avg_precip_mm": 171.6,
+      "n_years": 28
+    },
+    {
+      "month": 2,
+      "name": "Fev",
+      "avg_precip_mm": 131.8,
+      "n_years": 28
+    },
+    {
+      "month": 3,
+      "name": "Mar",
+      "avg_precip_mm": 151.4,
+      "n_years": 28
+    },
+    {
+      "month": 4,
+      "name": "Abr",
+      "avg_precip_mm": 165.9,
+      "n_years": 28
+    },
+    {
+      "month": 5,
+      "name": "Mai",
+      "avg_precip_mm": 188.4,
+      "n_years": 28
+    },
+    {
+      "month": 6,
+      "name": "Jun",
+      "avg_precip_mm": 179.3,
+      "n_years": 28
+    },
+    {
+      "month": 7,
+      "name": "Jul",
+      "avg_precip_mm": 153.0,
+      "n_years": 28
+    },
+    {
+      "month": 8,
+      "name": "Ago",
+      "avg_precip_mm": 132.1,
+      "n_years": 28
+    },
+    {
+      "month": 9,
+      "name": "Set",
+      "avg_precip_mm": 189.6,
+      "n_years": 28
+    },
+    {
+      "month": 10,
+      "name": "Out",
+      "avg_precip_mm": 259.8,
+      "n_years": 27
+    },
+    {
+      "month": 11,
+      "name": "Nov",
+      "avg_precip_mm": 173.7,
+      "n_years": 27
+    },
+    {
+      "month": 12,
+      "name": "Dez",
+      "avg_precip_mm": 169.7,
+      "n_years": 27
+    }
+  ],
+  "annual_totals": [
+    {
+      "year": 1998,
+      "total_mm": 2312.8,
+      "months_counted": 12
+    },
+    {
+      "year": 1999,
+      "total_mm": 1702.3,
+      "months_counted": 12
+    },
+    {
+      "year": 2000,
+      "total_mm": 1934.8,
+      "months_counted": 12
+    },
+    {
+      "year": 2001,
+      "total_mm": 1930.6,
+      "months_counted": 12
+    },
+    {
+      "year": 2002,
+      "total_mm": 2849.8,
+      "months_counted": 12
+    },
+    {
+      "year": 2003,
+      "total_mm": 2095.0,
+      "months_counted": 12
+    },
+    {
+      "year": 2004,
+      "total_mm": 1348.5,
+      "months_counted": 12
+    },
+    {
+      "year": 2005,
+      "total_mm": 2170.6,
+      "months_counted": 12
+    },
+    {
+      "year": 2006,
+      "total_mm": 1595.5,
+      "months_counted": 12
+    },
+    {
+      "year": 2007,
+      "total_mm": 1911.8,
+      "months_counted": 12
+    },
+    {
+      "year": 2008,
+      "total_mm": 1729.3,
+      "months_counted": 12
+    },
+    {
+      "year": 2009,
+      "total_mm": 2164.9,
+      "months_counted": 12
+    },
+    {
+      "year": 2010,
+      "total_mm": 2042.1,
+      "months_counted": 12
+    },
+    {
+      "year": 2011,
+      "total_mm": 2173.7,
+      "months_counted": 12
+    },
+    {
+      "year": 2012,
+      "total_mm": 1889.6,
+      "months_counted": 12
+    },
+    {
+      "year": 2013,
+      "total_mm": 1910.1,
+      "months_counted": 12
+    },
+    {
+      "year": 2014,
+      "total_mm": 2497.9,
+      "months_counted": 12
+    },
+    {
+      "year": 2015,
+      "total_mm": 2769.3,
+      "months_counted": 12
+    },
+    {
+      "year": 2016,
+      "total_mm": 1868.5,
+      "months_counted": 12
+    },
+    {
+      "year": 2017,
+      "total_mm": 2537.6,
+      "months_counted": 12
+    },
+    {
+      "year": 2018,
+      "total_mm": 2136.1,
+      "months_counted": 12
+    },
+    {
+      "year": 2019,
+      "total_mm": 2218.8,
+      "months_counted": 12
+    },
+    {
+      "year": 2020,
+      "total_mm": 1657.6,
+      "months_counted": 12
+    },
+    {
+      "year": 2021,
+      "total_mm": 1544.7,
+      "months_counted": 12
+    },
+    {
+      "year": 2022,
+      "total_mm": 1702.6,
+      "months_counted": 12
+    },
+    {
+      "year": 2023,
+      "total_mm": 2628.9,
+      "months_counted": 12
+    },
+    {
+      "year": 2024,
+      "total_mm": 2392.6,
+      "months_counted": 12
+    }
+  ],
+  "trend": {
+    "first_half_avg_mm": 1983.7,
+    "second_half_avg_mm": 2137.7,
+    "change_pct": 7.8
+  },
+  "timeseries": [
+    {
+      "year": 1998,
+      "month": 1,
+      "date": "1998-01",
+      "precip_mm_hr": 0.2877,
+      "precip_mm_month": 214.0
+    },
+    {
+      "year": 1998,
+      "month": 2,
+      "date": "1998-02",
+      "precip_mm_hr": 0.551,
+      "precip_mm_month": 373.6
+    },
+    {
+      "year": 1998,
+      "month": 3,
+      "date": "1998-03",
+      "precip_mm_hr": 0.2157,
+      "precip_mm_month": 160.5
+    },
+    {
+      "year": 1998,
+      "month": 4,
+      "date": "1998-04",
+      "precip_mm_hr": 0.4158,
+      "precip_mm_month": 299.4
+    },
+    {
+      "year": 1998,
+      "month": 5,
+      "date": "1998-05",
+      "precip_mm_hr": 0.2072,
+      "precip_mm_month": 154.1
+    },
+    {
+      "year": 1998,
+      "month": 6,
+      "date": "1998-06",
+      "precip_mm_hr": 0.1668,
+      "precip_mm_month": 120.1
+    },
+    {
+      "year": 1998,
+      "month": 7,
+      "date": "1998-07",
+      "precip_mm_hr": 0.2275,
+      "precip_mm_month": 169.3
+    },
+    {
+      "year": 1998,
+      "month": 8,
+      "date": "1998-08",
+      "precip_mm_hr": 0.3057,
+      "precip_mm_month": 227.4
+    },
+    {
+      "year": 1998,
+      "month": 9,
+      "date": "1998-09",
+      "precip_mm_hr": 0.2851,
+      "precip_mm_month": 205.3
+    },
+    {
+      "year": 1998,
+      "month": 10,
+      "date": "1998-10",
+      "precip_mm_hr": 0.2716,
+      "precip_mm_month": 202.1
+    },
+    {
+      "year": 1998,
+      "month": 11,
+      "date": "1998-11",
+      "precip_mm_hr": 0.0623,
+      "precip_mm_month": 44.9
+    },
+    {
+      "year": 1998,
+      "month": 12,
+      "date": "1998-12",
+      "precip_mm_hr": 0.191,
+      "precip_mm_month": 142.1
+    },
+    {
+      "year": 1999,
+      "month": 1,
+      "date": "1999-01",
+      "precip_mm_hr": 0.1431,
+      "precip_mm_month": 106.4
+    },
+    {
+      "year": 1999,
+      "month": 2,
+      "date": "1999-02",
+      "precip_mm_hr": 0.1819,
+      "precip_mm_month": 123.3
+    },
+    {
+      "year": 1999,
+      "month": 3,
+      "date": "1999-03",
+      "precip_mm_hr": 0.1438,
+      "precip_mm_month": 107.0
+    },
+    {
+      "year": 1999,
+      "month": 4,
+      "date": "1999-04",
+      "precip_mm_hr": 0.283,
+      "precip_mm_month": 203.8
+    },
+    {
+      "year": 1999,
+      "month": 5,
+      "date": "1999-05",
+      "precip_mm_hr": 0.2366,
+      "precip_mm_month": 176.0
+    },
+    {
+      "year": 1999,
+      "month": 6,
+      "date": "1999-06",
+      "precip_mm_hr": 0.1673,
+      "precip_mm_month": 120.5
+    },
+    {
+      "year": 1999,
+      "month": 7,
+      "date": "1999-07",
+      "precip_mm_hr": 0.2804,
+      "precip_mm_month": 208.6
+    },
+    {
+      "year": 1999,
+      "month": 8,
+      "date": "1999-08",
+      "precip_mm_hr": 0.0456,
+      "precip_mm_month": 33.9
+    },
+    {
+      "year": 1999,
+      "month": 9,
+      "date": "1999-09",
+      "precip_mm_hr": 0.3163,
+      "precip_mm_month": 227.7
+    },
+    {
+      "year": 1999,
+      "month": 10,
+      "date": "1999-10",
+      "precip_mm_hr": 0.2863,
+      "precip_mm_month": 213.0
+    },
+    {
+      "year": 1999,
+      "month": 11,
+      "date": "1999-11",
+      "precip_mm_hr": 0.1156,
+      "precip_mm_month": 83.2
+    },
+    {
+      "year": 1999,
+      "month": 12,
+      "date": "1999-12",
+      "precip_mm_hr": 0.133,
+      "precip_mm_month": 98.9
+    },
+    {
+      "year": 2000,
+      "month": 1,
+      "date": "2000-01",
+      "precip_mm_hr": 0.2,
+      "precip_mm_month": 148.8
+    },
+    {
+      "year": 2000,
+      "month": 2,
+      "date": "2000-02",
+      "precip_mm_hr": 0.1135,
+      "precip_mm_month": 76.9
+    },
+    {
+      "year": 2000,
+      "month": 3,
+      "date": "2000-03",
+      "precip_mm_hr": 0.3274,
+      "precip_mm_month": 243.6
+    },
+    {
+      "year": 2000,
+      "month": 4,
+      "date": "2000-04",
+      "precip_mm_hr": 0.1365,
+      "precip_mm_month": 98.3
+    },
+    {
+      "year": 2000,
+      "month": 5,
+      "date": "2000-05",
+      "precip_mm_hr": 0.1467,
+      "precip_mm_month": 109.2
+    },
+    {
+      "year": 2000,
+      "month": 6,
+      "date": "2000-06",
+      "precip_mm_hr": 0.3306,
+      "precip_mm_month": 238.0
+    },
+    {
+      "year": 2000,
+      "month": 7,
+      "date": "2000-07",
+      "precip_mm_hr": 0.1361,
+      "precip_mm_month": 101.2
+    },
+    {
+      "year": 2000,
+      "month": 8,
+      "date": "2000-08",
+      "precip_mm_hr": 0.1395,
+      "precip_mm_month": 103.8
+    },
+    {
+      "year": 2000,
+      "month": 9,
+      "date": "2000-09",
+      "precip_mm_hr": 0.2151,
+      "precip_mm_month": 154.9
+    },
+    {
+      "year": 2000,
+      "month": 10,
+      "date": "2000-10",
+      "precip_mm_hr": 0.4423,
+      "precip_mm_month": 329.1
+    },
+    {
+      "year": 2000,
+      "month": 11,
+      "date": "2000-11",
+      "precip_mm_hr": 0.202,
+      "precip_mm_month": 145.4
+    },
+    {
+      "year": 2000,
+      "month": 12,
+      "date": "2000-12",
+      "precip_mm_hr": 0.2495,
+      "precip_mm_month": 185.6
+    },
+    {
+      "year": 2001,
+      "month": 1,
+      "date": "2001-01",
+      "precip_mm_hr": 0.4758,
+      "precip_mm_month": 354.0
+    },
+    {
+      "year": 2001,
+      "month": 2,
+      "date": "2001-02",
+      "precip_mm_hr": 0.2117,
+      "precip_mm_month": 143.6
+    },
+    {
+      "year": 2001,
+      "month": 3,
+      "date": "2001-03",
+      "precip_mm_hr": 0.1788,
+      "precip_mm_month": 133.0
+    },
+    {
+      "year": 2001,
+      "month": 4,
+      "date": "2001-04",
+      "precip_mm_hr": 0.288,
+      "precip_mm_month": 207.4
+    },
+    {
+      "year": 2001,
+      "month": 5,
+      "date": "2001-05",
+      "precip_mm_hr": 0.1751,
+      "precip_mm_month": 130.3
+    },
+    {
+      "year": 2001,
+      "month": 6,
+      "date": "2001-06",
+      "precip_mm_hr": 0.1545,
+      "precip_mm_month": 111.3
+    },
+    {
+      "year": 2001,
+      "month": 7,
+      "date": "2001-07",
+      "precip_mm_hr": 0.1766,
+      "precip_mm_month": 131.4
+    },
+    {
+      "year": 2001,
+      "month": 8,
+      "date": "2001-08",
+      "precip_mm_hr": 0.1075,
+      "precip_mm_month": 80.0
+    },
+    {
+      "year": 2001,
+      "month": 9,
+      "date": "2001-09",
+      "precip_mm_hr": 0.3225,
+      "precip_mm_month": 232.2
+    },
+    {
+      "year": 2001,
+      "month": 10,
+      "date": "2001-10",
+      "precip_mm_hr": 0.2353,
+      "precip_mm_month": 175.0
+    },
+    {
+      "year": 2001,
+      "month": 11,
+      "date": "2001-11",
+      "precip_mm_hr": 0.2005,
+      "precip_mm_month": 144.3
+    },
+    {
+      "year": 2001,
+      "month": 12,
+      "date": "2001-12",
+      "precip_mm_hr": 0.1184,
+      "precip_mm_month": 88.1
+    },
+    {
+      "year": 2002,
+      "month": 1,
+      "date": "2002-01",
+      "precip_mm_hr": 0.2117,
+      "precip_mm_month": 157.5
+    },
+    {
+      "year": 2002,
+      "month": 2,
+      "date": "2002-02",
+      "precip_mm_hr": 0.1113,
+      "precip_mm_month": 75.5
+    },
+    {
+      "year": 2002,
+      "month": 3,
+      "date": "2002-03",
+      "precip_mm_hr": 0.3104,
+      "precip_mm_month": 230.9
+    },
+    {
+      "year": 2002,
+      "month": 4,
+      "date": "2002-04",
+      "precip_mm_hr": 0.2382,
+      "precip_mm_month": 171.5
+    },
+    {
+      "year": 2002,
+      "month": 5,
+      "date": "2002-05",
+      "precip_mm_hr": 0.2954,
+      "precip_mm_month": 219.7
+    },
+    {
+      "year": 2002,
+      "month": 6,
+      "date": "2002-06",
+      "precip_mm_hr": 0.3158,
+      "precip_mm_month": 227.3
+    },
+    {
+      "year": 2002,
+      "month": 7,
+      "date": "2002-07",
+      "precip_mm_hr": 0.2991,
+      "precip_mm_month": 222.5
+    },
+    {
+      "year": 2002,
+      "month": 8,
+      "date": "2002-08",
+      "precip_mm_hr": 0.3362,
+      "precip_mm_month": 250.2
+    },
+    {
+      "year": 2002,
+      "month": 9,
+      "date": "2002-09",
+      "precip_mm_hr": 0.4305,
+      "precip_mm_month": 310.0
+    },
+    {
+      "year": 2002,
+      "month": 10,
+      "date": "2002-10",
+      "precip_mm_hr": 0.6268,
+      "precip_mm_month": 466.4
+    },
+    {
+      "year": 2002,
+      "month": 11,
+      "date": "2002-11",
+      "precip_mm_hr": 0.2958,
+      "precip_mm_month": 213.0
+    },
+    {
+      "year": 2002,
+      "month": 12,
+      "date": "2002-12",
+      "precip_mm_hr": 0.4104,
+      "precip_mm_month": 305.3
+    },
+    {
+      "year": 2003,
+      "month": 1,
+      "date": "2003-01",
+      "precip_mm_hr": 0.2414,
+      "precip_mm_month": 179.6
+    },
+    {
+      "year": 2003,
+      "month": 2,
+      "date": "2003-02",
+      "precip_mm_hr": 0.3291,
+      "precip_mm_month": 223.1
+    },
+    {
+      "year": 2003,
+      "month": 3,
+      "date": "2003-03",
+      "precip_mm_hr": 0.248,
+      "precip_mm_month": 184.5
+    },
+    {
+      "year": 2003,
+      "month": 4,
+      "date": "2003-04",
+      "precip_mm_hr": 0.3121,
+      "precip_mm_month": 224.7
+    },
+    {
+      "year": 2003,
+      "month": 5,
+      "date": "2003-05",
+      "precip_mm_hr": 0.0576,
+      "precip_mm_month": 42.9
+    },
+    {
+      "year": 2003,
+      "month": 6,
+      "date": "2003-06",
+      "precip_mm_hr": 0.1999,
+      "precip_mm_month": 143.9
+    },
+    {
+      "year": 2003,
+      "month": 7,
+      "date": "2003-07",
+      "precip_mm_hr": 0.1928,
+      "precip_mm_month": 143.5
+    },
+    {
+      "year": 2003,
+      "month": 8,
+      "date": "2003-08",
+      "precip_mm_hr": 0.0866,
+      "precip_mm_month": 64.4
+    },
+    {
+      "year": 2003,
+      "month": 9,
+      "date": "2003-09",
+      "precip_mm_hr": 0.1114,
+      "precip_mm_month": 80.2
+    },
+    {
+      "year": 2003,
+      "month": 10,
+      "date": "2003-10",
+      "precip_mm_hr": 0.3148,
+      "precip_mm_month": 234.2
+    },
+    {
+      "year": 2003,
+      "month": 11,
+      "date": "2003-11",
+      "precip_mm_hr": 0.2709,
+      "precip_mm_month": 195.0
+    },
+    {
+      "year": 2003,
+      "month": 12,
+      "date": "2003-12",
+      "precip_mm_hr": 0.5094,
+      "precip_mm_month": 379.0
+    },
+    {
+      "year": 2004,
+      "month": 1,
+      "date": "2004-01",
+      "precip_mm_hr": 0.1249,
+      "precip_mm_month": 92.9
+    },
+    {
+      "year": 2004,
+      "month": 2,
+      "date": "2004-02",
+      "precip_mm_hr": 0.1056,
+      "precip_mm_month": 71.6
+    },
+    {
+      "year": 2004,
+      "month": 3,
+      "date": "2004-03",
+      "precip_mm_hr": 0.0641,
+      "precip_mm_month": 47.7
+    },
+    {
+      "year": 2004,
+      "month": 4,
+      "date": "2004-04",
+      "precip_mm_hr": 0.2089,
+      "precip_mm_month": 150.4
+    },
+    {
+      "year": 2004,
+      "month": 5,
+      "date": "2004-05",
+      "precip_mm_hr": 0.1687,
+      "precip_mm_month": 125.5
+    },
+    {
+      "year": 2004,
+      "month": 6,
+      "date": "2004-06",
+      "precip_mm_hr": 0.1633,
+      "precip_mm_month": 117.6
+    },
+    {
+      "year": 2004,
+      "month": 7,
+      "date": "2004-07",
+      "precip_mm_hr": 0.1643,
+      "precip_mm_month": 122.2
+    },
+    {
+      "year": 2004,
+      "month": 8,
+      "date": "2004-08",
+      "precip_mm_hr": 0.0713,
+      "precip_mm_month": 53.0
+    },
+    {
+      "year": 2004,
+      "month": 9,
+      "date": "2004-09",
+      "precip_mm_hr": 0.2134,
+      "precip_mm_month": 153.7
+    },
+    {
+      "year": 2004,
+      "month": 10,
+      "date": "2004-10",
+      "precip_mm_hr": 0.1956,
+      "precip_mm_month": 145.5
+    },
+    {
+      "year": 2004,
+      "month": 11,
+      "date": "2004-11",
+      "precip_mm_hr": 0.2465,
+      "precip_mm_month": 177.4
+    },
+    {
+      "year": 2004,
+      "month": 12,
+      "date": "2004-12",
+      "precip_mm_hr": 0.1223,
+      "precip_mm_month": 91.0
+    },
+    {
+      "year": 2005,
+      "month": 1,
+      "date": "2005-01",
+      "precip_mm_hr": 0.1741,
+      "precip_mm_month": 129.5
+    },
+    {
+      "year": 2005,
+      "month": 2,
+      "date": "2005-02",
+      "precip_mm_hr": 0.0329,
+      "precip_mm_month": 22.3
+    },
+    {
+      "year": 2005,
+      "month": 3,
+      "date": "2005-03",
+      "precip_mm_hr": 0.1395,
+      "precip_mm_month": 103.8
+    },
+    {
+      "year": 2005,
+      "month": 4,
+      "date": "2005-04",
+      "precip_mm_hr": 0.3898,
+      "precip_mm_month": 280.7
+    },
+    {
+      "year": 2005,
+      "month": 5,
+      "date": "2005-05",
+      "precip_mm_hr": 0.3713,
+      "precip_mm_month": 276.3
+    },
+    {
+      "year": 2005,
+      "month": 6,
+      "date": "2005-06",
+      "precip_mm_hr": 0.4253,
+      "precip_mm_month": 306.2
+    },
+    {
+      "year": 2005,
+      "month": 7,
+      "date": "2005-07",
+      "precip_mm_hr": 0.13,
+      "precip_mm_month": 96.7
+    },
+    {
+      "year": 2005,
+      "month": 8,
+      "date": "2005-08",
+      "precip_mm_hr": 0.2321,
+      "precip_mm_month": 172.7
+    },
+    {
+      "year": 2005,
+      "month": 9,
+      "date": "2005-09",
+      "precip_mm_hr": 0.231,
+      "precip_mm_month": 166.4
+    },
+    {
+      "year": 2005,
+      "month": 10,
+      "date": "2005-10",
+      "precip_mm_hr": 0.4813,
+      "precip_mm_month": 358.1
+    },
+    {
+      "year": 2005,
+      "month": 11,
+      "date": "2005-11",
+      "precip_mm_hr": 0.1629,
+      "precip_mm_month": 117.3
+    },
+    {
+      "year": 2005,
+      "month": 12,
+      "date": "2005-12",
+      "precip_mm_hr": 0.1889,
+      "precip_mm_month": 140.6
+    },
+    {
+      "year": 2006,
+      "month": 1,
+      "date": "2006-01",
+      "precip_mm_hr": 0.1559,
+      "precip_mm_month": 116.0
+    },
+    {
+      "year": 2006,
+      "month": 2,
+      "date": "2006-02",
+      "precip_mm_hr": 0.1233,
+      "precip_mm_month": 83.6
+    },
+    {
+      "year": 2006,
+      "month": 3,
+      "date": "2006-03",
+      "precip_mm_hr": 0.2053,
+      "precip_mm_month": 152.7
+    },
+    {
+      "year": 2006,
+      "month": 4,
+      "date": "2006-04",
+      "precip_mm_hr": 0.1216,
+      "precip_mm_month": 87.5
+    },
+    {
+      "year": 2006,
+      "month": 5,
+      "date": "2006-05",
+      "precip_mm_hr": 0.0679,
+      "precip_mm_month": 50.5
+    },
+    {
+      "year": 2006,
+      "month": 6,
+      "date": "2006-06",
+      "precip_mm_hr": 0.2213,
+      "precip_mm_month": 159.4
+    },
+    {
+      "year": 2006,
+      "month": 7,
+      "date": "2006-07",
+      "precip_mm_hr": 0.2202,
+      "precip_mm_month": 163.8
+    },
+    {
+      "year": 2006,
+      "month": 8,
+      "date": "2006-08",
+      "precip_mm_hr": 0.1392,
+      "precip_mm_month": 103.6
+    },
+    {
+      "year": 2006,
+      "month": 9,
+      "date": "2006-09",
+      "precip_mm_hr": 0.1918,
+      "precip_mm_month": 138.1
+    },
+    {
+      "year": 2006,
+      "month": 10,
+      "date": "2006-10",
+      "precip_mm_hr": 0.2386,
+      "precip_mm_month": 177.5
+    },
+    {
+      "year": 2006,
+      "month": 11,
+      "date": "2006-11",
+      "precip_mm_hr": 0.33,
+      "precip_mm_month": 237.6
+    },
+    {
+      "year": 2006,
+      "month": 12,
+      "date": "2006-12",
+      "precip_mm_hr": 0.1683,
+      "precip_mm_month": 125.2
+    },
+    {
+      "year": 2007,
+      "month": 1,
+      "date": "2007-01",
+      "precip_mm_hr": 0.1924,
+      "precip_mm_month": 143.2
+    },
+    {
+      "year": 2007,
+      "month": 2,
+      "date": "2007-02",
+      "precip_mm_hr": 0.2363,
+      "precip_mm_month": 160.2
+    },
+    {
+      "year": 2007,
+      "month": 3,
+      "date": "2007-03",
+      "precip_mm_hr": 0.1685,
+      "precip_mm_month": 125.3
+    },
+    {
+      "year": 2007,
+      "month": 4,
+      "date": "2007-04",
+      "precip_mm_hr": 0.2367,
+      "precip_mm_month": 170.4
+    },
+    {
+      "year": 2007,
+      "month": 5,
+      "date": "2007-05",
+      "precip_mm_hr": 0.2859,
+      "precip_mm_month": 212.7
+    },
+    {
+      "year": 2007,
+      "month": 6,
+      "date": "2007-06",
+      "precip_mm_hr": 0.0749,
+      "precip_mm_month": 53.9
+    },
+    {
+      "year": 2007,
+      "month": 7,
+      "date": "2007-07",
+      "precip_mm_hr": 0.2511,
+      "precip_mm_month": 186.8
+    },
+    {
+      "year": 2007,
+      "month": 8,
+      "date": "2007-08",
+      "precip_mm_hr": 0.1288,
+      "precip_mm_month": 95.9
+    },
+    {
+      "year": 2007,
+      "month": 9,
+      "date": "2007-09",
+      "precip_mm_hr": 0.3091,
+      "precip_mm_month": 222.5
+    },
+    {
+      "year": 2007,
+      "month": 10,
+      "date": "2007-10",
+      "precip_mm_hr": 0.3818,
+      "precip_mm_month": 284.1
+    },
+    {
+      "year": 2007,
+      "month": 11,
+      "date": "2007-11",
+      "precip_mm_hr": 0.173,
+      "precip_mm_month": 124.5
+    },
+    {
+      "year": 2007,
+      "month": 12,
+      "date": "2007-12",
+      "precip_mm_hr": 0.1779,
+      "precip_mm_month": 132.3
+    },
+    {
+      "year": 2008,
+      "month": 1,
+      "date": "2008-01",
+      "precip_mm_hr": 0.1483,
+      "precip_mm_month": 110.3
+    },
+    {
+      "year": 2008,
+      "month": 2,
+      "date": "2008-02",
+      "precip_mm_hr": 0.1547,
+      "precip_mm_month": 104.9
+    },
+    {
+      "year": 2008,
+      "month": 3,
+      "date": "2008-03",
+      "precip_mm_hr": 0.1232,
+      "precip_mm_month": 91.7
+    },
+    {
+      "year": 2008,
+      "month": 4,
+      "date": "2008-04",
+      "precip_mm_hr": 0.235,
+      "precip_mm_month": 169.2
+    },
+    {
+      "year": 2008,
+      "month": 5,
+      "date": "2008-05",
+      "precip_mm_hr": 0.1426,
+      "precip_mm_month": 106.1
+    },
+    {
+      "year": 2008,
+      "month": 6,
+      "date": "2008-06",
+      "precip_mm_hr": 0.2974,
+      "precip_mm_month": 214.2
+    },
+    {
+      "year": 2008,
+      "month": 7,
+      "date": "2008-07",
+      "precip_mm_hr": 0.1158,
+      "precip_mm_month": 86.2
+    },
+    {
+      "year": 2008,
+      "month": 8,
+      "date": "2008-08",
+      "precip_mm_hr": 0.2196,
+      "precip_mm_month": 163.4
+    },
+    {
+      "year": 2008,
+      "month": 9,
+      "date": "2008-09",
+      "precip_mm_hr": 0.1457,
+      "precip_mm_month": 104.9
+    },
+    {
+      "year": 2008,
+      "month": 10,
+      "date": "2008-10",
+      "precip_mm_hr": 0.5269,
+      "precip_mm_month": 392.0
+    },
+    {
+      "year": 2008,
+      "month": 11,
+      "date": "2008-11",
+      "precip_mm_hr": 0.1236,
+      "precip_mm_month": 89.0
+    },
+    {
+      "year": 2008,
+      "month": 12,
+      "date": "2008-12",
+      "precip_mm_hr": 0.1309,
+      "precip_mm_month": 97.4
+    },
+    {
+      "year": 2009,
+      "month": 1,
+      "date": "2009-01",
+      "precip_mm_hr": 0.194,
+      "precip_mm_month": 144.4
+    },
+    {
+      "year": 2009,
+      "month": 2,
+      "date": "2009-02",
+      "precip_mm_hr": 0.2276,
+      "precip_mm_month": 154.3
+    },
+    {
+      "year": 2009,
+      "month": 3,
+      "date": "2009-03",
+      "precip_mm_hr": 0.0878,
+      "precip_mm_month": 65.3
+    },
+    {
+      "year": 2009,
+      "month": 4,
+      "date": "2009-04",
+      "precip_mm_hr": 0.0221,
+      "precip_mm_month": 15.9
+    },
+    {
+      "year": 2009,
+      "month": 5,
+      "date": "2009-05",
+      "precip_mm_hr": 0.2321,
+      "precip_mm_month": 172.7
+    },
+    {
+      "year": 2009,
+      "month": 6,
+      "date": "2009-06",
+      "precip_mm_hr": 0.114,
+      "precip_mm_month": 82.1
+    },
+    {
+      "year": 2009,
+      "month": 7,
+      "date": "2009-07",
+      "precip_mm_hr": 0.1976,
+      "precip_mm_month": 147.0
+    },
+    {
+      "year": 2009,
+      "month": 8,
+      "date": "2009-08",
+      "precip_mm_hr": 0.3522,
+      "precip_mm_month": 262.0
+    },
+    {
+      "year": 2009,
+      "month": 9,
+      "date": "2009-09",
+      "precip_mm_hr": 0.4157,
+      "precip_mm_month": 299.3
+    },
+    {
+      "year": 2009,
+      "month": 10,
+      "date": "2009-10",
+      "precip_mm_hr": 0.2062,
+      "precip_mm_month": 153.4
+    },
+    {
+      "year": 2009,
+      "month": 11,
+      "date": "2009-11",
+      "precip_mm_hr": 0.6773,
+      "precip_mm_month": 487.7
+    },
+    {
+      "year": 2009,
+      "month": 12,
+      "date": "2009-12",
+      "precip_mm_hr": 0.243,
+      "precip_mm_month": 180.8
+    },
+    {
+      "year": 2010,
+      "month": 1,
+      "date": "2010-01",
+      "precip_mm_hr": 0.3917,
+      "precip_mm_month": 291.4
+    },
+    {
+      "year": 2010,
+      "month": 2,
+      "date": "2010-02",
+      "precip_mm_hr": 0.2786,
+      "precip_mm_month": 188.9
+    },
+    {
+      "year": 2010,
+      "month": 3,
+      "date": "2010-03",
+      "precip_mm_hr": 0.1119,
+      "precip_mm_month": 83.3
+    },
+    {
+      "year": 2010,
+      "month": 4,
+      "date": "2010-04",
+      "precip_mm_hr": 0.2628,
+      "precip_mm_month": 189.2
+    },
+    {
+      "year": 2010,
+      "month": 5,
+      "date": "2010-05",
+      "precip_mm_hr": 0.2187,
+      "precip_mm_month": 162.7
+    },
+    {
+      "year": 2010,
+      "month": 6,
+      "date": "2010-06",
+      "precip_mm_hr": 0.1931,
+      "precip_mm_month": 139.1
+    },
+    {
+      "year": 2010,
+      "month": 7,
+      "date": "2010-07",
+      "precip_mm_hr": 0.3511,
+      "precip_mm_month": 261.2
+    },
+    {
+      "year": 2010,
+      "month": 8,
+      "date": "2010-08",
+      "precip_mm_hr": 0.0387,
+      "precip_mm_month": 28.8
+    },
+    {
+      "year": 2010,
+      "month": 9,
+      "date": "2010-09",
+      "precip_mm_hr": 0.4025,
+      "precip_mm_month": 289.8
+    },
+    {
+      "year": 2010,
+      "month": 10,
+      "date": "2010-10",
+      "precip_mm_hr": 0.1518,
+      "precip_mm_month": 112.9
+    },
+    {
+      "year": 2010,
+      "month": 11,
+      "date": "2010-11",
+      "precip_mm_hr": 0.1231,
+      "precip_mm_month": 88.6
+    },
+    {
+      "year": 2010,
+      "month": 12,
+      "date": "2010-12",
+      "precip_mm_hr": 0.2772,
+      "precip_mm_month": 206.2
+    },
+    {
+      "year": 2011,
+      "month": 1,
+      "date": "2011-01",
+      "precip_mm_hr": 0.2236,
+      "precip_mm_month": 166.3
+    },
+    {
+      "year": 2011,
+      "month": 2,
+      "date": "2011-02",
+      "precip_mm_hr": 0.3788,
+      "precip_mm_month": 256.8
+    },
+    {
+      "year": 2011,
+      "month": 3,
+      "date": "2011-03",
+      "precip_mm_hr": 0.3613,
+      "precip_mm_month": 268.8
+    },
+    {
+      "year": 2011,
+      "month": 4,
+      "date": "2011-04",
+      "precip_mm_hr": 0.2809,
+      "precip_mm_month": 202.3
+    },
+    {
+      "year": 2011,
+      "month": 5,
+      "date": "2011-05",
+      "precip_mm_hr": 0.1102,
+      "precip_mm_month": 82.0
+    },
+    {
+      "year": 2011,
+      "month": 6,
+      "date": "2011-06",
+      "precip_mm_hr": 0.3376,
+      "precip_mm_month": 243.1
+    },
+    {
+      "year": 2011,
+      "month": 7,
+      "date": "2011-07",
+      "precip_mm_hr": 0.3284,
+      "precip_mm_month": 244.3
+    },
+    {
+      "year": 2011,
+      "month": 8,
+      "date": "2011-08",
+      "precip_mm_hr": 0.3005,
+      "precip_mm_month": 223.6
+    },
+    {
+      "year": 2011,
+      "month": 9,
+      "date": "2011-09",
+      "precip_mm_hr": 0.1579,
+      "precip_mm_month": 113.7
+    },
+    {
+      "year": 2011,
+      "month": 10,
+      "date": "2011-10",
+      "precip_mm_hr": 0.3207,
+      "precip_mm_month": 238.6
+    },
+    {
+      "year": 2011,
+      "month": 11,
+      "date": "2011-11",
+      "precip_mm_hr": 0.1177,
+      "precip_mm_month": 84.8
+    },
+    {
+      "year": 2011,
+      "month": 12,
+      "date": "2011-12",
+      "precip_mm_hr": 0.0665,
+      "precip_mm_month": 49.4
+    },
+    {
+      "year": 2012,
+      "month": 1,
+      "date": "2012-01",
+      "precip_mm_hr": 0.145,
+      "precip_mm_month": 107.9
+    },
+    {
+      "year": 2012,
+      "month": 2,
+      "date": "2012-02",
+      "precip_mm_hr": 0.1989,
+      "precip_mm_month": 134.8
+    },
+    {
+      "year": 2012,
+      "month": 3,
+      "date": "2012-03",
+      "precip_mm_hr": 0.0505,
+      "precip_mm_month": 37.6
+    },
+    {
+      "year": 2012,
+      "month": 4,
+      "date": "2012-04",
+      "precip_mm_hr": 0.1431,
+      "precip_mm_month": 103.0
+    },
+    {
+      "year": 2012,
+      "month": 5,
+      "date": "2012-05",
+      "precip_mm_hr": 0.0816,
+      "precip_mm_month": 60.7
+    },
+    {
+      "year": 2012,
+      "month": 6,
+      "date": "2012-06",
+      "precip_mm_hr": 0.145,
+      "precip_mm_month": 104.4
+    },
+    {
+      "year": 2012,
+      "month": 7,
+      "date": "2012-07",
+      "precip_mm_hr": 0.3069,
+      "precip_mm_month": 228.3
+    },
+    {
+      "year": 2012,
+      "month": 8,
+      "date": "2012-08",
+      "precip_mm_hr": 0.0941,
+      "precip_mm_month": 70.0
+    },
+    {
+      "year": 2012,
+      "month": 9,
+      "date": "2012-09",
+      "precip_mm_hr": 0.2714,
+      "precip_mm_month": 195.4
+    },
+    {
+      "year": 2012,
+      "month": 10,
+      "date": "2012-10",
+      "precip_mm_hr": 0.5192,
+      "precip_mm_month": 386.3
+    },
+    {
+      "year": 2012,
+      "month": 11,
+      "date": "2012-11",
+      "precip_mm_hr": 0.1172,
+      "precip_mm_month": 84.4
+    },
+    {
+      "year": 2012,
+      "month": 12,
+      "date": "2012-12",
+      "precip_mm_hr": 0.5065,
+      "precip_mm_month": 376.8
+    },
+    {
+      "year": 2013,
+      "month": 1,
+      "date": "2013-01",
+      "precip_mm_hr": 0.1875,
+      "precip_mm_month": 139.5
+    },
+    {
+      "year": 2013,
+      "month": 2,
+      "date": "2013-02",
+      "precip_mm_hr": 0.2328,
+      "precip_mm_month": 157.8
+    },
+    {
+      "year": 2013,
+      "month": 3,
+      "date": "2013-03",
+      "precip_mm_hr": 0.3016,
+      "precip_mm_month": 224.4
+    },
+    {
+      "year": 2013,
+      "month": 4,
+      "date": "2013-04",
+      "precip_mm_hr": 0.2388,
+      "precip_mm_month": 171.9
+    },
+    {
+      "year": 2013,
+      "month": 5,
+      "date": "2013-05",
+      "precip_mm_hr": 0.1467,
+      "precip_mm_month": 109.1
+    },
+    {
+      "year": 2013,
+      "month": 6,
+      "date": "2013-06",
+      "precip_mm_hr": 0.1431,
+      "precip_mm_month": 103.1
+    },
+    {
+      "year": 2013,
+      "month": 7,
+      "date": "2013-07",
+      "precip_mm_hr": 0.1761,
+      "precip_mm_month": 131.0
+    },
+    {
+      "year": 2013,
+      "month": 8,
+      "date": "2013-08",
+      "precip_mm_hr": 0.3181,
+      "precip_mm_month": 236.6
+    },
+    {
+      "year": 2013,
+      "month": 9,
+      "date": "2013-09",
+      "precip_mm_hr": 0.214,
+      "precip_mm_month": 154.0
+    },
+    {
+      "year": 2013,
+      "month": 10,
+      "date": "2013-10",
+      "precip_mm_hr": 0.2634,
+      "precip_mm_month": 195.9
+    },
+    {
+      "year": 2013,
+      "month": 11,
+      "date": "2013-11",
+      "precip_mm_hr": 0.252,
+      "precip_mm_month": 181.4
+    },
+    {
+      "year": 2013,
+      "month": 12,
+      "date": "2013-12",
+      "precip_mm_hr": 0.1417,
+      "precip_mm_month": 105.4
+    },
+    {
+      "year": 2014,
+      "month": 1,
+      "date": "2014-01",
+      "precip_mm_hr": 0.2512,
+      "precip_mm_month": 186.9
+    },
+    {
+      "year": 2014,
+      "month": 2,
+      "date": "2014-02",
+      "precip_mm_hr": 0.1541,
+      "precip_mm_month": 104.5
+    },
+    {
+      "year": 2014,
+      "month": 3,
+      "date": "2014-03",
+      "precip_mm_hr": 0.2215,
+      "precip_mm_month": 164.8
+    },
+    {
+      "year": 2014,
+      "month": 4,
+      "date": "2014-04",
+      "precip_mm_hr": 0.2184,
+      "precip_mm_month": 157.2
+    },
+    {
+      "year": 2014,
+      "month": 5,
+      "date": "2014-05",
+      "precip_mm_hr": 0.3195,
+      "precip_mm_month": 237.7
+    },
+    {
+      "year": 2014,
+      "month": 6,
+      "date": "2014-06",
+      "precip_mm_hr": 0.4653,
+      "precip_mm_month": 335.0
+    },
+    {
+      "year": 2014,
+      "month": 7,
+      "date": "2014-07",
+      "precip_mm_hr": 0.2568,
+      "precip_mm_month": 191.0
+    },
+    {
+      "year": 2014,
+      "month": 8,
+      "date": "2014-08",
+      "precip_mm_hr": 0.1263,
+      "precip_mm_month": 94.0
+    },
+    {
+      "year": 2014,
+      "month": 9,
+      "date": "2014-09",
+      "precip_mm_hr": 0.5351,
+      "precip_mm_month": 385.3
+    },
+    {
+      "year": 2014,
+      "month": 10,
+      "date": "2014-10",
+      "precip_mm_hr": 0.3448,
+      "precip_mm_month": 256.6
+    },
+    {
+      "year": 2014,
+      "month": 11,
+      "date": "2014-11",
+      "precip_mm_hr": 0.2069,
+      "precip_mm_month": 149.0
+    },
+    {
+      "year": 2014,
+      "month": 12,
+      "date": "2014-12",
+      "precip_mm_hr": 0.317,
+      "precip_mm_month": 235.9
+    },
+    {
+      "year": 2015,
+      "month": 1,
+      "date": "2015-01",
+      "precip_mm_hr": 0.389,
+      "precip_mm_month": 289.4
+    },
+    {
+      "year": 2015,
+      "month": 2,
+      "date": "2015-02",
+      "precip_mm_hr": 0.2024,
+      "precip_mm_month": 137.2
+    },
+    {
+      "year": 2015,
+      "month": 3,
+      "date": "2015-03",
+      "precip_mm_hr": 0.1256,
+      "precip_mm_month": 93.5
+    },
+    {
+      "year": 2015,
+      "month": 4,
+      "date": "2015-04",
+      "precip_mm_hr": 0.2548,
+      "precip_mm_month": 183.5
+    },
+    {
+      "year": 2015,
+      "month": 5,
+      "date": "2015-05",
+      "precip_mm_hr": 0.2495,
+      "precip_mm_month": 185.7
+    },
+    {
+      "year": 2015,
+      "month": 6,
+      "date": "2015-06",
+      "precip_mm_hr": 0.3925,
+      "precip_mm_month": 282.6
+    },
+    {
+      "year": 2015,
+      "month": 7,
+      "date": "2015-07",
+      "precip_mm_hr": 0.3776,
+      "precip_mm_month": 280.9
+    },
+    {
+      "year": 2015,
+      "month": 8,
+      "date": "2015-08",
+      "precip_mm_hr": 0.1451,
+      "precip_mm_month": 107.9
+    },
+    {
+      "year": 2015,
+      "month": 9,
+      "date": "2015-09",
+      "precip_mm_hr": 0.268,
+      "precip_mm_month": 193.0
+    },
+    {
+      "year": 2015,
+      "month": 10,
+      "date": "2015-10",
+      "precip_mm_hr": 0.3367,
+      "precip_mm_month": 250.5
+    },
+    {
+      "year": 2015,
+      "month": 11,
+      "date": "2015-11",
+      "precip_mm_hr": 0.3667,
+      "precip_mm_month": 264.0
+    },
+    {
+      "year": 2015,
+      "month": 12,
+      "date": "2015-12",
+      "precip_mm_hr": 0.6735,
+      "precip_mm_month": 501.1
+    },
+    {
+      "year": 2016,
+      "month": 1,
+      "date": "2016-01",
+      "precip_mm_hr": 0.2004,
+      "precip_mm_month": 149.1
+    },
+    {
+      "year": 2016,
+      "month": 2,
+      "date": "2016-02",
+      "precip_mm_hr": 0.1941,
+      "precip_mm_month": 131.6
+    },
+    {
+      "year": 2016,
+      "month": 3,
+      "date": "2016-03",
+      "precip_mm_hr": 0.3403,
+      "precip_mm_month": 253.2
+    },
+    {
+      "year": 2016,
+      "month": 4,
+      "date": "2016-04",
+      "precip_mm_hr": 0.302,
+      "precip_mm_month": 217.4
+    },
+    {
+      "year": 2016,
+      "month": 5,
+      "date": "2016-05",
+      "precip_mm_hr": 0.0635,
+      "precip_mm_month": 47.2
+    },
+    {
+      "year": 2016,
+      "month": 6,
+      "date": "2016-06",
+      "precip_mm_hr": 0.0115,
+      "precip_mm_month": 8.3
+    },
+    {
+      "year": 2016,
+      "month": 7,
+      "date": "2016-07",
+      "precip_mm_hr": 0.1892,
+      "precip_mm_month": 140.8
+    },
+    {
+      "year": 2016,
+      "month": 8,
+      "date": "2016-08",
+      "precip_mm_hr": 0.2264,
+      "precip_mm_month": 168.4
+    },
+    {
+      "year": 2016,
+      "month": 9,
+      "date": "2016-09",
+      "precip_mm_hr": 0.0929,
+      "precip_mm_month": 66.9
+    },
+    {
+      "year": 2016,
+      "month": 10,
+      "date": "2016-10",
+      "precip_mm_hr": 0.4944,
+      "precip_mm_month": 367.8
+    },
+    {
+      "year": 2016,
+      "month": 11,
+      "date": "2016-11",
+      "precip_mm_hr": 0.2384,
+      "precip_mm_month": 171.6
+    },
+    {
+      "year": 2016,
+      "month": 12,
+      "date": "2016-12",
+      "precip_mm_hr": 0.1965,
+      "precip_mm_month": 146.2
+    },
+    {
+      "year": 2017,
+      "month": 1,
+      "date": "2017-01",
+      "precip_mm_hr": 0.285,
+      "precip_mm_month": 212.0
+    },
+    {
+      "year": 2017,
+      "month": 2,
+      "date": "2017-02",
+      "precip_mm_hr": 0.2859,
+      "precip_mm_month": 193.9
+    },
+    {
+      "year": 2017,
+      "month": 3,
+      "date": "2017-03",
+      "precip_mm_hr": 0.2862,
+      "precip_mm_month": 213.0
+    },
+    {
+      "year": 2017,
+      "month": 4,
+      "date": "2017-04",
+      "precip_mm_hr": 0.5147,
+      "precip_mm_month": 370.6
+    },
+    {
+      "year": 2017,
+      "month": 5,
+      "date": "2017-05",
+      "precip_mm_hr": 0.5836,
+      "precip_mm_month": 434.2
+    },
+    {
+      "year": 2017,
+      "month": 6,
+      "date": "2017-06",
+      "precip_mm_hr": 0.2291,
+      "precip_mm_month": 165.0
+    },
+    {
+      "year": 2017,
+      "month": 7,
+      "date": "2017-07",
+      "precip_mm_hr": 0.0134,
+      "precip_mm_month": 10.0
+    },
+    {
+      "year": 2017,
+      "month": 8,
+      "date": "2017-08",
+      "precip_mm_hr": 0.2499,
+      "precip_mm_month": 185.9
+    },
+    {
+      "year": 2017,
+      "month": 9,
+      "date": "2017-09",
+      "precip_mm_hr": 0.1646,
+      "precip_mm_month": 118.5
+    },
+    {
+      "year": 2017,
+      "month": 10,
+      "date": "2017-10",
+      "precip_mm_hr": 0.4074,
+      "precip_mm_month": 303.1
+    },
+    {
+      "year": 2017,
+      "month": 11,
+      "date": "2017-11",
+      "precip_mm_hr": 0.3198,
+      "precip_mm_month": 230.2
+    },
+    {
+      "year": 2017,
+      "month": 12,
+      "date": "2017-12",
+      "precip_mm_hr": 0.136,
+      "precip_mm_month": 101.2
+    },
+    {
+      "year": 2018,
+      "month": 1,
+      "date": "2018-01",
+      "precip_mm_hr": 0.4283,
+      "precip_mm_month": 318.7
+    },
+    {
+      "year": 2018,
+      "month": 2,
+      "date": "2018-02",
+      "precip_mm_hr": 0.173,
+      "precip_mm_month": 117.3
+    },
+    {
+      "year": 2018,
+      "month": 3,
+      "date": "2018-03",
+      "precip_mm_hr": 0.2785,
+      "precip_mm_month": 207.2
+    },
+    {
+      "year": 2018,
+      "month": 4,
+      "date": "2018-04",
+      "precip_mm_hr": 0.1158,
+      "precip_mm_month": 83.4
+    },
+    {
+      "year": 2018,
+      "month": 5,
+      "date": "2018-05",
+      "precip_mm_hr": 0.144,
+      "precip_mm_month": 107.1
+    },
+    {
+      "year": 2018,
+      "month": 6,
+      "date": "2018-06",
+      "precip_mm_hr": 0.2652,
+      "precip_mm_month": 190.9
+    },
+    {
+      "year": 2018,
+      "month": 7,
+      "date": "2018-07",
+      "precip_mm_hr": 0.1446,
+      "precip_mm_month": 107.6
+    },
+    {
+      "year": 2018,
+      "month": 8,
+      "date": "2018-08",
+      "precip_mm_hr": 0.1879,
+      "precip_mm_month": 139.8
+    },
+    {
+      "year": 2018,
+      "month": 9,
+      "date": "2018-09",
+      "precip_mm_hr": 0.2557,
+      "precip_mm_month": 184.1
+    },
+    {
+      "year": 2018,
+      "month": 10,
+      "date": "2018-10",
+      "precip_mm_hr": 0.3344,
+      "precip_mm_month": 248.8
+    },
+    {
+      "year": 2018,
+      "month": 11,
+      "date": "2018-11",
+      "precip_mm_hr": 0.3727,
+      "precip_mm_month": 268.3
+    },
+    {
+      "year": 2018,
+      "month": 12,
+      "date": "2018-12",
+      "precip_mm_hr": 0.2189,
+      "precip_mm_month": 162.9
+    },
+    {
+      "year": 2019,
+      "month": 1,
+      "date": "2019-01",
+      "precip_mm_hr": 0.3388,
+      "precip_mm_month": 252.1
+    },
+    {
+      "year": 2019,
+      "month": 2,
+      "date": "2019-02",
+      "precip_mm_hr": 0.2876,
+      "precip_mm_month": 195.0
+    },
+    {
+      "year": 2019,
+      "month": 3,
+      "date": "2019-03",
+      "precip_mm_hr": 0.2649,
+      "precip_mm_month": 197.1
+    },
+    {
+      "year": 2019,
+      "month": 4,
+      "date": "2019-04",
+      "precip_mm_hr": 0.1924,
+      "precip_mm_month": 138.5
+    },
+    {
+      "year": 2019,
+      "month": 5,
+      "date": "2019-05",
+      "precip_mm_hr": 0.4161,
+      "precip_mm_month": 309.6
+    },
+    {
+      "year": 2019,
+      "month": 6,
+      "date": "2019-06",
+      "precip_mm_hr": 0.1028,
+      "precip_mm_month": 74.0
+    },
+    {
+      "year": 2019,
+      "month": 7,
+      "date": "2019-07",
+      "precip_mm_hr": 0.1941,
+      "precip_mm_month": 144.4
+    },
+    {
+      "year": 2019,
+      "month": 8,
+      "date": "2019-08",
+      "precip_mm_hr": 0.1419,
+      "precip_mm_month": 105.6
+    },
+    {
+      "year": 2019,
+      "month": 9,
+      "date": "2019-09",
+      "precip_mm_hr": 0.131,
+      "precip_mm_month": 94.3
+    },
+    {
+      "year": 2019,
+      "month": 10,
+      "date": "2019-10",
+      "precip_mm_hr": 0.5776,
+      "precip_mm_month": 429.7
+    },
+    {
+      "year": 2019,
+      "month": 11,
+      "date": "2019-11",
+      "precip_mm_hr": 0.3197,
+      "precip_mm_month": 230.2
+    },
+    {
+      "year": 2019,
+      "month": 12,
+      "date": "2019-12",
+      "precip_mm_hr": 0.0649,
+      "precip_mm_month": 48.3
+    },
+    {
+      "year": 2020,
+      "month": 1,
+      "date": "2020-01",
+      "precip_mm_hr": 0.2693,
+      "precip_mm_month": 200.3
+    },
+    {
+      "year": 2020,
+      "month": 2,
+      "date": "2020-02",
+      "precip_mm_hr": 0.0736,
+      "precip_mm_month": 49.9
+    },
+    {
+      "year": 2020,
+      "month": 3,
+      "date": "2020-03",
+      "precip_mm_hr": 0.0236,
+      "precip_mm_month": 17.6
+    },
+    {
+      "year": 2020,
+      "month": 4,
+      "date": "2020-04",
+      "precip_mm_hr": 0.0624,
+      "precip_mm_month": 44.9
+    },
+    {
+      "year": 2020,
+      "month": 5,
+      "date": "2020-05",
+      "precip_mm_hr": 0.2915,
+      "precip_mm_month": 216.9
+    },
+    {
+      "year": 2020,
+      "month": 6,
+      "date": "2020-06",
+      "precip_mm_hr": 0.388,
+      "precip_mm_month": 279.3
+    },
+    {
+      "year": 2020,
+      "month": 7,
+      "date": "2020-07",
+      "precip_mm_hr": 0.4478,
+      "precip_mm_month": 333.2
+    },
+    {
+      "year": 2020,
+      "month": 8,
+      "date": "2020-08",
+      "precip_mm_hr": 0.191,
+      "precip_mm_month": 142.1
+    },
+    {
+      "year": 2020,
+      "month": 9,
+      "date": "2020-09",
+      "precip_mm_hr": 0.1209,
+      "precip_mm_month": 87.0
+    },
+    {
+      "year": 2020,
+      "month": 10,
+      "date": "2020-10",
+      "precip_mm_hr": 0.079,
+      "precip_mm_month": 58.8
+    },
+    {
+      "year": 2020,
+      "month": 11,
+      "date": "2020-11",
+      "precip_mm_hr": 0.1317,
+      "precip_mm_month": 94.9
+    },
+    {
+      "year": 2020,
+      "month": 12,
+      "date": "2020-12",
+      "precip_mm_hr": 0.1784,
+      "precip_mm_month": 132.7
+    },
+    {
+      "year": 2021,
+      "month": 1,
+      "date": "2021-01",
+      "precip_mm_hr": 0.2669,
+      "precip_mm_month": 198.6
+    },
+    {
+      "year": 2021,
+      "month": 2,
+      "date": "2021-02",
+      "precip_mm_hr": 0.0888,
+      "precip_mm_month": 60.2
+    },
+    {
+      "year": 2021,
+      "month": 3,
+      "date": "2021-03",
+      "precip_mm_hr": 0.214,
+      "precip_mm_month": 159.2
+    },
+    {
+      "year": 2021,
+      "month": 4,
+      "date": "2021-04",
+      "precip_mm_hr": 0.0742,
+      "precip_mm_month": 53.4
+    },
+    {
+      "year": 2021,
+      "month": 5,
+      "date": "2021-05",
+      "precip_mm_hr": 0.2771,
+      "precip_mm_month": 206.2
+    },
+    {
+      "year": 2021,
+      "month": 6,
+      "date": "2021-06",
+      "precip_mm_hr": 0.2598,
+      "precip_mm_month": 187.1
+    },
+    {
+      "year": 2021,
+      "month": 7,
+      "date": "2021-07",
+      "precip_mm_hr": 0.028,
+      "precip_mm_month": 20.8
+    },
+    {
+      "year": 2021,
+      "month": 8,
+      "date": "2021-08",
+      "precip_mm_hr": 0.2072,
+      "precip_mm_month": 154.1
+    },
+    {
+      "year": 2021,
+      "month": 9,
+      "date": "2021-09",
+      "precip_mm_hr": 0.3099,
+      "precip_mm_month": 223.2
+    },
+    {
+      "year": 2021,
+      "month": 10,
+      "date": "2021-10",
+      "precip_mm_hr": 0.2364,
+      "precip_mm_month": 175.9
+    },
+    {
+      "year": 2021,
+      "month": 11,
+      "date": "2021-11",
+      "precip_mm_hr": 0.0912,
+      "precip_mm_month": 65.7
+    },
+    {
+      "year": 2021,
+      "month": 12,
+      "date": "2021-12",
+      "precip_mm_hr": 0.0542,
+      "precip_mm_month": 40.3
+    },
+    {
+      "year": 2022,
+      "month": 1,
+      "date": "2022-01",
+      "precip_mm_hr": 0.0974,
+      "precip_mm_month": 72.5
+    },
+    {
+      "year": 2022,
+      "month": 2,
+      "date": "2022-02",
+      "precip_mm_hr": 0.1302,
+      "precip_mm_month": 88.3
+    },
+    {
+      "year": 2022,
+      "month": 3,
+      "date": "2022-03",
+      "precip_mm_hr": 0.3186,
+      "precip_mm_month": 237.0
+    },
+    {
+      "year": 2022,
+      "month": 4,
+      "date": "2022-04",
+      "precip_mm_hr": 0.3637,
+      "precip_mm_month": 261.9
+    },
+    {
+      "year": 2022,
+      "month": 5,
+      "date": "2022-05",
+      "precip_mm_hr": 0.3442,
+      "precip_mm_month": 256.1
+    },
+    {
+      "year": 2022,
+      "month": 6,
+      "date": "2022-06",
+      "precip_mm_hr": 0.237,
+      "precip_mm_month": 170.6
+    },
+    {
+      "year": 2022,
+      "month": 7,
+      "date": "2022-07",
+      "precip_mm_hr": 0.1756,
+      "precip_mm_month": 130.6
+    },
+    {
+      "year": 2022,
+      "month": 8,
+      "date": "2022-08",
+      "precip_mm_hr": 0.1534,
+      "precip_mm_month": 114.1
+    },
+    {
+      "year": 2022,
+      "month": 9,
+      "date": "2022-09",
+      "precip_mm_hr": 0.1047,
+      "precip_mm_month": 75.4
+    },
+    {
+      "year": 2022,
+      "month": 10,
+      "date": "2022-10",
+      "precip_mm_hr": 0.1862,
+      "precip_mm_month": 138.5
+    },
+    {
+      "year": 2022,
+      "month": 11,
+      "date": "2022-11",
+      "precip_mm_hr": 0.1263,
+      "precip_mm_month": 91.0
+    },
+    {
+      "year": 2022,
+      "month": 12,
+      "date": "2022-12",
+      "precip_mm_hr": 0.0895,
+      "precip_mm_month": 66.6
+    },
+    {
+      "year": 2023,
+      "month": 1,
+      "date": "2023-01",
+      "precip_mm_hr": 0.074,
+      "precip_mm_month": 55.1
+    },
+    {
+      "year": 2023,
+      "month": 2,
+      "date": "2023-02",
+      "precip_mm_hr": 0.0818,
+      "precip_mm_month": 55.4
+    },
+    {
+      "year": 2023,
+      "month": 3,
+      "date": "2023-03",
+      "precip_mm_hr": 0.2173,
+      "precip_mm_month": 161.7
+    },
+    {
+      "year": 2023,
+      "month": 4,
+      "date": "2023-04",
+      "precip_mm_hr": 0.07,
+      "precip_mm_month": 50.4
+    },
+    {
+      "year": 2023,
+      "month": 5,
+      "date": "2023-05",
+      "precip_mm_hr": 0.3575,
+      "precip_mm_month": 266.0
+    },
+    {
+      "year": 2023,
+      "month": 6,
+      "date": "2023-06",
+      "precip_mm_hr": 0.2011,
+      "precip_mm_month": 144.8
+    },
+    {
+      "year": 2023,
+      "month": 7,
+      "date": "2023-07",
+      "precip_mm_hr": 0.1812,
+      "precip_mm_month": 134.8
+    },
+    {
+      "year": 2023,
+      "month": 8,
+      "date": "2023-08",
+      "precip_mm_hr": 0.1372,
+      "precip_mm_month": 102.1
+    },
+    {
+      "year": 2023,
+      "month": 9,
+      "date": "2023-09",
+      "precip_mm_hr": 0.6395,
+      "precip_mm_month": 460.4
+    },
+    {
+      "year": 2023,
+      "month": 10,
+      "date": "2023-10",
+      "precip_mm_hr": 0.6494,
+      "precip_mm_month": 483.1
+    },
+    {
+      "year": 2023,
+      "month": 11,
+      "date": "2023-11",
+      "precip_mm_hr": 0.6858,
+      "precip_mm_month": 493.8
+    },
+    {
+      "year": 2023,
+      "month": 12,
+      "date": "2023-12",
+      "precip_mm_hr": 0.2975,
+      "precip_mm_month": 221.3
+    },
+    {
+      "year": 2024,
+      "month": 1,
+      "date": "2024-01",
+      "precip_mm_hr": 0.2472,
+      "precip_mm_month": 184.0
+    },
+    {
+      "year": 2024,
+      "month": 2,
+      "date": "2024-02",
+      "precip_mm_hr": 0.1818,
+      "precip_mm_month": 123.3
+    },
+    {
+      "year": 2024,
+      "month": 3,
+      "date": "2024-03",
+      "precip_mm_hr": 0.223,
+      "precip_mm_month": 165.9
+    },
+    {
+      "year": 2024,
+      "month": 4,
+      "date": "2024-04",
+      "precip_mm_hr": 0.3684,
+      "precip_mm_month": 265.2
+    },
+    {
+      "year": 2024,
+      "month": 5,
+      "date": "2024-05",
+      "precip_mm_hr": 0.6513,
+      "precip_mm_month": 484.5
+    },
+    {
+      "year": 2024,
+      "month": 6,
+      "date": "2024-06",
+      "precip_mm_hr": 0.3623,
+      "precip_mm_month": 260.9
+    },
+    {
+      "year": 2024,
+      "month": 7,
+      "date": "2024-07",
+      "precip_mm_hr": 0.0611,
+      "precip_mm_month": 45.5
+    },
+    {
+      "year": 2024,
+      "month": 8,
+      "date": "2024-08",
+      "precip_mm_hr": 0.1456,
+      "precip_mm_month": 108.3
+    },
+    {
+      "year": 2024,
+      "month": 9,
+      "date": "2024-09",
+      "precip_mm_hr": 0.23,
+      "precip_mm_month": 165.6
+    },
+    {
+      "year": 2024,
+      "month": 10,
+      "date": "2024-10",
+      "precip_mm_hr": 0.3188,
+      "precip_mm_month": 237.2
+    },
+    {
+      "year": 2024,
+      "month": 11,
+      "date": "2024-11",
+      "precip_mm_hr": 0.1833,
+      "precip_mm_month": 132.0
+    },
+    {
+      "year": 2024,
+      "month": 12,
+      "date": "2024-12",
+      "precip_mm_hr": 0.296,
+      "precip_mm_month": 220.2
+    },
+    {
+      "year": 2025,
+      "month": 1,
+      "date": "2025-01",
+      "precip_mm_hr": 0.1151,
+      "precip_mm_month": 85.6
+    },
+    {
+      "year": 2025,
+      "month": 2,
+      "date": "2025-02",
+      "precip_mm_hr": 0.1214,
+      "precip_mm_month": 82.3
+    },
+    {
+      "year": 2025,
+      "month": 3,
+      "date": "2025-03",
+      "precip_mm_hr": 0.1472,
+      "precip_mm_month": 109.5
+    },
+    {
+      "year": 2025,
+      "month": 4,
+      "date": "2025-04",
+      "precip_mm_hr": 0.1001,
+      "precip_mm_month": 72.1
+    },
+    {
+      "year": 2025,
+      "month": 5,
+      "date": "2025-05",
+      "precip_mm_hr": 0.4491,
+      "precip_mm_month": 334.1
+    },
+    {
+      "year": 2025,
+      "month": 6,
+      "date": "2025-06",
+      "precip_mm_hr": 0.6093,
+      "precip_mm_month": 438.7
+    },
+    {
+      "year": 2025,
+      "month": 7,
+      "date": "2025-07",
+      "precip_mm_hr": 0.1365,
+      "precip_mm_month": 101.6
+    },
+    {
+      "year": 2025,
+      "month": 8,
+      "date": "2025-08",
+      "precip_mm_hr": 0.1441,
+      "precip_mm_month": 107.2
+    },
+    {
+      "year": 2025,
+      "month": 9,
+      "date": "2025-09",
+      "precip_mm_hr": 0.2873,
+      "precip_mm_month": 206.9
+    }
+  ]
+}

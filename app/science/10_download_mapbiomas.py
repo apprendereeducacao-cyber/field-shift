@@ -18,7 +18,7 @@ warnings.filterwarnings("ignore")
 
 PROJECT = "apprendere-educacao"
 LAT, LON = -28.6033, -53.6733
-RADIUS_M = 5000  # 5km radius around the point
+RADIUS_M = 20000  # 20km radius — covers full Cruz Alta municipality
 OUTPUT_FILE = "mapbiomas_cruzalta.json"
 WEB_OUTPUT = "../web/data/mapbiomas.json"
 

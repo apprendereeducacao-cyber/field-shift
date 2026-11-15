@@ -224,8 +224,8 @@ export default function MapaPage() {
         (p.elevation_m - min) / range,
       ]);
       const heat = L.heatLayer(heatData, {
-        radius: 25,
-        blur: 20,
+        radius: 10,
+        blur: 8,
         maxZoom: 14,
         max: 1.0,
         gradient: {
@@ -251,8 +251,8 @@ export default function MapaPage() {
         (temps[i] - minT) / rangeT,
       ]);
       const heat = L.heatLayer(heatData, {
-        radius: 25,
-        blur: 20,
+        radius: 10,
+        blur: 8,
         maxZoom: 14,
         max: 1.0,
         gradient: {
@@ -316,7 +316,7 @@ export default function MapaPage() {
       </div>
 
       <div className="overflow-hidden rounded-xl border border-border">
-        <div ref={mapRef} className="h-[250px] w-full bg-bg-surface-alt" />
+        <div ref={mapRef} className="h-[500px] w-full bg-bg-surface-alt" />
       </div>
 
       {activeLayer === "relevo" && (
@@ -473,7 +473,7 @@ export default function MapaPage() {
             ))}
           </div>
           <p className="mt-4 text-xs text-text-dim">
-            Dados de cobertura e uso do solo num raio de 15km ao redor de Cruz
+            Dados de cobertura e uso do solo num raio de 20km ao redor de Cruz
             Alta. Fonte: MapBiomas Collection 9 (Landsat 30m, 1985-2023). A soja
             domina com mais de 80% da area.
           </p>

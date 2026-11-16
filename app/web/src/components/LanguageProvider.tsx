@@ -6,7 +6,7 @@ import { LanguageContext, type Lang } from "@/lib/i18n";
 const STORAGE_KEY = "stellaroot_lang";
 
 export default function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>("pt");
+  const [lang, setLangState] = useState<Lang>("en");
 
   useEffect(() => {
     try {

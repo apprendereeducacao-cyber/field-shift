@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import {
   getDefaultSiteId,
+  getSiteIdByName,
   getTimeline,
   getRiskEngine,
   getCoverCrops,
@@ -8,26 +9,51 @@ import {
   getSite,
 } from "@/lib/supabase-data";
 
+function normalizeRiskCalendar(months: any[], monthlyAvgs: any[]): any[] {
+  if (months?.length && months[0]?.dry_spell !== undefined) return months;
+  if (!monthlyAvgs?.length) return [];
+  return monthlyAvgs.map((m: any) => {
+    const rain = m.avg_rain_mm ?? 0;
+    const tmax = m.avg_tmax_c ?? 0;
+    const tmin = m.avg_tmin_c ?? 0;
+    return {
+      dry_spell: rain < 60 ? 0.8 : rain < 80 ? 0.5 : rain < 100 ? 0.3 : 0.1,
+      heat: tmax > 35 ? 0.8 : tmax > 32 ? 0.5 : tmax > 30 ? 0.3 : 0.1,
+      heavy_rain: rain > 300 ? 0.8 : rain > 250 ? 0.5 : rain > 200 ? 0.3 : 0.1,
+      frost: tmin < 2 ? 0.8 : tmin < 5 ? 0.5 : tmin < 8 ? 0.3 : 0.0,
+    };
+  });
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const year = searchParams.get("year");
+  const city = searchParams.get("city");
 
   try {
-    const siteId = await getDefaultSiteId();
-    const [site, timeline, riskEngine, coverCrops, { strategies }] =
+    let siteId: string;
+    if (city) {
+      const found = await getSiteIdByName(city);
+      siteId = found ?? await getDefaultSiteId();
+    } else {
+      siteId = await getDefaultSiteId();
+    }
+    const [site, timeline, coverCrops, { strategies }] =
       await Promise.all([
         getSite(siteId),
         getTimeline(siteId),
-        getRiskEngine(siteId),
         getCoverCrops(),
         getRotations(siteId),
       ]);
+
+    let riskEngine: any = null;
+    try { riskEngine = await getRiskEngine(siteId); } catch {}
 
     const years = timeline.timeline.map((y) => y.year).sort((a, b) => b - a);
     const selectedYear = year ? parseInt(year, 10) : years[0];
 
     const yearData = timeline.timeline.find((y) => y.year === selectedYear);
-    const yearRisk = riskEngine.year_risks.find((y) => y.year === selectedYear);
+    const yearRisk = riskEngine?.year_risks?.find((y: any) => y.year === selectedYear) ?? null;
 
     const monthlyAvgs = site.q1?.monthly_averages ?? [];
     const avgTemp = monthlyAvgs.length > 0
@@ -46,7 +72,7 @@ export async function GET(request: Request) {
     const worstYear = timeline.timeline.reduce((a, b) => ((b.yield_sc_ha ?? 0) < (a.yield_sc_ha ?? 0) ? b : a), timeline.timeline[0]);
     const avgYield = totalYears > 0 ? timeline.timeline.reduce((s, y) => s + (y.yield_sc_ha ?? 0), 0) / totalYears : 0;
 
-    const riskMonths = site.q2?.months ?? [];
+    const riskMonths = normalizeRiskCalendar(site.q2?.months ?? [], site.q1?.monthly_averages ?? []);
     const frostMonths = riskMonths
       .map((m: any, i: number) => ({ i, v: m.frost ?? 0 }))
       .filter((m: any) => m.v > 0.3)
@@ -115,7 +141,7 @@ export async function GET(request: Request) {
         totalScore: s.total_score,
         sequence: s.sequence,
       })),
-      riskCalendar: site.q2.months,
+      riskCalendar: normalizeRiskCalendar(site.q2?.months ?? [], site.q1?.monthly_averages ?? []),
       summary,
     });
   } catch (e: any) {

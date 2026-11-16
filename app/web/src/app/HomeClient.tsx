@@ -1184,7 +1184,7 @@ export default function HomeClient() {
         className="relative flex min-h-[62vh] flex-col items-center justify-center overflow-hidden"
         style={{ background: "radial-gradient(120% 90% at 0% 0%, rgba(70,154,92,0.55) 0%, rgba(11,26,16,0) 60%), #0B1A10" }}
       >
-        <div className="absolute inset-0 opacity-50" style={{ backgroundImage: "radial-gradient(rgba(150,225,142,0.16) 1px, transparent 1px)", backgroundSize: "16px 16px" }} />
+        <div className="pointer-events-none absolute inset-0 opacity-50" style={{ backgroundImage: "radial-gradient(rgba(150,225,142,0.16) 1px, transparent 1px)", backgroundSize: "16px 16px" }} />
 
         {/* Satellite image inside globe — circular clip with radial fade */}
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
@@ -1202,7 +1202,7 @@ export default function HomeClient() {
           </div>
         </div>
 
-        <div className="absolute inset-0 opacity-50">
+        <div className="pointer-events-none absolute inset-0 opacity-50">
           <GlobeScene />
         </div>
 

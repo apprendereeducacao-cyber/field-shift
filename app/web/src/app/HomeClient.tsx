@@ -989,6 +989,7 @@ export default function HomeClient() {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<Municipality[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showCityDropdown, setShowCityDropdown] = useState(false);
   const [selectedCity, setSelectedCity] = useState<{ name: string; uf: string; lat: number; lon: number } | null>(null);
   const [report, setReport] = useState<ReportData | null>(null);
   const [unavailableCity, setUnavailableCity] = useState<{ name: string; uf: string } | null>(null);
@@ -1083,6 +1084,7 @@ export default function HomeClient() {
     setQuery("");
     setSuggestions([]);
     setShowSuggestions(false);
+    setShowCityDropdown(false);
     setSelectedCity(null);
     setReport(null);
     setUnavailableCity(null);
@@ -1210,46 +1212,38 @@ export default function HomeClient() {
           </h1>
 
           <div className="relative mt-8 w-full max-w-md">
-            <div className="flex items-center rounded-full border border-stone-700 bg-forest-900/80 px-5 py-3 backdrop-blur-md">
-              <svg className="mr-3 h-5 w-5 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <button
+              onClick={() => setShowCityDropdown((v) => !v)}
+              className="flex w-full items-center rounded-full border border-stone-700 bg-forest-900/80 px-5 py-3 backdrop-blur-md transition-colors hover:bg-forest-800/80"
+            >
+              <svg className="mr-3 h-5 w-5 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
               </svg>
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => handleInputChange(e.target.value)}
-                onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
-                placeholder="Buscar municipio..."
-                className="flex-1 bg-transparent text-sm text-stone-100 placeholder:text-stone-500 outline-none"
-              />
-              {query && (
-                <button
-                  onClick={handleReset}
-                  className="ml-2 text-stone-400 hover:text-stone-200"
-                >
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              )}
-            </div>
+              <span className={selectedCity ? "text-sm text-stone-100" : "text-sm text-stone-500"}>
+                {selectedCity ? `${selectedCity.name}, ${selectedCity.uf}` : "Selecione seu municipio"}
+              </span>
+              <svg className="ml-auto h-4 w-4 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
 
-            {showSuggestions && suggestions.length > 0 && (
+            {showCityDropdown && (
               <div className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-[16px] border border-stone-700 bg-forest-900/95 shadow-xl backdrop-blur-lg">
-                {suggestions.map((mun) => (
-                  <button
-                    key={mun.id}
-                    onClick={() => selectCity(mun)}
-                    className="flex w-full items-center gap-3 px-5 py-3 text-left text-sm text-stone-200 transition-colors hover:bg-forest-800/50"
-                  >
-                    <svg className="h-4 w-4 shrink-0 text-stone-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                    </svg>
-                    <span>{mun.nome}</span>
-                    <span className="ml-auto text-xs text-stone-500">{mun.microrregiao.mesorregiao.UF.sigla}</span>
-                  </button>
-                ))}
+                <button
+                  onClick={() => {
+                    setShowCityDropdown(false);
+                    selectCity({ id: 4305108, nome: "Cruz Alta", microrregiao: { mesorregiao: { UF: { sigla: "RS" } } } } as Municipality);
+                  }}
+                  className="flex w-full items-center gap-3 px-5 py-3.5 text-left text-sm text-stone-200 transition-colors hover:bg-forest-800/50"
+                >
+                  <svg className="h-4 w-4 shrink-0 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                  </svg>
+                  <span>Cruz Alta</span>
+                  <span className="ml-auto text-xs text-stone-500">RS</span>
+                </button>
               </div>
             )}
           </div>

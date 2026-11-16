@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Sphere, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
+import { useLanguage, t, type Lang } from "@/lib/i18n";
 
 const DATA_PARTNERS = [
   "NASA POWER",
@@ -24,7 +25,9 @@ const DATA_PARTNERS = [
 
 const MONTH_NAMES_SHORT = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 const RISK_KEYS = ["dry_spell", "heat", "heavy_rain", "frost"] as const;
-const RISK_LABELS: Record<string, string> = { dry_spell: "Seca longa", heat: "Calor forte", heavy_rain: "Chuvarada", frost: "Geada" };
+function riskLabels(lang: Lang): Record<string, string> {
+  return { dry_spell: t(lang, "risk.dry_spell"), heat: t(lang, "risk.heat"), heavy_rain: t(lang, "risk.heavy_rain"), frost: t(lang, "risk.frost") };
+}
 function riskText(v: number) { return `${Math.round(v * 10)} em 10`; }
 function riskColor(v: number) {
   if (v <= 0) return "bg-stone-50 text-stone-400";
@@ -61,64 +64,74 @@ type ReportData = {
 };
 
 /* ── Producer Form Data ── */
-const SUMMER_CROPS = [
-  { value: "", label: "Selecione" },
-  { value: "soja", label: "Soja" },
-  { value: "milho", label: "Milho" },
-  { value: "feijao", label: "Feijao" },
-  { value: "outro", label: "Outro" },
-  { value: "nenhum", label: "Nenhum" },
-];
+function summerCrops(lang: Lang) {
+  return [
+    { value: "", label: t(lang, "form.select") },
+    { value: "soja", label: t(lang, "crop.soja") },
+    { value: "milho", label: t(lang, "crop.milho") },
+    { value: "feijao", label: t(lang, "crop.feijao") },
+    { value: "outro", label: t(lang, "crop.outro") },
+    { value: "nenhum", label: t(lang, "crop.nenhum") },
+  ];
+}
 
-const SAFRINHA_CROPS = [
-  { value: "", label: "Selecione" },
-  { value: "soja_safrinha", label: "Soja safrinha (ciclo curto)" },
-  { value: "milho_safrinha", label: "Milho safrinha" },
-  { value: "feijao", label: "Feijao" },
-  { value: "sorgo", label: "Sorgo" },
-  { value: "girassol", label: "Girassol" },
-  { value: "milheto", label: "Milheto (cobertura)" },
-  { value: "brachiaria", label: "Brachiaria (cobertura)" },
-  { value: "crotalaria", label: "Crotalaria (adubo verde)" },
-  { value: "pousio", label: "Nao plantou safrinha" },
-];
+function safrinhaCrops(lang: Lang) {
+  return [
+    { value: "", label: t(lang, "form.select") },
+    { value: "soja_safrinha", label: t(lang, "crop.soja_safrinha") },
+    { value: "milho_safrinha", label: t(lang, "crop.milho_safrinha") },
+    { value: "feijao", label: t(lang, "crop.feijao") },
+    { value: "sorgo", label: t(lang, "crop.sorgo") },
+    { value: "girassol", label: t(lang, "crop.girassol") },
+    { value: "milheto", label: t(lang, "crop.milheto") },
+    { value: "brachiaria", label: t(lang, "crop.brachiaria") },
+    { value: "crotalaria", label: t(lang, "crop.crotalaria") },
+    { value: "pousio", label: t(lang, "crop.pousio_safrinha") },
+  ];
+}
 
-const WINTER_CROPS = [
-  { value: "", label: "Selecione" },
-  { value: "pousio", label: "Pousio (nao plantou nada)" },
-  { value: "trigo", label: "Trigo (renda)" },
-  { value: "aveia_preta", label: "Aveia-preta (cobertura)" },
-  { value: "aveia_branca", label: "Aveia-branca (grao)" },
-  { value: "centeio", label: "Centeio" },
-  { value: "canola", label: "Canola (renda)" },
-  { value: "ervilhaca", label: "Ervilhaca (fixa N)" },
-  { value: "nabo_forrageiro", label: "Nabo forrageiro" },
-  { value: "azevem", label: "Azevem (pastagem)" },
-  { value: "aveia_ervilhaca", label: "Aveia + Ervilhaca (mix)" },
-  { value: "centeio_nabo", label: "Centeio + Nabo (mix)" },
-  { value: "aveia_ervilhaca_nabo", label: "Triplo mix" },
-  { value: "outro", label: "Outro" },
-];
+function winterCrops(lang: Lang) {
+  return [
+    { value: "", label: t(lang, "form.select") },
+    { value: "pousio", label: t(lang, "crop.pousio") },
+    { value: "trigo", label: t(lang, "crop.trigo") },
+    { value: "aveia_preta", label: t(lang, "crop.aveia_preta") },
+    { value: "aveia_branca", label: t(lang, "crop.aveia_branca") },
+    { value: "centeio", label: t(lang, "crop.centeio") },
+    { value: "canola", label: t(lang, "crop.canola") },
+    { value: "ervilhaca", label: t(lang, "crop.ervilhaca") },
+    { value: "nabo_forrageiro", label: t(lang, "crop.nabo_forrageiro") },
+    { value: "azevem", label: t(lang, "crop.azevem") },
+    { value: "aveia_ervilhaca", label: t(lang, "crop.aveia_ervilhaca") },
+    { value: "centeio_nabo", label: t(lang, "crop.centeio_nabo") },
+    { value: "aveia_ervilhaca_nabo", label: t(lang, "crop.aveia_ervilhaca_nabo") },
+    { value: "outro", label: t(lang, "crop.outro") },
+  ];
+}
 
-const YIELD_RESULTS = [
-  { value: "", label: "Selecione" },
-  { value: "boa", label: "Boa (acima da media)" },
-  { value: "normal", label: "Normal" },
-  { value: "ruim", label: "Ruim (abaixo da media)" },
-  { value: "perda_total", label: "Perda total" },
-];
+function yieldResults(lang: Lang) {
+  return [
+    { value: "", label: t(lang, "form.select") },
+    { value: "boa", label: t(lang, "yield.boa") },
+    { value: "normal", label: t(lang, "yield.normal") },
+    { value: "ruim", label: t(lang, "yield.ruim") },
+    { value: "perda_total", label: t(lang, "yield.perda_total") },
+  ];
+}
 
-const PROBLEMS = [
-  { value: "", label: "Selecione" },
-  { value: "nenhum", label: "Nenhum problema grave" },
-  { value: "seca", label: "Seca / estiagem" },
-  { value: "chuva_demais", label: "Excesso de chuva" },
-  { value: "praga_doenca", label: "Praga ou doenca" },
-  { value: "nematoides", label: "Nematoides" },
-  { value: "solo_compactado", label: "Solo compactado" },
-  { value: "geada", label: "Geada" },
-  { value: "granizo", label: "Granizo" },
-];
+function problems(lang: Lang) {
+  return [
+    { value: "", label: t(lang, "form.select") },
+    { value: "nenhum", label: t(lang, "problem.nenhum") },
+    { value: "seca", label: t(lang, "problem.seca") },
+    { value: "chuva_demais", label: t(lang, "problem.chuva_demais") },
+    { value: "praga_doenca", label: t(lang, "problem.praga_doenca") },
+    { value: "nematoides", label: t(lang, "problem.nematoides") },
+    { value: "solo_compactado", label: t(lang, "problem.solo_compactado") },
+    { value: "geada", label: t(lang, "problem.geada") },
+    { value: "granizo", label: t(lang, "problem.granizo") },
+  ];
+}
 
 
 function GlobeWireframe() {
@@ -158,9 +171,13 @@ function GlobeScene() {
   );
 }
 
-const SEASON_LABEL: Record<string, string> = {
-  summer: "Verao", safrinha: "Safrinha", winter: "Inverno", winter_late: "Pos-colheita inverno", winter_mix: "Inverno consorcio",
-};
+function seasonLabel(lang: Lang, key: string): string {
+  const map: Record<string, string> = {
+    summer: t(lang, "season.summer"), safrinha: t(lang, "season.safrinha"), winter: t(lang, "season.winter"),
+    winter_late: t(lang, "season.winter_late"), winter_mix: t(lang, "season.winter_mix"),
+  };
+  return map[key] ?? key;
+}
 const CROP_DISPLAY: Record<string, string> = {
   aveia_preta_ervilhaca: "Aveia-preta + Ervilhaca (mix)",
   centeio_nabo: "Centeio + Nabo forrageiro (mix)",
@@ -184,10 +201,10 @@ type SeasonData = { summer: string; safrinha: string; winter: string; yield_resu
 const EMPTY_SEASON: SeasonData = { summer: "", safrinha: "", winter: "", yield_result: "", problem: "" };
 
 function SelectField({
-  id, label, value, onChange, options, error,
+  id, label, value, onChange, options, error, requiredText,
 }: {
   id: string; label: string; value: string; onChange: (v: string) => void;
-  options: { value: string; label: string }[]; error?: boolean;
+  options: { value: string; label: string }[]; error?: boolean; requiredText?: string;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -233,12 +250,13 @@ function SelectField({
           ))}
         </div>
       )}
-      {error && !value && <p className="mt-1 text-xs text-destructive">Obrigatorio</p>}
+      {error && !value && <p className="mt-1 text-xs text-destructive">{requiredText ?? "Obrigatorio"}</p>}
     </div>
   );
 }
 
 function ProducerForm({ municipality, onComplete }: { municipality: string; onComplete: () => void }) {
+  const { lang } = useLanguage();
   const thisYear = new Date().getFullYear();
   const labels = [`${thisYear - 1}/${thisYear}`, `${thisYear - 2}/${thisYear - 1}`];
   const [seasons, setSeasons] = useState<SeasonData[]>([{ ...EMPTY_SEASON }, { ...EMPTY_SEASON }]);
@@ -275,34 +293,34 @@ function ProducerForm({ municipality, onComplete }: { municipality: string; onCo
   return (
     <section className="mx-auto w-full max-w-2xl space-y-5 px-4 py-10 sm:px-10">
       <div className="text-center">
-        <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Sobre sua lavoura</p>
+        <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">{t(lang, "form.about_farm")}</p>
         <h2 className="mt-2 text-[28px] font-light leading-tight tracking-[-0.02em] text-foreground sm:text-[32px]">
-          Conte sobre {municipality}
+          {t(lang, "form.tell_about")} {municipality}
         </h2>
         <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-          Informe o que plantou nas 2 ultimas safras para recomendacoes personalizadas.
+          {t(lang, "form.instructions")}
         </p>
       </div>
 
       {seasons.map((s, i) => (
         <div key={i} className="rounded-[24px] border border-border bg-card p-6 space-y-4">
-          <h3 className="text-base font-semibold text-foreground">Safra {labels[i]}</h3>
+          <h3 className="text-base font-semibold text-foreground">{t(lang, "form.season")} {labels[i]}</h3>
           <div className="grid gap-3 sm:grid-cols-2">
-            <SelectField id={`summer-${i}`} label="Verao" value={s.summer} onChange={(v) => update(i, "summer", v)} options={SUMMER_CROPS} error={showErrors} />
-            <SelectField id={`safrinha-${i}`} label="Safrinha" value={s.safrinha} onChange={(v) => update(i, "safrinha", v)} options={SAFRINHA_CROPS} error={showErrors} />
+            <SelectField id={`summer-${i}`} label={t(lang, "form.summer")} value={s.summer} onChange={(v) => update(i, "summer", v)} options={summerCrops(lang)} error={showErrors} requiredText={t(lang, "form.required")} />
+            <SelectField id={`safrinha-${i}`} label={t(lang, "form.safrinha")} value={s.safrinha} onChange={(v) => update(i, "safrinha", v)} options={safrinhaCrops(lang)} error={showErrors} requiredText={t(lang, "form.required")} />
           </div>
-          <SelectField id={`winter-${i}`} label="Inverno" value={s.winter} onChange={(v) => update(i, "winter", v)} options={WINTER_CROPS} error={showErrors} />
+          <SelectField id={`winter-${i}`} label={t(lang, "form.winter")} value={s.winter} onChange={(v) => update(i, "winter", v)} options={winterCrops(lang)} error={showErrors} requiredText={t(lang, "form.required")} />
           <div className="grid gap-3 sm:grid-cols-2 border-t border-border pt-3">
-            <SelectField id={`yield-${i}`} label="Resultado do verao" value={s.yield_result} onChange={(v) => update(i, "yield_result", v)} options={YIELD_RESULTS} error={showErrors} />
-            <SelectField id={`problem-${i}`} label="Maior problema" value={s.problem} onChange={(v) => update(i, "problem", v)} options={PROBLEMS} error={showErrors} />
+            <SelectField id={`yield-${i}`} label={t(lang, "form.summer_result")} value={s.yield_result} onChange={(v) => update(i, "yield_result", v)} options={yieldResults(lang)} error={showErrors} requiredText={t(lang, "form.required")} />
+            <SelectField id={`problem-${i}`} label={t(lang, "form.main_problem")} value={s.problem} onChange={(v) => update(i, "problem", v)} options={problems(lang)} error={showErrors} requiredText={t(lang, "form.required")} />
           </div>
         </div>
       ))}
 
       <div className="flex cursor-pointer items-center justify-between rounded-[24px] border border-border bg-card p-4" onClick={() => setSoilCompacted(!soilCompacted)}>
         <div>
-          <p className="text-sm font-medium text-foreground">O solo esta compactado?</p>
-          <p className="mt-0.5 text-xs text-muted-foreground">Se a agua empoca ou a raiz nao desce, pode estar compactado. Isso muda a recomendacao de cobertura.</p>
+          <p className="text-sm font-medium text-foreground">{t(lang, "form.soil_compacted")}</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">{t(lang, "form.soil_compacted_hint")}</p>
         </div>
         <button role="switch" aria-checked={soilCompacted} onClick={(e) => { e.stopPropagation(); setSoilCompacted(!soilCompacted); }}
           className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${soilCompacted ? "bg-primary" : "bg-muted"}`}>
@@ -313,11 +331,11 @@ function ProducerForm({ municipality, onComplete }: { municipality: string; onCo
       <div className="flex flex-col items-center gap-3 pt-2">
         {showErrors && !isFormComplete && (
           <div className="w-full rounded-[16px] border border-destructive/30 bg-destructive/5 p-4 text-center">
-            <p className="text-sm text-destructive">Preencha todos os campos antes de continuar.</p>
+            <p className="text-sm text-destructive">{t(lang, "form.fill_all")}</p>
           </div>
         )}
         <button onClick={handleSubmit} className="h-11 w-full rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover sm:w-auto sm:px-12">
-          Ver meu relatorio
+          {t(lang, "form.view_report")}
         </button>
       </div>
     </section>
@@ -330,6 +348,7 @@ type AnalogData = {
 };
 
 function CityReport({ report, onYearChange }: { report: ReportData; onYearChange: (year: number) => void }) {
+  const { lang } = useLanguage();
   const [aiQuestion, setAiQuestion] = useState("");
   const [aiAnswer, setAiAnswer] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
@@ -439,9 +458,9 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
           } catch { /* partial line */ }
         }
       }
-      if (!text) setAiAnswer("Sem resposta do agronomo. Tente reformular.");
+      if (!text) setAiAnswer(t(lang, "report.no_answer"));
     } catch {
-      setAiAnswer("Erro ao consultar o agronomo. Tente novamente.");
+      setAiAnswer(t(lang, "report.error_consult"));
     }
     setAiLoading(false);
   };
@@ -451,7 +470,7 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
       <section className="mx-auto w-full max-w-4xl px-4 py-12 sm:px-10">
         <div className="flex flex-col items-center gap-4">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-          <p className="text-sm text-muted-foreground">Analisando {report.municipality}, {report.uf}...</p>
+          <p className="text-sm text-muted-foreground">{t(lang, "report.analyzing")} {report.municipality}, {report.uf}...</p>
         </div>
       </section>
     );
@@ -459,11 +478,11 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
 
   const verdictLine = report.riskScore
     ? report.riskScore >= 70
-      ? `Safra de risco elevado (${report.riskLabel ? formatCrop(report.riskLabel) : "alto"}). Atencao redobrada no manejo.`
+      ? t(lang, "verdict.high_risk")
       : report.riskScore >= 40
-      ? `Risco moderado. Planeje cobertura de inverno e monitore a previsao.`
-      : `Risco baixo — boas condicoes para alta produtividade.`
-    : `Dados climaticos em analise para esta safra.`;
+      ? t(lang, "verdict.moderate_risk")
+      : t(lang, "verdict.low_risk")
+    : t(lang, "verdict.analyzing");
 
   return (
     <section className="mx-auto w-full max-w-4xl space-y-4 px-4 py-10 sm:px-10">
@@ -476,10 +495,10 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
 
       {/* ── Section tabs ── */}
       <div className="flex justify-center gap-1 rounded-full border border-border bg-muted p-1">
-        {([["rotacao", "Rotacao"], ["clima", "Analise da Safra"], ["riscos", "Riscos"]] as const).map(([key, label]) => (
+        {([["rotacao", t(lang, "tab.rotacao")], ["clima", t(lang, "tab.analise")], ["riscos", t(lang, "tab.riscos")]] as [string, string][]).map(([key, label]) => (
           <button
             key={key}
-            onClick={() => setActiveTab(key)}
+            onClick={() => setActiveTab(key as "rotacao" | "clima" | "riscos")}
             className={`rounded-full px-5 py-1.5 text-sm font-medium transition-colors ${
               activeTab === key ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
             }`}
@@ -493,7 +512,7 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
       {/* ── Year selector ── */}
       {report.years.length > 0 && (
         <div ref={yearRef} className="relative flex items-center justify-center gap-2">
-          <label className="text-sm text-muted-foreground">Safra:</label>
+          <label className="text-sm text-muted-foreground">{t(lang, "report.safra")}:</label>
           <button
             type="button"
             onClick={() => setYearOpen(!yearOpen)}
@@ -524,7 +543,7 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
       <div className="rounded-[24px] border border-primary bg-primary/5 p-6">
         <div className="flex items-center justify-between gap-4">
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Veredicto da safra {report.selectedYear}/{(report.selectedYear ?? 0) + 1}</p>
+            <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">{t(lang, "report.verdict")} {report.selectedYear}/{(report.selectedYear ?? 0) + 1}</p>
             <p className="mt-2 text-2xl font-semibold tabular-nums text-foreground">
               {report.yearData?.yield?.toFixed(1) ?? "—"} <span className="text-base font-normal text-muted-foreground">sc/ha</span>
             </p>
@@ -538,7 +557,7 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
                   report.riskScore >= 70 ? "text-red-700" : report.riskScore >= 40 ? "text-amber-700" : "text-emerald-700"
                 }`}>{report.riskScore}</span>
               </div>
-              <p className="text-[10px] text-muted-foreground">risco</p>
+              <p className="text-[10px] text-muted-foreground">{t(lang, "report.risk")}</p>
             </div>
           )}
         </div>
@@ -548,15 +567,15 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
       {/* ── Clima do ano (compact pills) ── */}
       <div className="flex gap-3">
         <div className="flex-1 rounded-[16px] border border-border bg-card px-4 py-3 text-center">
-          <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">Temperatura</p>
+          <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">{t(lang, "report.temperature")}</p>
           <p className="mt-1 text-lg font-semibold tabular-nums text-ember-600">{report.yearData?.temp?.toFixed(1) ?? report.avgTemp?.toFixed(1) ?? "—"}<span className="text-xs font-normal text-muted-foreground"> C</span></p>
         </div>
         <div className="flex-1 rounded-[16px] border border-border bg-card px-4 py-3 text-center">
-          <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">Chuva</p>
+          <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">{t(lang, "report.rain")}</p>
           <p className="mt-1 text-lg font-semibold tabular-nums text-rain-600">{report.yearData?.rain?.toFixed(0) ?? report.avgRain?.toFixed(0) ?? "—"}<span className="text-xs font-normal text-muted-foreground"> mm</span></p>
         </div>
         <div className="flex-1 rounded-[16px] border border-border bg-card px-4 py-3 text-center">
-          <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">Produtividade</p>
+          <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">{t(lang, "report.productivity")}</p>
           <p className="mt-1 text-lg font-semibold tabular-nums text-leaf-600">{report.yearData?.yield?.toFixed(1) ?? "—"}<span className="text-xs font-normal text-muted-foreground"> sc/ha</span></p>
         </div>
       </div>
@@ -566,8 +585,8 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
         const enso = report.yearData!.enso!;
         const isElNino = enso.includes("el_nino");
         const isLaNina = enso.includes("la_nina");
-        const intensity = enso.includes("forte") ? "Forte" : enso.includes("fraco") ? "Fraco" : enso.includes("moderado") ? "Moderado" : "";
-        const label = isElNino ? "El Nino" : isLaNina ? "La Nina" : "Ano Neutro";
+        const intensity = enso.includes("forte") ? t(lang, "enso.strong") : enso.includes("fraco") ? t(lang, "enso.weak") : enso.includes("moderado") ? t(lang, "enso.moderate") : "";
+        const label = isElNino ? t(lang, "enso.el_nino") : isLaNina ? t(lang, "enso.la_nina") : t(lang, "enso.neutral");
         const fullLabel = intensity ? `${label} (${intensity})` : label;
         const phase = isElNino ? report.ensoImpact?.el_nino
           : isLaNina ? report.ensoImpact?.la_nina
@@ -576,15 +595,15 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
           <div className="rounded-[16px] border border-border bg-card px-5 py-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">Fenomeno climatico {report.selectedYear}/{report.selectedYear + 1}</p>
+                <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">{t(lang, "report.climate_phenomenon")} {report.selectedYear}/{report.selectedYear + 1}</p>
                 <p className={`mt-1 text-lg font-semibold ${isElNino ? "text-red-600" : isLaNina ? "text-blue-600" : "text-stone-500"}`}>
                   {fullLabel}
                 </p>
               </div>
               {phase && (
                 <div className="text-right">
-                  <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">Media historica nesse fenomeno</p>
-                  <p className="mt-1 text-lg font-semibold tabular-nums text-foreground">{phase.avg_yield_sc_ha?.toFixed(1) ?? "—"} <span className="text-xs font-normal text-muted-foreground">sc/ha em {phase.n_safras} safras</span></p>
+                  <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">{t(lang, "report.historical_avg")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums text-foreground">{phase.avg_yield_sc_ha?.toFixed(1) ?? "—"} <span className="text-xs font-normal text-muted-foreground">sc/ha — {phase.n_safras} {t(lang, "report.seasons_count")}</span></p>
                 </div>
               )}
             </div>
@@ -596,7 +615,7 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
       {analogLoading && (
         <div className="rounded-[24px] border border-border bg-card p-6 text-center">
           <div className="mx-auto h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-          <p className="mt-2 text-sm text-muted-foreground">Calculando tendencia climatica...</p>
+          <p className="mt-2 text-sm text-muted-foreground">{t(lang, "report.calculating_trend")}</p>
         </div>
       )}
       {analogData?.projection && !analogLoading && (() => {
@@ -624,21 +643,21 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
           <div className={`rounded-[24px] border p-5 space-y-4 ${outlookColors[proj.outlook]}`}>
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">Tendencia para {nextSafra}</p>
+                <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">{t(lang, "report.trend_for")} {nextSafra}</p>
                 <p className={`mt-1 text-xl font-semibold ${outlookTextColors[proj.outlook]}`}>{proj.outlook_label}</p>
               </div>
               <div className="text-right shrink-0">
                 <p className="text-2xl font-semibold tabular-nums text-foreground">{proj.weighted_yield.toFixed(0)}</p>
-                <p className="text-[10px] text-muted-foreground">sc/ha estimado</p>
+                <p className="text-[10px] text-muted-foreground">{t(lang, "report.estimated")}</p>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
               <span className={`rounded-full px-3 py-1 text-xs font-semibold ${outlookBadgeColors[proj.outlook]}`}>
-                {proj.pct_vs_avg > 0 ? "+" : ""}{proj.pct_vs_avg}% vs media
+                {proj.pct_vs_avg > 0 ? "+" : ""}{proj.pct_vs_avg}% {t(lang, "report.vs_avg")}
               </span>
               <span className="text-xs text-muted-foreground">
-                Faixa provavel: {proj.expected_yield_range[0].toFixed(0)}-{proj.expected_yield_range[1].toFixed(0)} sc/ha
+                {t(lang, "report.probable_range")}: {proj.expected_yield_range[0].toFixed(0)}-{proj.expected_yield_range[1].toFixed(0)} sc/ha
               </span>
             </div>
 
@@ -657,7 +676,7 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
 
             <details className="group">
               <summary className="cursor-pointer text-xs text-muted-foreground hover:text-foreground transition-colors">
-                Anos com clima similar (base do calculo)
+                {t(lang, "report.similar_years")}
               </summary>
               <div className="mt-2 divide-y divide-border/50">
                 {analogData.analog_years.slice(0, 5).map((ay) => (
@@ -679,7 +698,7 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
                 ))}
               </div>
               <p className="mt-2 text-[10px] text-muted-foreground">
-                Tendencia baseada nos ultimos 3 anos ({(latestAvailableYear ?? report.selectedYear) - 2}-{latestAvailableYear ?? report.selectedYear}) comparados com 44 anos de dados NASA
+                {t(lang, "report.trend_based")} ({(latestAvailableYear ?? report.selectedYear) - 2}-{latestAvailableYear ?? report.selectedYear}) {t(lang, "report.compared_nasa")}
               </p>
             </details>
           </div>
@@ -692,19 +711,19 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
       {/* ── Estrategias de rotacao ── */}
       <div>
         <div className="mb-3 text-center">
-          <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Sua estrategia</p>
-          <h3 className="mt-1 text-lg font-semibold text-foreground">Rotacao para {report.municipality}</h3>
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">{t(lang, "report.your_strategy")}</p>
+          <h3 className="mt-1 text-lg font-semibold text-foreground">{t(lang, "report.rotation_for")} {report.municipality}</h3>
           <p className="mt-0.5 text-xs text-muted-foreground">
             {aiStrategies
-              ? "Recomendacao por IA agronoma baseada em pesquisas da Embrapa"
-              : "Baseado em 44 anos de dados climaticos"}
+              ? t(lang, "report.ai_recommendation")
+              : t(lang, "report.data_based")}
           </p>
         </div>
 
         {aiStrategiesLoading && (
           <div className="rounded-[24px] border border-border bg-card p-6 text-center">
             <div className="mx-auto h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-            <p className="mt-2 text-sm text-muted-foreground">Super inteligencia analisando melhores rotacoes...</p>
+            <p className="mt-2 text-sm text-muted-foreground">{t(lang, "report.ai_analyzing")}</p>
           </div>
         )}
 
@@ -720,7 +739,7 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
               return (
                 <div key={i} className={`relative rounded-[24px] border bg-card transition-shadow ${i === 0 ? "border-primary shadow-sm" : "border-border"} ${isExpanded ? "shadow-md" : "hover:shadow-md"}`}>
                   {i === 0 && (
-                    <span className="absolute -top-3 left-5 rounded-full bg-primary px-3 py-0.5 text-[10px] font-bold tracking-wide text-primary-foreground uppercase">Recomendada</span>
+                    <span className="absolute -top-3 left-5 rounded-full bg-primary px-3 py-0.5 text-[10px] font-bold tracking-wide text-primary-foreground uppercase">{t(lang, "report.recommended")}</span>
                   )}
                   <button
                     type="button"
@@ -745,7 +764,7 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
                     <div className="mt-3 flex flex-wrap gap-1.5">
                       {hasYears ? (
                         <>
-                          <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">{s.years.length} anos</span>
+                          <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">{s.years.length} {t(lang, "report.years")}</span>
                           {uniqueCrops.slice(0, 6).map((crop: string, j: number) => (
                             <span key={j} className="rounded-full bg-forest-50 px-2.5 py-0.5 text-xs font-medium text-primary">{crop}</span>
                           ))}
@@ -753,7 +772,7 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
                       ) : (
                         allSequences.map((seq: any, j: number) => (
                           <span key={j} className="rounded-full bg-forest-50 px-2.5 py-0.5 text-xs font-medium text-primary">
-                            {formatCrop(seq.crop)} <span className="text-stone-400">({seq.month_range || SEASON_LABEL[seq.season] || seq.season})</span>
+                            {formatCrop(seq.crop)} <span className="text-stone-400">({seq.month_range || seasonLabel(lang, seq.season) || seq.season})</span>
                           </span>
                         ))
                       )}
@@ -766,7 +785,7 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
                         s.years.map((year: any, yi: number) => (
                           <div key={yi}>
                             <p className="text-[10px] font-semibold tracking-wide text-primary uppercase mb-2">{year.year_label}</p>
-                            <MonthTimeline sequence={year.sequence || []} />
+                            <MonthTimeline sequence={year.sequence || []} lang={lang} />
                             {(year.sequence || []).some((seq: any) => seq.reason) && (
                               <div className="mt-2 space-y-1">
                                 {(year.sequence || []).map((seq: any, j: number) => (
@@ -783,10 +802,10 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
                         ))
                       ) : (
                         <>
-                          <MonthTimeline sequence={allSequences} />
+                          <MonthTimeline sequence={allSequences} lang={lang} />
                           {allSequences.some((seq: any) => seq.reason) && (
                             <div className="space-y-2">
-                              <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">Por que cada cultura</p>
+                              <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">{t(lang, "report.why_each_crop")}</p>
                               {allSequences.map((seq: any, j: number) => (
                                 seq.reason && (
                                   <div key={j} className="flex gap-2">
@@ -802,7 +821,7 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
 
                       {s.justificativa && (
                         <div>
-                          <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">Justificativa</p>
+                          <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">{t(lang, "report.justification")}</p>
                           <p className="mt-1 text-xs leading-relaxed text-foreground">{s.justificativa}</p>
                         </div>
                       )}
@@ -816,7 +835,7 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
 
         {!aiStrategiesLoading && !aiStrategies && report.strategies.length === 0 && !report.rotation && (
           <div className="rounded-[24px] border border-border bg-card p-5">
-            <p className="text-sm text-muted-foreground">Culturas indicadas para a regiao:</p>
+            <p className="text-sm text-muted-foreground">{t(lang, "report.crops_for_region")}</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {report.topCrops.map((c) => (
                 <span key={c} className="rounded-full bg-forest-50 px-3 py-1 text-sm font-medium text-primary">{c}</span>
@@ -828,15 +847,15 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
 
       {/* ── AI Agronomo ── */}
       <div className="rounded-[24px] border border-border bg-card p-6">
-        <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">Consultar agronomo IA</p>
-        <p className="mt-1 text-sm text-muted-foreground">Pergunte sobre manejo, rotacao ou clima para {report.municipality}</p>
+        <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">{t(lang, "report.consult_ai")}</p>
+        <p className="mt-1 text-sm text-muted-foreground">{t(lang, "report.ask_about")} {report.municipality}</p>
         <div className="mt-3 flex gap-2">
           <input
             type="text"
             value={aiQuestion}
             onChange={(e) => setAiQuestion(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && askAI()}
-            placeholder="Ex: Qual a melhor epoca para plantar aveia-preta?"
+            placeholder={t(lang, "report.placeholder_question")}
             className="flex-1 rounded-full border border-border bg-muted px-4 py-2.5 text-sm text-foreground placeholder:text-stone-400 outline-none focus:border-primary"
           />
           <button
@@ -844,7 +863,7 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
             disabled={aiLoading || !aiQuestion.trim()}
             className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover disabled:opacity-50"
           >
-            {aiLoading ? "..." : "Perguntar"}
+            {aiLoading ? "..." : t(lang, "report.ask")}
           </button>
         </div>
         {aiAnswer && (
@@ -857,13 +876,13 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
 
       {activeTab === "riscos" && report.riskCalendar?.length === 12 && (
         <div className="rounded-[24px] border border-border bg-card p-6">
-          <p className="text-sm font-semibold text-foreground">Calendario de riscos detalhado</p>
-          <p className="mt-0.5 text-xs text-muted-foreground">Frequencia de cada risco por mes nos ultimos 44 anos</p>
+          <p className="text-sm font-semibold text-foreground">{t(lang, "report.risk_calendar")}</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">{t(lang, "report.risk_frequency")}</p>
           <div className="mt-4 overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr>
-                  <th className="py-2 px-2 text-left text-xs text-muted-foreground font-medium">Risco</th>
+                  <th className="py-2 px-2 text-left text-xs text-muted-foreground font-medium">{t(lang, "report.risk_header")}</th>
                   {MONTH_NAMES_SHORT.map((m) => (
                     <th key={m} className="py-2 px-1 text-center text-xs text-muted-foreground font-medium min-w-[44px]">{m}</th>
                   ))}
@@ -872,7 +891,7 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
               <tbody>
                 {RISK_KEYS.map((key) => (
                   <tr key={key} className="border-t border-border">
-                    <td className="py-2.5 px-2 text-xs text-muted-foreground font-medium whitespace-nowrap">{RISK_LABELS[key]}</td>
+                    <td className="py-2.5 px-2 text-xs text-muted-foreground font-medium whitespace-nowrap">{riskLabels(lang)[key]}</td>
                     {report.riskCalendar.map((month, i) => (
                       <td key={i} className="py-2.5 px-1 text-center">
                         <span className={`inline-block w-full rounded py-0.5 px-0.5 text-[10px] font-semibold ${riskColor(month[key])}`}>
@@ -886,17 +905,17 @@ function CityReport({ report, onYearChange }: { report: ReportData; onYearChange
             </table>
           </div>
           <div className="flex flex-wrap gap-3 mt-3 text-[10px] text-stone-400">
-            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-emerald-100" /> Raro</span>
-            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-amber-100" /> As vezes</span>
-            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-orange-100" /> Frequente</span>
-            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-red-100" /> Quase todo ano</span>
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-emerald-100" /> {t(lang, "risk.rare")}</span>
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-amber-100" /> {t(lang, "risk.sometimes")}</span>
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-orange-100" /> {t(lang, "risk.frequent")}</span>
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-red-100" /> {t(lang, "risk.almost_every_year")}</span>
           </div>
         </div>
       )}
 
       <div className="flex justify-center">
         <Link href="/mapa" className="rounded-full border border-border bg-card px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted">
-          Abrir mapa
+          {t(lang, "report.open_map")}
         </Link>
       </div>
     </section>
@@ -922,7 +941,7 @@ function parseMonthRange(range: string): [number, number] | null {
   return [start, end];
 }
 
-function MonthTimeline({ sequence }: { sequence: { crop: string; month_range?: string; season?: string }[] }) {
+function MonthTimeline({ sequence, lang: mlang }: { sequence: { crop: string; month_range?: string; season?: string }[]; lang?: Lang }) {
   const cells: { color: string; label: string }[] = Array.from({ length: 12 }, () => ({ color: "bg-stone-100", label: "" }));
 
   sequence.forEach((seq, idx) => {
@@ -941,7 +960,7 @@ function MonthTimeline({ sequence }: { sequence: { crop: string; month_range?: s
 
   return (
     <div>
-      <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase mb-2">Ocupacao do solo — 12 meses</p>
+      <p className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase mb-2">{mlang ? t(mlang, "report.soil_12months") : "Ocupacao do solo — 12 meses"}</p>
       <div className="flex gap-0.5">
         {cells.map((cell, i) => (
           <div key={i} className="flex-1 min-w-0">
@@ -958,6 +977,7 @@ function MonthTimeline({ sequence }: { sequence: { crop: string; month_range?: s
 
 /* ── Unavailable City Notice ── */
 function UnavailableCity({ name, uf, onReset }: { name: string; uf: string; onReset: () => void }) {
+  const { lang } = useLanguage();
   return (
     <section className="mx-auto w-full max-w-2xl px-4 py-16 text-center sm:px-10">
       <div className="rounded-[24px] border border-border bg-card p-8">
@@ -969,16 +989,16 @@ function UnavailableCity({ name, uf, onReset }: { name: string; uf: string; onRe
         </div>
         <h2 className="text-xl font-semibold text-foreground">{name}, {uf}</h2>
         <p className="mt-3 text-sm text-muted-foreground">
-          Ainda nao disponivel para este municipio. No momento, apenas <strong className="text-foreground">Cruz Alta - RS</strong> esta liberada com dados completos de satelite.
+          {t(lang, "unavailable.not_available")} <strong className="text-foreground">Cruz Alta - RS</strong> {t(lang, "unavailable.is_available")}
         </p>
         <p className="mt-2 text-xs text-muted-foreground">
-          Estamos expandindo para mais municipios em breve.
+          {t(lang, "unavailable.expanding")}
         </p>
         <button
           onClick={onReset}
           className="mt-6 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
         >
-          Buscar outro municipio
+          {t(lang, "unavailable.search_another")}
         </button>
       </div>
     </section>
@@ -986,6 +1006,7 @@ function UnavailableCity({ name, uf, onReset }: { name: string; uf: string; onRe
 }
 
 export default function HomeClient() {
+  const { lang } = useLanguage();
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<Municipality[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -1208,7 +1229,7 @@ export default function HomeClient() {
 
         <div className="relative z-10 flex flex-col items-center px-4 text-center">
           <h1 className="text-[44px] font-light leading-[1.1] tracking-[-0.035em] text-stone-50 sm:text-[56px]">
-            Adapte sua lavoura<br />com dados da NASA
+            {t(lang, "hero.title_line1")}<br />{t(lang, "hero.title_line2")}
           </h1>
 
           <div className="relative mt-8 w-full max-w-md">
@@ -1221,7 +1242,7 @@ export default function HomeClient() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
               </svg>
               <span className={selectedCity ? "text-sm text-stone-100" : "text-sm text-stone-500"}>
-                {selectedCity ? `${selectedCity.name}, ${selectedCity.uf}` : "Selecione seu municipio"}
+                {selectedCity ? `${selectedCity.name}, ${selectedCity.uf}` : t(lang, "hero.select_city")}
               </span>
               <svg className="ml-auto h-4 w-4 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
@@ -1254,7 +1275,7 @@ export default function HomeClient() {
       {/* ── SATELITES PARCEIROS ── */}
       <section className="border-y border-border bg-shell py-8 overflow-hidden">
         <h2 className="text-center text-lg font-semibold tracking-[-0.01em] text-white sm:text-xl">
-          Satélites Parceiros
+          {t(lang, "hero.satellites")}
         </h2>
         <div className="relative mt-5">
           <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-shell to-transparent" />
@@ -1306,18 +1327,18 @@ export default function HomeClient() {
                 className="h-7 w-auto"
               />
               <p className="mt-4 text-sm leading-relaxed">
-                Inteligencia agricola baseada em 44 anos de dados da NASA para ajudar produtores a tomar decisoes melhores sobre rotacao de culturas e manejo do solo.
+                {t(lang, "footer.description")}
               </p>
             </div>
             <div>
-              <h4 className="text-sm font-semibold text-white">Plataforma</h4>
+              <h4 className="text-sm font-semibold text-white">{t(lang, "footer.platform")}</h4>
               <ul className="mt-3 space-y-2 text-sm">
-                <li><Link href="/" className="transition-colors hover:text-white">Inicio</Link></li>
-                <li><Link href="/mapa" className="transition-colors hover:text-white">Mapa interativo</Link></li>
+                <li><Link href="/" className="transition-colors hover:text-white">{t(lang, "footer.inicio")}</Link></li>
+                <li><Link href="/mapa" className="transition-colors hover:text-white">{t(lang, "footer.interactive_map")}</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="text-sm font-semibold text-white">Fontes de dados</h4>
+              <h4 className="text-sm font-semibold text-white">{t(lang, "footer.data_sources")}</h4>
               <ul className="mt-3 space-y-2 text-sm">
                 <li>NASA MODIS / ECOSTRESS</li>
                 <li>Sentinel-2 (ESA)</li>
@@ -1327,17 +1348,17 @@ export default function HomeClient() {
               </ul>
             </div>
             <div>
-              <h4 className="text-sm font-semibold text-white">Sobre</h4>
+              <h4 className="text-sm font-semibold text-white">{t(lang, "footer.about")}</h4>
               <ul className="mt-3 space-y-2 text-sm">
                 <li>NASA Space Apps Challenge 2026</li>
-                <li>Cruz Alta, Rio Grande do Sul</li>
-                <li>Dados abertos e gratuitos</li>
+                <li>{t(lang, "footer.cruz_alta")}</li>
+                <li>{t(lang, "footer.open_data")}</li>
               </ul>
             </div>
           </div>
           <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 sm:flex-row">
-            <p className="text-xs">Stella Root — NASA Space Apps 2026</p>
-            <p className="text-xs">Dados de satelites publicos. Uso educacional e agricola.</p>
+            <p className="text-xs">{t(lang, "footer.tagline")}</p>
+            <p className="text-xs">{t(lang, "footer.satellite_data")}</p>
           </div>
         </div>
       </footer>

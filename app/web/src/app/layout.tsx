@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import Navigation from "@/components/Navigation";
+import LanguageProvider from "@/components/LanguageProvider";
 import "./globals.css";
 
 const manrope = localFont({
@@ -31,11 +32,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="pt-BR" className={`${manrope.variable} h-full antialiased`} style={{ fontFamily: "var(--font-manrope), ui-sans-serif, system-ui, sans-serif" }}>
       <body className="flex min-h-full flex-col bg-background text-foreground">
-        <Navigation />
-        <main className="flex-1">{children}</main>
-        <footer className="border-t border-border px-4 py-4 text-center text-[11px] text-muted-foreground">
-          Stella Root — Cruz Alta-RS | NASA Space Apps 2026
-        </footer>
+        <LanguageProvider>
+          <Navigation />
+          <main className="flex-1">{children}</main>
+          <footer className="border-t border-border px-4 py-4 text-center text-[11px] text-muted-foreground">
+            Stella Root — Cruz Alta-RS | NASA Space Apps 2026
+          </footer>
+        </LanguageProvider>
       </body>
     </html>
   );

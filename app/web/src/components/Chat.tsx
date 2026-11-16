@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import { useLanguage, t } from "@/lib/i18n";
 
 type Message = {
   id: string;
@@ -27,6 +28,7 @@ function getAnonymousId(): string {
 }
 
 export default function Chat() {
+  const { lang } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
@@ -160,7 +162,7 @@ export default function Chat() {
               setMessages((prev) =>
                 prev.map((m) =>
                   m.id === assistantId
-                    ? { ...m, content: "Erro: " + payload.error }
+                    ? { ...m, content: t(lang, "chat.error_prefix") + payload.error }
                     : m
                 )
               );
@@ -173,7 +175,7 @@ export default function Chat() {
       setMessages((prev) =>
         prev.map((m) =>
           m.id === assistantId
-            ? { ...m, content: "Erro ao conectar. Tente novamente." }
+            ? { ...m, content: t(lang, "chat.error_connect") }
             : m
         )
       );
@@ -201,7 +203,7 @@ export default function Chat() {
       <button
         onClick={() => setIsOpen(true)}
         className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg transition-transform hover:scale-105"
-        aria-label="Abrir chat com agronomo"
+        aria-label={t(lang, "chat.open")}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -227,7 +229,7 @@ export default function Chat() {
         <div className="flex items-center gap-2">
           <div className="h-2 w-2 rounded-full bg-emerald-500" />
           <span className="text-sm font-semibold text-text-primary">
-            Agronomo IA
+            {t(lang, "chat.ai_agronomist")}
           </span>
         </div>
         <div className="flex items-center gap-1">
@@ -237,7 +239,7 @@ export default function Chat() {
               setShowSessions(!showSessions);
             }}
             className="rounded-md p-1.5 text-text-muted transition-colors hover:bg-surface hover:text-text-primary"
-            title="Conversas anteriores"
+            title={t(lang, "chat.previous")}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -257,7 +259,7 @@ export default function Chat() {
           <button
             onClick={handleNewChat}
             className="rounded-md p-1.5 text-text-muted transition-colors hover:bg-surface hover:text-text-primary"
-            title="Nova conversa"
+            title={t(lang, "chat.new")}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -277,7 +279,7 @@ export default function Chat() {
           <button
             onClick={() => setIsOpen(false)}
             className="rounded-md p-1.5 text-text-muted transition-colors hover:bg-surface hover:text-text-primary"
-            title="Fechar"
+            title={t(lang, "chat.close")}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -301,10 +303,10 @@ export default function Chat() {
       {showSessions && (
         <div className="border-b border-border bg-surface-alt p-3">
           <p className="mb-2 text-xs font-medium text-text-muted">
-            Conversas recentes
+            {t(lang, "chat.recent")}
           </p>
           {sessions.length === 0 ? (
-            <p className="text-xs text-text-dim">Nenhuma conversa ainda.</p>
+            <p className="text-xs text-text-dim">{t(lang, "chat.no_conversations")}</p>
           ) : (
             <div className="flex max-h-32 flex-col gap-1 overflow-y-auto">
               {sessions.map((s) => (
@@ -313,7 +315,7 @@ export default function Chat() {
                   onClick={() => loadSession(s.id)}
                   className="rounded-md px-2 py-1.5 text-left text-xs text-text-secondary transition-colors hover:bg-surface"
                 >
-                  {s.title ?? "Sem titulo"}
+                  {s.title ?? t(lang, "chat.no_title")}
                 </button>
               ))}
             </div>
@@ -326,11 +328,10 @@ export default function Chat() {
         {messages.length === 0 && (
           <div className="flex h-full flex-col items-center justify-center gap-2 text-center">
             <p className="text-sm font-medium text-text-secondary">
-              Agronomo virtual
+              {t(lang, "chat.virtual")}
             </p>
             <p className="max-w-[260px] text-xs text-text-muted">
-              Pergunte sobre rotacao de culturas, cobertura de solo,
-              clima ou qualquer decisao agricola para sua propriedade.
+              {t(lang, "chat.ask_about")}
             </p>
           </div>
         )}
@@ -368,7 +369,7 @@ export default function Chat() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Pergunte ao agronomo..."
+            placeholder={t(lang, "chat.placeholder")}
             rows={1}
             className="flex-1 resize-none rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-dim focus:border-primary focus:outline-none"
             disabled={isStreaming}
@@ -377,7 +378,7 @@ export default function Chat() {
             onClick={handleSend}
             disabled={isStreaming || !input.trim()}
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-white transition-opacity disabled:opacity-40"
-            aria-label="Enviar mensagem"
+            aria-label={t(lang, "chat.send")}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

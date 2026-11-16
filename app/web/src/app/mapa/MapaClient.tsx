@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import { useLanguage, t } from "@/lib/i18n";
 import type {
   NdviTilesData,
   TopographyData,
@@ -30,18 +31,20 @@ const LAND_USE_COLORS: Record<string, string> = {
   agricultura_geral: "#E65100",
 };
 
-const LAND_USE_LABELS: Record<string, string> = {
-  soja: "Soja",
-  urbano_outros: "Urbano/Outros",
-  floresta: "Floresta",
-  outras_lavouras: "Outras lavouras",
-  campo_nativo: "Campo nativo",
-  agua: "Agua",
-  silvicultura: "Silvicultura",
-  pastagem: "Pastagem",
-  lavoura_perene: "Lavoura perene",
-  agricultura_geral: "Agricultura geral",
-};
+function landUseLabels(lang: "pt" | "en"): Record<string, string> {
+  return {
+    soja: t(lang, "map.lu_soja"),
+    urbano_outros: t(lang, "map.lu_urbano"),
+    floresta: t(lang, "map.lu_floresta"),
+    outras_lavouras: t(lang, "map.lu_outras"),
+    campo_nativo: t(lang, "map.lu_campo"),
+    agua: t(lang, "map.lu_agua"),
+    silvicultura: t(lang, "map.lu_silvicultura"),
+    pastagem: t(lang, "map.lu_pastagem"),
+    lavoura_perene: t(lang, "map.lu_perene"),
+    agricultura_geral: t(lang, "map.lu_agri_geral"),
+  };
+}
 
 type LayerKey =
   | "relevo"
@@ -60,64 +63,24 @@ type LayerConfig = {
   zIndex: number;
 };
 
-const LAYER_CONFIGS: LayerConfig[] = [
-  {
-    key: "relevo",
-    label: "Relevo",
-    description: "SRTM 30m",
-    icon: "M",
-    zIndex: 400,
-  },
-  {
-    key: "temperatura",
-    label: "Temperatura",
-    description: "MODIS LST satelite",
-    icon: "T",
-    zIndex: 410,
-  },
-  {
-    key: "ndvi",
-    label: "NDVI",
-    description: "Sentinel-2 10m",
-    icon: "N",
-    zIndex: 420,
-  },
-  {
-    key: "precipitacao",
-    label: "Precipitacao",
-    description: "GPM IMERG satelite",
-    icon: "P",
-    zIndex: 430,
-  },
-  {
-    key: "umidade-solo",
-    label: "Umidade do Solo",
-    description: "SMAP L4 satelite",
-    icon: "U",
-    zIndex: 440,
-  },
-  {
-    key: "uso-do-solo",
-    label: "Uso do Solo",
-    description: "MapBiomas Col. 9",
-    icon: "S",
-    zIndex: 450,
-  },
-  {
-    key: "ecostress",
-    label: "ECOSTRESS",
-    description: "NASA ECOSTRESS 70m",
-    icon: "E",
-    zIndex: 455,
-  },
-];
+function layerConfigs(lang: "pt" | "en"): LayerConfig[] {
+  return [
+    { key: "relevo", label: t(lang, "map.layer_relevo"), description: "SRTM 30m", icon: "M", zIndex: 400 },
+    { key: "temperatura", label: t(lang, "map.layer_temp"), description: "MODIS LST", icon: "T", zIndex: 410 },
+    { key: "ndvi", label: "NDVI", description: "Sentinel-2 10m", icon: "N", zIndex: 420 },
+    { key: "precipitacao", label: t(lang, "map.layer_precip"), description: "GPM IMERG", icon: "P", zIndex: 430 },
+    { key: "umidade-solo", label: t(lang, "map.layer_soil"), description: "SMAP L4", icon: "U", zIndex: 440 },
+    { key: "uso-do-solo", label: t(lang, "map.layer_landuse"), description: "MapBiomas Col. 9", icon: "S", zIndex: 450 },
+    { key: "ecostress", label: "ECOSTRESS", description: "NASA ECOSTRESS 70m", icon: "E", zIndex: 455 },
+  ];
+}
 
 type LayerState = { visible: boolean; opacity: number };
 
-const MONTH_NAMES_SHORT = [
-  "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
-  "Jul", "Ago", "Set", "Out", "Nov", "Dez",
-];
+function monthNames(lang: "pt" | "en"): string[] {
+  if (lang === "en") return ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+}
 
 function elevationColor(ratio: number): string {
   const stops = [
@@ -176,6 +139,10 @@ export default function MapaClient({
   mapbiomas,
   mapTiles,
 }: Props) {
+  const { lang } = useLanguage();
+  const LAYER_CONFIGS = layerConfigs(lang);
+  const MONTH_NAMES_SHORT = monthNames(lang);
+  const LAND_USE_LABELS = landUseLabels(lang);
   const avgTmax = site.q1?.temperature_c?.avg_tmax ?? 25.4;
   const meanElev = topography.summary.mean_elevation_m;
 
@@ -863,7 +830,7 @@ export default function MapaClient({
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
             <path d="M2 4h12M2 8h12M2 12h12" />
           </svg>
-          Camadas
+          {t(lang, "map.layers")}
           {visibleCount > 0 && (
             <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
               {visibleCount}
@@ -882,7 +849,7 @@ export default function MapaClient({
               }
             }}
             className="flex h-9 w-9 items-center justify-center rounded-xl bg-card/95 text-muted-foreground shadow-lg backdrop-blur-sm transition-colors hover:text-foreground"
-            title="Resetar vista"
+            title={t(lang, "map.reset_view")}
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
               <circle cx="8" cy="8" r="3" />
@@ -892,7 +859,7 @@ export default function MapaClient({
           <button
             onClick={toggleFullscreen}
             className="flex h-9 w-9 items-center justify-center rounded-xl bg-card/95 text-muted-foreground shadow-lg backdrop-blur-sm transition-colors hover:text-foreground"
-            title={isFullscreen ? "Sair do fullscreen" : "Fullscreen"}
+            title={isFullscreen ? t(lang, "map.exit_fullscreen") : t(lang, "map.fullscreen")}
           >
             {isFullscreen ? (
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
@@ -971,7 +938,7 @@ export default function MapaClient({
                           {cfg.label}
                         </div>
                         <div className="text-[10px] leading-tight text-stone-400">
-                          {noData ? "Sem dados (rode o script GEE)" : cfg.description}
+                          {noData ? t(lang, "map.no_data") : cfg.description}
                         </div>
                       </div>
                       {!noData && (
@@ -1066,7 +1033,7 @@ export default function MapaClient({
                           : "text-stone-400"
                       }`}
                     >
-                      Mensal
+                      {t(lang, "map.monthly")}
                     </button>
                     <button
                       onClick={() => {
@@ -1079,7 +1046,7 @@ export default function MapaClient({
                           : "text-stone-400"
                       }`}
                     >
-                      Anual
+                      {t(lang, "map.yearly")}
                     </button>
                   </div>
                 )}
@@ -1141,7 +1108,7 @@ export default function MapaClient({
               <div className="mt-3 border-t border-border pt-3">
                 <div className="mb-2 flex items-center justify-between">
                   <span className="text-xs font-semibold text-foreground">
-                    Precipitacao — {MONTH_NAMES_SHORT[precipMonth - 1]}
+                    {t(lang, "map.layer_precip")} — {MONTH_NAMES_SHORT[precipMonth - 1]}
                   </span>
                   {currentPrecip && (
                     <span className="rounded-full bg-status-info-bg px-2 py-0.5 text-[10px] font-bold text-status-info">
@@ -1171,8 +1138,8 @@ export default function MapaClient({
                     ))}
                   </div>
                   <div className="mt-0.5 flex justify-between text-[8px] text-stone-400">
-                    <span>Seco</span>
-                    <span>Chuvoso</span>
+                    <span>{t(lang, "map.dry")}</span>
+                    <span>{t(lang, "map.rainy")}</span>
                   </div>
                 </div>
               </div>
@@ -1183,7 +1150,7 @@ export default function MapaClient({
               <div className="mt-3 border-t border-border pt-3">
                 <div className="mb-2 flex items-center justify-between">
                   <span className="text-xs font-semibold text-foreground">
-                    Umidade Solo — {MONTH_NAMES_SHORT[smMonth - 1]}
+                    {t(lang, "map.layer_soil")} — {MONTH_NAMES_SHORT[smMonth - 1]}
                   </span>
                   {currentSm && (
                     <span className="rounded-full bg-forest-50 px-2 py-0.5 text-[10px] font-bold text-moisture-600">
@@ -1213,8 +1180,8 @@ export default function MapaClient({
                     ))}
                   </div>
                   <div className="mt-0.5 flex justify-between text-[8px] text-stone-400">
-                    <span>Seco</span>
-                    <span>Umido</span>
+                    <span>{t(lang, "map.dry")}</span>
+                    <span>{t(lang, "map.wet")}</span>
                   </div>
                 </div>
               </div>
@@ -1262,7 +1229,7 @@ export default function MapaClient({
                 </div>
                 {currentEco && (
                   <p className="mt-1 text-[9px] text-stone-400">
-                    {currentEco.n_images} imagens | 70m resolucao
+                    {currentEco.n_images} {t(lang, "map.images")} | 70m {t(lang, "map.resolution")}
                   </p>
                 )}
               </div>
@@ -1272,7 +1239,7 @@ export default function MapaClient({
             {layers.relevo.visible && (
               <div className="mt-3 border-t border-border pt-3">
                 <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-stone-400">
-                  Elevacao
+                  {t(lang, "map.elevation")}
                 </p>
                 <div className="flex items-center gap-1">
                   <span className="text-[10px] text-muted-foreground">
@@ -1297,16 +1264,16 @@ export default function MapaClient({
             {layers.temperatura.visible && (
               <div className="mt-3 border-t border-border pt-3">
                 <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-stone-400">
-                  {hasLstTiles ? "Temperatura de superficie (LST)" : "Temperatura max. estimada"}
+                  {hasLstTiles ? t(lang, "map.surface_temp") : t(lang, "map.estimated_temp")}
                 </p>
                 <div className="flex items-center gap-1">
-                  <span className="text-[10px] text-muted-foreground">Frio</span>
+                  <span className="text-[10px] text-muted-foreground">{t(lang, "map.cold")}</span>
                   <div className="flex h-2 flex-1 overflow-hidden rounded-full">
                     {["#1E88E5", "#42A5F5", "#FDD835", "#FF9800", "#E65100"].map((c) => (
                       <div key={c} className="flex-1" style={{ backgroundColor: c }} />
                     ))}
                   </div>
-                  <span className="text-[10px] text-muted-foreground">Quente</span>
+                  <span className="text-[10px] text-muted-foreground">{t(lang, "map.hot")}</span>
                 </div>
               </div>
             )}
@@ -1315,7 +1282,7 @@ export default function MapaClient({
               <div className="mt-3 border-t border-border pt-3">
                 <div className="mb-1.5 flex items-center justify-between">
                   <p className="text-[10px] font-semibold uppercase tracking-wider text-stone-400">
-                    Uso do solo
+                    {t(lang, "map.layer_landuse")}
                     {hasMbRaster && mbYears.length > 0
                       ? ` — ${mbYears[mbYearIdx]?.year}`
                       : " — 2023"}
@@ -1361,7 +1328,7 @@ export default function MapaClient({
             {/* Info footer */}
             <div className="mt-3 border-t border-border pt-2">
               <p className="text-[9px] leading-relaxed text-stone-400">
-                Clique no mapa para ver dados do ponto. SRTM (elevacao) | MODIS LST (temperatura) | Sentinel-2 (NDVI) | GPM (precipitacao) | SMAP (umidade) | MapBiomas (uso do solo) | NASA ECOSTRESS (LST 70m)
+                {t(lang, "map.click_info")}
               </p>
             </div>
           </div>
@@ -1372,9 +1339,9 @@ export default function MapaClient({
       <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-[500] flex items-end justify-between p-3">
         <div className="pointer-events-auto rounded-full bg-card/90 px-4 py-1.5 text-[11px] text-muted-foreground shadow-lg backdrop-blur-sm">
           <span className="font-semibold text-foreground">
-            Municipio de {site.point.name}
+            {t(lang, "map.municipality_of")} {site.point.name}
           </span>{" "}
-          — {site.point.state} | Elev. media {meanElev}m | {topography.points.length} pontos topograficos
+          — {site.point.state} | {t(lang, "map.avg_elev")} {meanElev}m | {topography.points.length} {t(lang, "map.topo_points")}
         </div>
       </div>
 

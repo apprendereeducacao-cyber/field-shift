@@ -20,7 +20,7 @@ export function t(lang: Lang, key: string): string {
 
 const pt: Record<string, string> = {
   // Navigation
-  "nav.inicio": "Inicio",
+  "nav.inicio": "Início",
   "nav.mapa": "Mapa",
   "nav.fechar_menu": "Fechar menu",
   "nav.abrir_menu": "Abrir menu",
@@ -28,8 +28,8 @@ const pt: Record<string, string> = {
   // Hero
   "hero.title_line1": "Adapte sua lavoura",
   "hero.title_line2": "com dados da NASA",
-  "hero.select_city": "Selecione seu municipio",
-  "hero.satellites": "Satélites Parceiros",
+  "hero.select_city": "Selecione seu município",
+  "hero.satellites": "Satélites parceiros",
 
   // Producer form
   "form.about_farm": "Sobre sua lavoura",

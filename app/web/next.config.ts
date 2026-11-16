@@ -18,7 +18,7 @@ const securityHeaders = [
     value: [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://unpkg.com",
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://server.arcgisonline.com https://earthengine.googleapis.com https://storage.googleapis.com",
       "connect-src 'self' https://servicodados.ibge.gov.br https://earthengine.googleapis.com https://storage.googleapis.com",

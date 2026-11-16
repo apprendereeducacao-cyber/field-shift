@@ -30,7 +30,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="pt-BR" className={`${manrope.variable} h-full antialiased`} style={{ fontFamily: "var(--font-manrope), ui-sans-serif, system-ui, sans-serif" }}>
+    <html lang="en" className={`${manrope.variable} h-full antialiased`} style={{ fontFamily: "var(--font-manrope), ui-sans-serif, system-ui, sans-serif" }}>
       <body className="flex min-h-full flex-col bg-background text-foreground">
         <LanguageProvider>
           <Navigation />
